@@ -1,0 +1,78 @@
+{
+	"name": "Steam Web Tools",
+	"description": "Useful tools in Steam web sites",
+	"version": "0.2.4",
+	
+	"background": {
+        "page": "index.html"
+    },
+	"manifest_version": 2,
+	"permissions": [
+		"tabs",
+		"http://v1t.su/*"
+	],
+	
+	"icons": {
+		"128": "icons/icon-64.png",
+		"64": "icons/icon-64.png",
+		"18": "icons/icon-18.png"
+	},
+	
+	"content_scripts": [
+		{	"js": [ "includes/steam-store.js" ],
+			"matches": [
+				"https://store.steampowered.com/*",
+				"http://store.steampowered.com/*"
+			],
+			"run_at": "document_start"
+		},
+		{	"js": [ "includes/steam-store-game-page.js" ],
+			"matches": [
+				"https://store.steampowered.com/app/*",
+				"http://store.steampowered.com/app/*",
+				"https://store.steampowered.com/sub/*",
+				"http://store.steampowered.com/sub/*"
+			],
+			"run_at": "document_start"
+		},
+		{	"js": [ "includes/sendgift-page-launcher.js" ],
+			"matches": [
+				"http://store.steampowered.com/checkout/*",
+				"https://store.steampowered.com/checkout/*"
+			],
+			"run_at": "document_start"
+		},
+		{	"js": [ "includes/steamcommunity-launcher.js" ],
+			"matches": [
+				"https://steamcommunity.com/id/*",
+				"http://steamcommunity.com/id/*",
+				"https://steamcommunity.com/profiles/*",
+				"http://steamcommunity.com/profiles/*"
+			],
+			"run_at": "document_start"
+		},
+		{	"js": [ "includes/cart-page-launcher.js" ],
+			"matches": [
+				"http://store.steampowered.com/cart/*",
+				"https://store.steampowered.com/cart/*"
+			],
+			"run_at": "document_start"
+		},
+		{	"js": [ "includes/checkout-fastbuy-launcher.js" ],
+			"matches": [
+				"https://store.steampowered.com/checkout/?purchasetype=gift",
+				"http://store.steampowered.com/checkout/?purchasetype=gift"
+			],
+			"run_at": "document_start"
+		}
+	],
+	
+	"web_accessible_resources": [
+		"includes/cart-page.js",
+		"includes/checkout-fastbuy.js",
+		"includes/sendgift-page.js",
+		"includes/steamcommunity.js"
+	],
+	
+	"update_url": "http://v1t.su/projects/steam/webtools/ext-chrome-update.xml"
+}
