@@ -9,8 +9,7 @@ function init() {
 	var el = document.querySelector('#main_content > .rightcol');
 
 	links = [
-		//{href:'#', text:'Сохранить Корзину'},
-		//{href:'#', text:'Загрузить Корзину'},
+		{href:'javascript:document.cookie=\'shoppingCartGID=0; path=/\';location.href=\'/cart/\';', text:'Очистить Корзину'},
 		{href:'https://store.steampowered.com/checkout/?purchasetype=gift#fastbuy',blank:1, text:'Бысто купить в подарок со Steam Wallet'},
 	];
 
