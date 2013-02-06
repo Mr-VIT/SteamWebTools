@@ -32,15 +32,6 @@ var scripts = [
 		]
 	},
 	{
-		script:'steam-store-game-page.js',
-		include:[
-			'https://store.steampowered.com/app/',
-			'http://store.steampowered.com/app/',
-			'https://store.steampowered.com/sub/',
-			'http://store.steampowered.com/sub/',
-		]
-	},
-	{
 		script:'steamcommunity.js',
 		include:[
 			'https://steamcommunity.com/id/',
