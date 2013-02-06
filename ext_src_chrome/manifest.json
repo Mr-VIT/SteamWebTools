@@ -1,7 +1,7 @@
 {
 	"name": "Steam Web Tools",
 	"description": "Useful tools in Steam web sites",
-	"version": "0.2.5",
+	"version": "0.2.6",
 	
 	"background": {
         "page": "index.html"
@@ -19,19 +19,10 @@
 	},
 	
 	"content_scripts": [
-		{	"js": [ "includes/steam-store.js" ],
+		{	"js": [ "includes/steam-store-launcher.js" ],
 			"matches": [
 				"https://store.steampowered.com/*",
 				"http://store.steampowered.com/*"
-			],
-			"run_at": "document_start"
-		},
-		{	"js": [ "includes/steam-store-game-page.js" ],
-			"matches": [
-				"https://store.steampowered.com/app/*",
-				"http://store.steampowered.com/app/*",
-				"https://store.steampowered.com/sub/*",
-				"http://store.steampowered.com/sub/*"
 			],
 			"run_at": "document_start"
 		},
@@ -71,7 +62,8 @@
 		"includes/cart-page.js",
 		"includes/checkout-fastbuy.js",
 		"includes/sendgift-page.js",
-		"includes/steamcommunity.js"
+		"includes/steamcommunity.js",
+		"includes/steam-store.js"
 	],
 	
 	"update_url": "http://v1t.su/projects/steam/webtools/ext-chrome-update.xml"

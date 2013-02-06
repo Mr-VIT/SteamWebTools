@@ -19,17 +19,26 @@ function init(){
 
 }
 
+function includeJS(url){
+	document.getElementsByTagName('head')[0].appendChild(document.createElement('SCRIPT')).src=url;
+}
+
+
 
 function inventoryPageInit(){
 	// for subid detect
-	window.ajaxTarget = {descriptions:[]};
+	var ajaxTarget = {descriptions:[]};
 
-	window.getSubid = function(target, classid, gidGift, giftName){
-		window.ajaxTarget.element = target;
-		window.ajaxTarget.classid = classid;
-		window.ajaxTarget.gidGift = gidGift;
-		window.ajaxTarget.giftName = giftName;
-		document.getElementsByTagName('head')[0].appendChild(document.createElement('SCRIPT')).src='http://v1t.su/projects/steam/class-sub.php?jsonp=setSubID&get=sub&value='+classid;
+	window.getSubid = function(target, itemid){
+		ajaxTarget.element = target;
+		
+		var item = window.UserYou.rgContexts[753][1].inventory.rgInventory[itemid];
+
+		ajaxTarget.classid = item.classid;
+		ajaxTarget.giftId = itemid;
+		ajaxTarget.giftName = encodeURIComponent(item.name);
+		
+		includeJS('http://v1t.su/projects/steam/class-sub.php?jsonp=setSubID&get=sub&value='+item.classid);
 	}
 
 	window.setSubID=function(subid, f){
@@ -38,7 +47,7 @@ function inventoryPageInit(){
 		if (subid=="0"){
 			
 			if(window.g_bViewingOwnProfile){
-				new window.Ajax.Request( 'http://steamcommunity.com/gifts/' + window.ajaxTarget.gidGift + '/validateunpack', {
+				new window.Ajax.Request( 'http://steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
 					method: 'post',
 					parameters: { sessionid: window.g_sessionID },
 					onSuccess: function( transport ) {
@@ -53,11 +62,11 @@ function inventoryPageInit(){
 			if(f) {
 				//str+= ' (!)';
 				//send to base
-				document.getElementsByTagName('head')[0].appendChild(document.createElement('SCRIPT')).src='http://v1t.su/projects/steam/set_class-sub.php?class='+window.ajaxTarget.classid+'&sub='+subid+'&name='+window.ajaxTarget.giftName;
+				includeJS('http://v1t.su/projects/steam/set_class-sub.php?class='+ajaxTarget.classid+'&sub='+subid+'&name='+ajaxTarget.giftName);
 			}
 		}
-		window.ajaxTarget.element.outerHTML=str;
-		var ds = window.ajaxTarget.descriptions[window.ajaxTarget.classid];
+		ajaxTarget.element.outerHTML=str;
+		var ds = ajaxTarget.descriptions[ajaxTarget.classid];
 		ds[ds.length-1]={value:str};
 		ds.withSubid=true;
 	}
@@ -83,6 +92,7 @@ function inventoryPageInit(){
 	}
 	window.sendChecked = function(){
 		var url = 'http://store.steampowered.com/checkout/sendgift/';
+		// first to gid
 		for(var gid in window.checkedForSend){
 			break;
 		}
@@ -107,10 +117,10 @@ function inventoryPageInit(){
 					item.descriptions = [];
 					
 				item.descriptions.push({value:'ClassID = '+item.classid});
-				item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target,'+item.classid+', \''+item.id+'\', \''+encodeURIComponent(item.name)+'\');return false">Получить SubscriptionID</a>'});
+				item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target, \''+item.id+'\');return false">Получить SubscriptionID</a>'});
 				
-				if(!window.ajaxTarget.descriptions[item.classid])
-					window.ajaxTarget.descriptions[item.classid] = item.descriptions;
+				if(!ajaxTarget.descriptions[item.classid])
+					ajaxTarget.descriptions[item.classid] = item.descriptions;
 			
 
 				if(item.owner_actions) {
@@ -140,7 +150,6 @@ function inventoryPageInit(){
 	
 	var SelectInventory_old = window.SelectInventory;
 	window.SelectInventory = function(){
-		// do only if steam items
 
 		if (window.localStorage.hideDupGifts && !window.hiddenDupGifts[arguments[0]]) {
 
@@ -316,7 +325,7 @@ function profilePageInit(){
 	}
 	
 	// get rep status
-	document.getElementsByTagName('head')[0].appendChild(document.createElement('SCRIPT')).src='http://check.csmania.ru/api/swt9HkO2yFhf/0/repforext/'+steamid;
+	includeJS('http://check.csmania.ru/api/swt9HkO2yFhf/0/repforext/'+steamid);
 	
 	
 	
@@ -370,7 +379,7 @@ function profilePageInit(){
 	links = links.concat([
 		{
 			id:   'srch_sr',
-			href: 'http://forums.steamrep.com/search/search/?o=date&q='+steamid,
+			href: 'http://forums.steamrep.com/search/search?keywords='+steamid,
 			icon: 'http://steamrep.com/favicon.ico',
 			text: 'Искать на форумах SteamRep.com',
 		},
