@@ -1,7 +1,7 @@
 {
 	"name": "Steam Web Tools",
 	"description": "Useful tools in Steam web sites",
-	"version": "0.2.6",
+	"version": "0.2.7",
 	
 	"background": {
         "page": "index.html"

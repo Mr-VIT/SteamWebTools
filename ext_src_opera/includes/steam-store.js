@@ -50,14 +50,16 @@ function init() {
 		for(var i=0; i < els.length; i++){
 			el = els[i];
 			subid = el.value;
-			el.parentElement.parentElement.insertAdjacentHTML('beforeEnd', '<div>Subscription id = <a href="http://cdr.thebronasium.com/sub/'+subid+'">'+subid+'</a></div>');
+			el.parentElement.parentElement.insertAdjacentHTML('beforeEnd', '<div>Subscription id = <a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a></div>');
+			if(i==0){
+				el.parentElement.parentElement.insertAdjacentHTML('beforeEnd', '<div><a onclick="getPrices(event, \''+itemType+'\', '+itemId+');return false" href="#getPrices">Получить цены для других стран</a></div>');
+			} else {
+				el.parentElement.parentElement.insertAdjacentHTML('beforeEnd', '<div><a onclick="getPrices(event, \'sub\', '+subid+');return false" href="#getPrices">Получить цены для других стран этой подписки</a></div>');
+			}
 		}
 		
-		els[0].parentElement.parentElement.insertAdjacentHTML('beforeEnd', '<div><a id="aGetPrices" href="#getPrices">Получить цены для других стран</a></div>');
-		
-		document.getElementById('aGetPrices').onclick = function(e){
+		window.getPrices = function(e, itemType, itemId){
 			var el = e.target.parentElement;
-			el.innerHTML = 'Цены для других стран:</br>';
 			
 			function getPrice(cc){
 				var reqUrl = 'http://store.steampowered.com/api/';
@@ -72,7 +74,7 @@ function init() {
 				new window.Ajax.Request( reqUrl, {
 					method: 'get',
 					onSuccess: function( transport ) {
-						var s='<a href="?cc='+cc+'"><img src="http://icons.iconarchive.com/icons/famfamfam/flag/16/'+cc+'-icon.png" style="width:16px"/> '+cc.toUpperCase()+'</a> ';
+						var s='';
 						
 						if(transport.responseJSON[itemId].success){
 							var data = transport.responseJSON[itemId].data;
@@ -82,22 +84,28 @@ function init() {
 								s += '<s>'+(price.initial/100)+'</s> <span class="discount_pct">-'+price.discount_percent+'%</span> ';
 							}
 							
-							s += (price.final/100)+' '+price.currency;
+							s += '<b>'+(price.final/100)+'</b> '+price.currency;
 							
 							if(data.packages)
-								s += ' (subID:<a href="http://cdr.thebronasium.com/sub/'+data.packages[0]+'">'+data.packages[0]+'</a>)';
+								s += ' (subID:<a href="http://steamdb.info/sub/'+data.packages[0]+'">'+data.packages[0]+'</a>)';
 							
 						} else {
 							s+='NA';
 						}
-						el.innerHTML+= s+'<br/>';
+						document.querySelector('.swt_price_'+itemType+'_'+itemId+'_'+cc+'>span').innerHTML = s;
 					}
 				});
 			}
+			
+			var str = 'Цены для других стран:';
 
 			for(var i=0; i < _cc.ListA.length; i++){
+				str += '<div class="swt_price_'+itemType+'_'+itemId+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="http://icons.iconarchive.com/icons/famfamfam/flag/16/'+_cc.ListA[i]+'-icon.png" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
+			
 				getPrice(_cc.ListA[i]);
 			}
+			
+			el.innerHTML = str;
 			return false;
 		}
 		
@@ -107,12 +115,19 @@ function init() {
 			gamenameEl = document.querySelector('.apphub_AppName');
 		}
 		var gamename = encodeURIComponent(gamenameEl.textContent.trim());
-		el = document.querySelector('#main_content > .rightcol');
+		el = document.querySelector('#demo_block');
+		if(el)
+			el = el.parentElement;
+		else
+			el = document.querySelector('.share').parentElement.parentElement;
+			
 
 		links = [
+			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'http://steamdb.info/favicon.ico', text:'Посмотреть в SteamDB.info'},
 			{href:'http://steamgamesales.com/'+itemType+'/'+itemId, icon:'http://steamgamesales.com/favicon.ico', text:'Посмотреть на SteamGameSales.com'},
 			{href:'http://www.steamprices.com/ru/'+itemType+'/'+itemId, icon:'http://www.steamprices.com/favicon.png', text:'Посмотреть на SteamPrices.com'},
 			{href:'http://steammoney.com/?price=up&s='+gamename, icon:'http://steammoney.com/favicon.ico', text:'Искать на SteamMoney.com'},
+			{href:'http://plati.ru/asp/find.asp?agent=111350&searchstr='+gamename, icon:'http://plati.ru/favicon.ico', text:'Искать на Plati.ru'},
 		];
 		
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
@@ -122,7 +137,7 @@ function init() {
 };
 
 _cc = {
-	defList : 'ru us ua fr gb au',
+	defList : 'ru us ua fr de gb au br',
 	updHTMLccList : function(){
 		var s='';
 		_cc.ListA = _cc.curList.split(' ');

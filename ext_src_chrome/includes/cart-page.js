@@ -10,7 +10,7 @@ function init() {
 
 	links = [
 		{href:'javascript:document.cookie=\'shoppingCartGID=0; path=/\';location.href=\'/cart/\';', text:'Очистить Корзину'},
-		{href:'https://store.steampowered.com/checkout/?purchasetype=gift#fastbuy',blank:1, text:'Бысто купить в подарок со Steam Wallet'},
+		{href:'https://store.steampowered.com/checkout/?purchasetype=gift#fastbuy',blank:1, text:'Бысто купить в инвентарь со Steam Wallet'},
 	];
 
 	el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
@@ -31,7 +31,7 @@ function createBlock(title, links){
 </div>'+link.text+'</a>'
 	}
 
-	out+='</div></div></div>';
+	out+='Добавить SubID в корзину: <form method="post"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subid" placeholder="1"/><input type="submit" value="Добавить"></form></div></div></div>';
 
 	return out;
 }
