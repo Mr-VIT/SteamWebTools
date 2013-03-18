@@ -58,7 +58,7 @@ function inventoryPageInit(){
 			} else
 				str += 'не известно';
 		} else {
-			str += '<a href="http://cdr.thebronasium.com/sub/'+subid+'">'+subid+'</a>';
+			str += '<a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a>';
 			if(f) {
 				//str+= ' (!)';
 				//send to base
@@ -104,9 +104,8 @@ function inventoryPageInit(){
 	}
 	// END multi gifts sending
 	
-	var BuildHover_old = window.BuildHover;
-
 	// for gifts
+	var BuildHover_orig = window.BuildHover;
 	window.BuildHover = function(){
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 753)){
 			var item = arguments[1];
@@ -135,9 +134,14 @@ function inventoryPageInit(){
 				}
 			}
 		}
-		return BuildHover_old.apply(this, arguments);
+		return BuildHover_orig.apply(this, arguments);
 	}
 	
+	/* mb in future 
+	window.SellItemDialog.Show_orig = window.SellItemDialog.Show;
+	window.SellItemDialog.Show = function (item) {
+		return window.SellItemDialog.Show_orig.apply(this, arguments);
+	}*/
 	
 	//// Hide Duplicates
 	window.hiddenDupGifts = [];
