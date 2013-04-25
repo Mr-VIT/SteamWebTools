@@ -11,203 +11,12 @@ function init(){
 	if(el)
 	{
 		mainPage(el);
-	} 
-	else if (window.BuildHover) {
-		inventoryPageInit();
 	}
 
 }
 
 function includeJS(url){
 	document.getElementsByTagName('head')[0].appendChild(document.createElement('SCRIPT')).src=url;
-}
-
-
-
-function inventoryPageInit(){
-	// for subid detect
-	var ajaxTarget = {descriptions:[]};
-
-	window.getSubid = function(target, itemid){
-		ajaxTarget.element = target;
-		
-		var item = window.UserYou.rgContexts[753][1].inventory.rgInventory[itemid];
-
-		ajaxTarget.classid = item.classid;
-		ajaxTarget.giftId = itemid;
-		ajaxTarget.giftName = encodeURIComponent(item.name);
-		
-		includeJS('http://v1t.su/projects/steam/class-sub.php?jsonp=setSubID&get=sub&value='+item.classid);
-	}
-
-	window.setSubID=function(subid, f){
-		var str = 'SubscriptionID = ';
-
-		if (subid=="0"){
-			
-			if(window.g_bViewingOwnProfile){
-				new window.Ajax.Request( 'http://steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
-					method: 'post',
-					parameters: { sessionid: window.g_sessionID },
-					onSuccess: function( transport ) {
-						window.setSubID(transport.responseJSON.packageid, true);
-					}
-				});
-				return;
-			} else
-				str += 'не известно';
-		} else {
-			str += '<a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a>';
-			if(f) {
-				//str+= ' (!)';
-				//send to base
-				includeJS('http://v1t.su/projects/steam/set_class-sub.php?class='+ajaxTarget.classid+'&sub='+subid+'&name='+ajaxTarget.giftName);
-			}
-		}
-		ajaxTarget.element.outerHTML=str;
-		var ds = ajaxTarget.descriptions[ajaxTarget.classid];
-		ds[ds.length-1]={value:str};
-		ds.withSubid=true;
-	}
-
-	// multi gifts sending
-	document.body.insertAdjacentHTML("afterBegin", 
-		'<style>.checkedForSend{background:#366836!important}</style>'
-	);
-	window.checkedForSend={};
-	window.checkForSend = function(giftId){
-		var item = window.UserYou.rgContexts[753][1].inventory.rgInventory[giftId];
-		if(item.checkedForSend){
-			item.checkedForSend=false;
-			item.element.removeClassName('checkedForSend');
-			delete window.checkedForSend[giftId];
-
-		} else {
-			item.checkedForSend=true;
-			item.element.addClassName('checkedForSend');
-			
-			window.checkedForSend[giftId]=item.name;
-		}
-	}
-	window.sendChecked = function(){
-		var url = 'http://store.steampowered.com/checkout/sendgift/';
-		// first to gid
-		for(var gid in window.checkedForSend){
-			break;
-		}
-		
-		url+=gid+'#multisend='+encodeURIComponent(JSON.stringify(window.checkedForSend))
-		
-		window.location.href=url;
-		
-	}
-	// END multi gifts sending
-	
-	// for gifts
-	var BuildHover_orig = window.BuildHover;
-	window.BuildHover = function(){
-		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 753)){
-			var item = arguments[1];
-			if (!item.descriptions.withClassid && item.contextid==1) {
-				item.descriptions.withClassid=true;
-				
-				if(!item.descriptions)
-					item.descriptions = [];
-					
-				item.descriptions.push({value:'ClassID = '+item.classid});
-				item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target, \''+item.id+'\');return false">Получить SubscriptionID</a>'});
-				
-				if(!ajaxTarget.descriptions[item.classid])
-					ajaxTarget.descriptions[item.classid] = item.descriptions;
-			
-
-				if(item.owner_actions) {
-					item.owner_actions.push({
-						link:'javascript:checkForSend("%assetid%")',
-						name:'Выбрать для отправки'
-					});
-					item.owner_actions.push({
-						link:'javascript:sendChecked()',
-						name:'Отправить выбранные'
-					});
-				}
-			}
-		}
-		return BuildHover_orig.apply(this, arguments);
-	}
-	
-	/* mb in future 
-	window.SellItemDialog.Show_orig = window.SellItemDialog.Show;
-	window.SellItemDialog.Show = function (item) {
-		return window.SellItemDialog.Show_orig.apply(this, arguments);
-	}*/
-	
-	//// Hide Duplicates
-	window.hiddenDupGifts = [];
-	
-	window.UserYou.ReloadInventory_old = window.UserYou.ReloadInventory;
-	window.UserYou.ReloadInventory = function(){
-		window.hiddenDupGifts[arguments[0]] = false;
-		return window.UserYou.ReloadInventory_old.apply(this, arguments);
-	}
-	
-	var SelectInventory_old = window.SelectInventory;
-	window.SelectInventory = function(){
-
-		if (window.localStorage.hideDupGifts && !window.hiddenDupGifts[arguments[0]]) {
-
-			var inventory = window.UserYou.getInventory( arguments[0], arguments[1] );
-
-			var itemsA = [];
-
-			if(inventory.rgChildInventories) {
-				for(var x in inventory.rgChildInventories){
-					itemsA.push(inventory.rgChildInventories[x].rgInventory);
-				}
-			} else {
-				if(inventory.rgInventory)
-					itemsA.push(inventory.rgInventory);
-			}
-
-			if(itemsA.length){
-				window.hiddenDupGifts[arguments[0]] = true;
-				var items, newItems;
-				for(var i=0; i<itemsA.length; i++){
-					items = itemsA[i];
-					newItems=[];
-
-					for ( var j in items ){
-						if(items[j].is_stackable)
-							continue;
-						if(newItems[items[j].classid]){
-							newItems[items[j].classid].amount +=1;
-							delete items[j];
-						} else {
-							items[j].is_stackable = true;
-							items[j].amount = 1;
-							newItems[items[j].classid] = items[j];
-						}
-					}
-				}
-			}
-			
-		}
-
-		return SelectInventory_old.apply(this, arguments);
-	}
-
-	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((window.localStorage.hideDupGifts)?'checked="true"':'')+'/>Прятать дубликаты, показывая кол-во';
-	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
-	
-	window.onchangehidedup = function(e){
-		if(e.target.checked){
-			window.localStorage.hideDupGifts = 1
-		} else {
-			window.localStorage.removeItem('hideDupGifts')
-		}
-
-		window.location.reload();
-	};
 }
 
 function mainPage(tabContentsMyListings){
@@ -280,9 +89,9 @@ function mainPage(tabContentsMyListings){
 	var rows = window.$J('#tabContentsMyListings .market_listing_row').detach();
 	window.$J('.market_content_block.my_listing_section.market_home_listing_table').append('<div class="scrollbl_listing"></div>').click;
 	rows.prependTo("#tabContentsMyListings .scrollbl_listing");
-	
+
 	window.$J('.market_listing_cancel_button a').each(function(i, el){
-		var res = String(el.href).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i), market_name;
+		var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i), market_name;
 		if(res){
 			market_name = window.g_rgAssets[res[2]][res[3]][res[4]].market_name;
 			
@@ -291,10 +100,9 @@ function mainPage(tabContentsMyListings){
 			window.$J(el).before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
 			//window.$J(el).before('<a class="editprice" href="#editprice" data-listingid="'+res[1]+'" data-app="'+res[2]+'" data-context="'+res[3]+'" data-id="'+res[4]+'">Выставить с новой ценой</a>');
 			window.$J(el).remove();
-		
 		}
 	});
-	
+
 	/*
 	window.$J('a.editprice').click(function(){
 		$t = window.$J(this);
