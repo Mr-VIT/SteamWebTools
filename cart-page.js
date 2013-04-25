@@ -1,11 +1,13 @@
 ﻿// ==UserScript==
-// @include http://store.steampowered.com/cart/*
-// @include https://store.steampowered.com/cart/*
+// @include http://store.steampowered.com/cart*
+// @include https://store.steampowered.com/cart*
 // ==/UserScript==
 
 (function(){
 
 function init() {
+	$ = window.$J; // jQuery
+
 	var el = document.querySelector('#main_content > .rightcol');
 
 	links = [
@@ -14,6 +16,15 @@ function init() {
 	];
 
 	el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
+	
+	$('#addtocartsubids').bind('submit',function(){
+		var t = $(this);
+		var subids = t.find('input[name="subids"]').val();
+		subids = subids.split(',');
+		for (var i=0; i < subids.length; i++) {
+			t.append('<input type="hidden" name="subid[]" value="'+subids[i].trim()+'"/>')
+		}
+	})
 }
 
 	
@@ -31,7 +42,7 @@ function createBlock(title, links){
 </div>'+link.text+'</a>'
 	}
 
-	out+='Добавить SubID в корзину: <form method="post"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subid" placeholder="1"/><input type="submit" value="Добавить"></form></div></div></div>';
+	out+='Добавить SubID\'ы в корзину: <form id="addtocartsubids" method="post"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subids" placeholder="1, 2, 3"/><input type="submit" value="Добавить"></form></div></div></div>';
 
 	return out;
 }

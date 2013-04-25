@@ -39,6 +39,12 @@ var scripts = [
 			'https://steamcommunity.com/profiles/',
 			'http://steamcommunity.com/profiles/',
 		]
+	},
+	{
+		script:'market.js',
+		include:[
+			'http://steamcommunity.com/market'
+		]
 	}
 ];
 

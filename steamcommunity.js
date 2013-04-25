@@ -9,7 +9,6 @@
 (function(){
 
 function init(){
-
 	if (window.ajaxFriendUrl) {
 		profilePageInit();
 	} 
@@ -104,7 +103,7 @@ function inventoryPageInit(){
 	}
 	// END multi gifts sending
 	
-	// for gifts
+	//// for gifts
 	var BuildHover_orig = window.BuildHover;
 	window.BuildHover = function(){
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 753)){
@@ -136,6 +135,20 @@ function inventoryPageInit(){
 		}
 		return BuildHover_orig.apply(this, arguments);
 	}
+	
+	
+	//// Search on Market Button
+	var PopulateMarketActions_orig = window.PopulateMarketActions;
+	window.PopulateMarketActions = function (elActions, item) {
+		var res = PopulateMarketActions_orig.apply(this, arguments);
+		if (!item.marketable || (item.is_currency && window.CurrencyIsWalletFunds(item))) {
+			return res;
+		}
+		elActions.appendChild(window.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/search?q='+item.market_name, 'Найти на маркете'));
+	
+		return res;
+	}
+	
 	
 	/* mb in future 
 	window.SellItemDialog.Show_orig = window.SellItemDialog.Show;
@@ -329,7 +342,7 @@ function profilePageInit(){
 	}
 	
 	// get rep status
-	includeJS('http://check.csmania.ru/api/swt9HkO2yFhf/0/repforext/'+steamid);
+	includeJS('http://check.csmania.ru/api/swt9Hk02yFhf/0/repforext/'+steamid);
 	
 	
 	
@@ -338,7 +351,7 @@ function profilePageInit(){
 	// inventory gifts link
 	var el = document.querySelector('a.linkActionMinor[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ' <span class="linkActionSubtle">(<a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a>)</span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
 
 	// load hiddenMenuItems
 	try {
@@ -417,6 +430,12 @@ function profilePageInit(){
 			href: 'http://tf2outpost.com/user/'+steamid,
 			icon: 'http://tf2outpost.com/favicon.ico',
 			text: 'Трэйды на TF2OutPost.com',
+		},
+		{
+			id:   'trds_d2lng',
+			href: 'http://dota2lounge.com/profile?id='+steamid,
+			icon: 'http://dota2lounge.com/favicon.ico',
+			text: 'Трэйды на Dota2Lounge.com',
 		},
 		{
 			id:   'inv_sm',
