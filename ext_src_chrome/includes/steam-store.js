@@ -22,7 +22,7 @@ function init() {
 		}
 		var changeCCmenuHTML = '\
 		<style>#cc_menu_btn{min-width:59px;z-index:999;position:fixed;right:0;top:0;background-color:#000;opacity:0.5;}#cc_menu_btn:hover{opacity:1}#cc_list .popup_menu_item{white-space:nowrap}</style>\
-		<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="http://icons.iconarchive.com/icons/famfamfam/flag/16/'+curCC.toLowerCase()+'-icon.png" /> '+curCC:'')+' </span>\
+		<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="http://cdn.steamcommunity.com/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
 <div class="popup_block" id="cc_menu" style="display:none;">\
 <div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>\
 	<div class="popup_block" id="cc_list_edit" style="display:none;">\
@@ -100,7 +100,7 @@ function init() {
 			var str = 'Цены для других стран:';
 
 			for(var i=0; i < _cc.ListA.length; i++){
-				str += '<div class="swt_price_'+itemType+'_'+itemId+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="http://icons.iconarchive.com/icons/famfamfam/flag/16/'+_cc.ListA[i]+'-icon.png" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
+				str += '<div class="swt_price_'+itemType+'_'+itemId+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
 			
 				getPrice(_cc.ListA[i]);
 			}
@@ -142,7 +142,7 @@ _cc = {
 		var s='';
 		_cc.ListA = _cc.curList.split(' ');
 		for(var i=0; i < _cc.ListA.length; i++){
-			s += '<a class="popup_menu_item" href="'+_cc.url+_cc.ListA[i]+'"><img src="http://icons.iconarchive.com/icons/famfamfam/flag/16/'+_cc.ListA[i]+'-icon.png" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a>';
+			s += '<a class="popup_menu_item" href="'+_cc.url+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a>';
 		}
 		s += '<a class="popup_menu_item" title="Редактировать" href="#" onclick="ShowMenu(this, \'cc_list_edit\', \'right\', \'bottom\', true);return false"><img src="http://cdn.steamcommunity.com/public/images/skin_1/iconEdit.gif" style="width:16px"/></a>';
 		document.getElementById('cc_list').innerHTML=s;
