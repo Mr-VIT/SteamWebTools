@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @include https://store.steampowered.com/*
-// @include  http://store.steampowered.com/*
+// @include http://store.steampowered.com/*
 // ==/UserScript==
 
 (function(){
@@ -12,7 +12,7 @@ function init() {
 		document.cookie='birthtime=-1704124799; expires=21-Dec-2015 00:00:00 GMT; path=/';
 		window.location.reload();
 	}
-	
+
 	// cc switcher
 	var global_action_menu = document.getElementById('global_action_menu');
 	if(global_action_menu) {
@@ -128,6 +128,7 @@ function init() {
 			{href:'http://www.steamprices.com/ru/'+itemType+'/'+itemId, icon:'http://www.steamprices.com/favicon.png', text:'Посмотреть на SteamPrices.com'},
 			{href:'http://steammoney.com/?price=up&s='+gamename, icon:'http://steammoney.com/favicon.ico', text:'Искать на SteamMoney.com'},
 			{href:'http://plati.ru/asp/find.asp?agent=111350&searchstr='+gamename, icon:'http://plati.ru/favicon.ico', text:'Искать на Plati.ru'},
+			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text:'Искать на SteamPub.ru'},
 		];
 		
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));

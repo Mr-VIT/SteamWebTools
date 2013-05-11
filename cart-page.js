@@ -6,7 +6,8 @@
 (function(){
 
 function init() {
-	$ = window.$J; // jQuery
+
+	var $ = window.$J; // jQuery
 
 	var el = document.querySelector('#main_content > .rightcol');
 
@@ -16,7 +17,7 @@ function init() {
 	];
 
 	el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
-	
+
 	$('#addtocartsubids').bind('submit',function(){
 		var t = $(this);
 		var subids = t.find('input[name="subids"]').val();
