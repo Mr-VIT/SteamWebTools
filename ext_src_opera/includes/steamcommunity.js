@@ -347,9 +347,10 @@ function profilePageInit(){
 	
 	
 	// Games link - tab all games
-	document.querySelector('a.linkActionMinor[href$="games/"]').href+='?tab=all';
+	var el = document.querySelector('a.linkActionMinor[href$="games/"]');
+	if(el) el.href+='?tab=all';
 	// inventory gifts link
-	var el = document.querySelector('a.linkActionMinor[href$="inventory/"]');
+	el = document.querySelector('a.linkActionMinor[href$="inventory/"]');
 	if(el)
 		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
 
@@ -442,6 +443,12 @@ function profilePageInit(){
 			href: 'http://steammoney.com/userpage.php?id='+steamid,
 			icon: 'http://steammoney.com/favicon.ico',
 			text: 'Инвентарь SteamMoney.com',
+		},
+		{
+			id:   'inv_spub',
+			href: 'http://steampub.ru/user/'+steamid,
+			icon: 'http://steampub.ru/favicon.ico',
+			text: 'Профиль на SteamPub.ru',
 		},
 		{hr:true},
 

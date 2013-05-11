@@ -63,14 +63,13 @@ function mainPage(tabContentsMyListings){
 			if(el.checked)
 				data.push(el);
 		});
-		
+
 		function run(i){
 			if(i<data.length)
-				new window.Ajax.Request('http://steamcommunity.com/market/removelisting/', {
+				new window.Ajax.Request('http://steamcommunity.com/market/removelisting/'+window.$J(data[i]).data('listingid'), {
 					method: 'post',
 					parameters: {
 						sessionid: window.g_sessionID,
-						listingid: window.$J(data[i]).data('listingid')
 					},
 					onComplete: function() {
 						run(++i);
