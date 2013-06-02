@@ -8,10 +8,15 @@
 
 (function(){
 
+var $, steamid, profilesLinks;
 function init(){
+	$ = window.$J;
 	if (window.ajaxFriendUrl) {
 		profilePageInit();
 	} 
+	else if (window.g_rgProfileData) {
+		profileNewPageInit();
+	}
 	else if (window.BuildHover) {
 		inventoryPageInit();
 	}
@@ -22,7 +27,76 @@ function includeJS(url){
 	document.getElementsByTagName('head')[0].appendChild(document.createElement('SCRIPT')).src=url;
 }
 
+function SetRepBadges(selector){
+	document.querySelector(selector).insertAdjacentHTML('afterEnd',
+		'<a id="csmbadge" class="badge" href="http://check.csmania.ru/#steam:'+steamid+'">CSm: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a>'
+	);
+	
+	var badges = {
+		0:{
+			text : 'неизвестен',
+			color : '606060'
+		},
+		1:{
+			text : 'гарант',
+			color : '5E931B'
+		},
+		2:{
+			text : 'в белом списке',
+			color : '247E9E'
+		},
+		3:{
+			text : 'в черном списке',
+			color : '9E2424'
+		},
+		4:{
+			text : 'подозрительный',
+			color : 'B47200'
+		},
+		error:{
+			text : 'Error',
+			color : '606060'
+		}
+	};
+	
 
+	window.setRepStatus = function(res) {
+		if(!(res.csm >= 0)){
+			res.csm = error;
+		}
+		document.querySelector('#csmbadge').style.background = '#'+badges[res.csm].color;
+		document.querySelector('#csmbadge span').innerHTML = badges[res.csm].text;
+		
+		var srbcolor;
+		if(!res.srcom){
+			res.srcom = badges[0].text;
+			srbcolor = badges[0].color;
+		} else {
+			if(res.srcom.indexOf('SCAMMER')>-1){
+				srbcolor = badges[3].color;
+			} else
+			if(res.srcom.indexOf('CAUTION')>-1){
+				srbcolor = badges[4].color;
+			} else
+			if(res.srcom.indexOf('MIDDLEMAN')>-1){
+				srbcolor = badges[1].color;
+			} else
+			if((res.srcom.indexOf('TRUSTED SELLER')>-1)||(res.srcom.indexOf('ADMIN')>-1)){
+				srbcolor = badges[2].color;
+			} else {
+				srbcolor = badges[0].color;
+			}
+		}
+		
+		document.querySelector('#srbadge').style.background = '#'+srbcolor;
+		document.querySelector('#srbadge span').innerHTML = res.srcom;
+		
+	}
+	
+	// get rep status
+	includeJS('http://check.csmania.ru/api/swt9Hk02yFhf/0/repforext/'+steamid);
+	
+}
 
 function inventoryPageInit(){
 	// for subid detect
@@ -224,177 +298,8 @@ function inventoryPageInit(){
 	};
 }
 
-function profilePageInit(){
-	
-	function addLinks(links){
-		var out, tmp;
-		if (typeof links == 'string') {
-			out = links;
-		} else {
-			out='';
-			var link;
-			for (var i=0; i < links.length; i++){
-				link = links[i];
-
-				if (link.hr) {
-					if(addLinks.count)
-						out +='<hr/>';
-				} else {
-					if(link.id && (hiddenMenuItems.indexOf(link.id)>-1)){
-						continue;
-					}
-					addLinks.count++;
-					out += '<div '+(link.id ?'id="mi_'+link.id+'" ':'')+'class="actionItem"><div class="actionItemIcon"><a href="'+link.href+'">\
-		<img src="'+link.icon+'" width="16" height="16" border="0">\
-		</a></div><a class="linkActionMinor" href="'+link.href+'">'+link.text+'</a>';
-					if(link.id){
-						out += '<a href="#hide" onclick="hideMenuItem(\''+link.id+'\');return false" class="btn-hide" title="Не показывать этот пункт">[x]</a>';
-					}
-					out += '</div>';
-				}
-
-			}
-		}
-		document.querySelector('#rightActionBlock').insertAdjacentHTML("afterBegin", out);
-	}
-	addLinks.count=0;
-
-
-	var steamid = window.invitee
-	if(!steamid){
-		steamid = window.ajaxFriendUrl.split('/');
-		steamid = steamid[steamid.length-1];
-	}
-	
-	// Styles
-	document.body.insertAdjacentHTML("afterBegin", 
-		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;float:right;font-size:.7em;margin-right:10px;margin-top:1px;padding:3px;}.btn-hide{float:right;visibility:hidden}.actionItem:hover>.btn-hide{visibility:visible}</style>'
-	);
-	document.querySelector('#namehistory_link').insertAdjacentHTML('afterEnd',
-		'<a id="csmbadge" class="badge" href="http://check.csmania.ru/#steam:'+steamid+'">CSm: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a>'
-	);
-	
-	// permanent URL and names history
-	document.querySelector('#profileBlock').insertAdjacentHTML('beforeBegin', '<div><a href="http://steamcommunity.com/profiles/'+steamid+'/namehistory">Последние 10 имен</a><br/>\
-	Постоянная ссылка:<br/><a href="http://steamcommunity.com/profiles/'+steamid+'">http://steamcommunity.com/profiles/'+steamid+'</a><br/><br/></div>');
-	
-	
-	var badges = {
-		0:{
-			text : 'неизвестен',
-			color : '606060'
-		},
-		1:{
-			text : 'гарант',
-			color : '5E931B'
-		},
-		2:{
-			text : 'в белом списке',
-			color : '247E9E'
-		},
-		3:{
-			text : 'в черном списке',
-			color : '9E2424'
-		},
-		4:{
-			text : 'подозрительный',
-			color : 'B47200'
-		},
-		error:{
-			text : 'Error',
-			color : '606060'
-		}
-	};
-	
-
-	
-	window.setRepStatus = function(res) {
-		if(!(res.csm >= 0)){
-			res.csm = error;
-		}
-		document.querySelector('#csmbadge').style.background = '#'+badges[res.csm].color;
-		document.querySelector('#csmbadge span').innerHTML = badges[res.csm].text;
-		
-		var srbcolor;
-		if(!res.srcom){
-			res.srcom = badges[0].text;
-			srbcolor = badges[0].color;
-		} else {
-			if(res.srcom.indexOf('SCAMMER')>-1){
-				srbcolor = badges[3].color;
-			} else
-			if(res.srcom.indexOf('CAUTION')>-1){
-				srbcolor = badges[4].color;
-			} else
-			if(res.srcom.indexOf('MIDDLEMAN')>-1){
-				srbcolor = badges[1].color;
-			} else
-			if((res.srcom.indexOf('TRUSTED SELLER')>-1)||(res.srcom.indexOf('ADMIN')>-1)){
-				srbcolor = badges[2].color;
-			} else {
-				srbcolor = badges[0].color;
-			}
-		}
-		
-		document.querySelector('#srbadge').style.background = '#'+srbcolor;
-		document.querySelector('#srbadge span').innerHTML = res.srcom;
-		
-	}
-	
-	// get rep status
-	includeJS('http://check.csmania.ru/api/swt9Hk02yFhf/0/repforext/'+steamid);
-	
-	
-	
-	// Games link - tab all games
-	var el = document.querySelector('a.linkActionMinor[href$="games/"]');
-	if(el) el.href+='?tab=all';
-	// inventory gifts link
-	el = document.querySelector('a.linkActionMinor[href$="inventory/"]');
-	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
-
-	// load hiddenMenuItems
-	try {
-		var hiddenMenuItems = JSON.parse(window.localStorage.hiddenMenuItems);
-	} catch(err) {
-		var hiddenMenuItems = [];
-	}
-	
-	window.hideMenuItem = function(id){
-		document.querySelector('#mi_'+id).remove();
-		hiddenMenuItems.push(id);
-		window.localStorage.hiddenMenuItems=JSON.stringify(hiddenMenuItems);
-	}
-	
-	
-	// reset menu button
-	document.querySelector('.rightSectionHeader').innerHTML+='<a href="#resetmenu" onclick="resetMenu();return false" title="Восстановить меню"><img src="http://cdn.steamcommunity.com/public/images/community/icon_manage.png" style="float:right"/></a>'
-	window.resetMenu = function(){
-		delete window.localStorage.hiddenMenuItems;
-		window.location.reload();
-	}
-	
-	
-	var	links = [];
-
-	// "add friend" & "del friend"
-	if(!window.g_steamID) {
-		links.push({
-			href: 'steam://friends/add/'+steamid,
-			icon: 'http://cdn.steamcommunity.com/public/images/skin_1/iconAddFriend.png',
-			text: 'Добавить в друзья',
-		});
-		links.push({hr:true});
-	} else if(document.querySelector('#inCommon .YouAreFriends')) {
-		window.ajaxFriendUrl = "http://steamcommunity.com/actions/RemoveFriendAjax/"+steamid;
-
-		addLinks('<div class="notificationSpacer"><div id="NotificationArea" style="display:none"></div><div class="actionItem" id="AddFriendItem"><div class="actionItemIcon"><a  href="javascript:ajaxAddFriend()"><img src="http://cdn.steamcommunity.com/public/images/skin_1/iconFriends.png" width="16" height="16" border="0" /></a></div><a class="linkActionMinor " href="javascript:ajaxAddFriend()">Удалить из друзей</a></div></div>');
-		
-	}
-
-	// base links
-	links = links.concat([
+function profilePageBase(){
+	profilesLinks = [
 		{
 			id:   'srch_sr',
 			href: 'http://forums.steamrep.com/search/search?keywords='+steamid,
@@ -452,12 +357,165 @@ function profilePageInit(){
 		},
 		{hr:true},
 
-	]);
+	];
+}
+
+
+
+function profilePageInit(){
+	
+	steamid = window.invitee;
+	if(!steamid){
+		steamid = window.ajaxFriendUrl.split('/');
+		steamid = steamid[steamid.length-1];
+	}
+	profilePageBase();
+	
+	function addLinks(links){
+		var out;
+		if (typeof links == 'string') {
+			out = links;
+		} else {
+			out='';
+			var link;
+			for (var i=0; i < links.length; i++){
+				link = links[i];
+
+				if (link.hr) {
+					if(addLinks.count)
+						out +='<hr/>';
+				} else {
+					if(link.id && (hiddenMenuItems.indexOf(link.id)>-1)){
+						continue;
+					}
+					addLinks.count++;
+					out += '<div '+(link.id ?'id="mi_'+link.id+'" ':'')+'class="actionItem"><div class="actionItemIcon"><a href="'+link.href+'">\
+		<img src="'+link.icon+'" width="16" height="16" border="0">\
+		</a></div><a class="linkActionMinor" href="'+link.href+'">'+link.text+'</a>';
+					if(link.id){
+						out += '<a href="#hide" onclick="hideMenuItem(\''+link.id+'\');return false" class="btn-hide" title="Не показывать этот пункт">[x]</a>';
+					}
+					out += '</div>';
+				}
+
+			}
+		}
+		document.querySelector('#rightActionBlock').insertAdjacentHTML("afterBegin", out);
+	}
+	addLinks.count=0;
+
+
+	// Styles
+	document.body.insertAdjacentHTML("afterBegin", 
+		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;float:right;font-size:.7em;margin-right:10px;margin-top:1px;padding:3px;}.btn-hide{float:right;visibility:hidden}.actionItem:hover>.btn-hide{visibility:visible}</style>'
+	);
+	SetRepBadges('#namehistory_link');
+
+	
+	// permanent URL and names history
+	document.querySelector('#profileBlock').insertAdjacentHTML('beforeBegin', '<div><a href="http://steamcommunity.com/profiles/'+steamid+'/namehistory">Последние 10 имен</a><br/>\
+	Постоянная ссылка:<br/><a href="http://steamcommunity.com/profiles/'+steamid+'">http://steamcommunity.com/profiles/'+steamid+'</a><br/><br/></div>');
+	
+	
+	
+	// Games link - tab all games
+	var el = document.querySelector('a.linkActionMinor[href$="games/"]');
+	if(el) el.href+='?tab=all';
+	// inventory gifts link
+	el = document.querySelector('a.linkActionMinor[href$="inventory/"]');
+	if(el)
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
+
+	// load hiddenMenuItems
+	try {
+		var hiddenMenuItems = JSON.parse(window.localStorage.hiddenMenuItems);
+	} catch(err) {
+		var hiddenMenuItems = [];
+	}
+	
+	window.hideMenuItem = function(id){
+		document.querySelector('#mi_'+id).remove();
+		hiddenMenuItems.push(id);
+		window.localStorage.hiddenMenuItems=JSON.stringify(hiddenMenuItems);
+	}
+	
+	
+	// reset menu button
+	document.querySelector('.rightSectionHeader').innerHTML+='<a href="#resetmenu" onclick="resetMenu();return false" title="Восстановить меню"><img src="http://cdn.steamcommunity.com/public/images/community/icon_manage.png" style="float:right"/></a>'
+	window.resetMenu = function(){
+		delete window.localStorage.hiddenMenuItems;
+		window.location.reload();
+	}
+	
+	
+	var	links = [];
+
+	// "add friend" & "del friend"
+	if(!window.g_steamID) {
+		links.push({
+			href: 'steam://friends/add/'+steamid,
+			icon: 'http://cdn.steamcommunity.com/public/images/skin_1/iconAddFriend.png',
+			text: 'Добавить в друзья',
+		});
+		links.push({hr:true});
+	} else if(document.querySelector('#inCommon .YouAreFriends')) {
+		window.ajaxFriendUrl = "http://steamcommunity.com/actions/RemoveFriendAjax/"+steamid;
+
+		addLinks('<div class="notificationSpacer"><div id="NotificationArea" style="display:none"></div><div class="actionItem" id="AddFriendItem"><div class="actionItemIcon"><a  href="javascript:ajaxAddFriend()"><img src="http://cdn.steamcommunity.com/public/images/skin_1/iconFriends.png" width="16" height="16" border="0" /></a></div><a class="linkActionMinor " href="javascript:ajaxAddFriend()">Удалить из друзей</a></div></div>');
+		
+	}
+
+	// base links
+	links = links.concat(profilesLinks);
 
 	addLinks(links);
 
 }
 
+function profileNewPageInit(){
+
+	steamid = window.g_rgProfileData.steamid;
+
+	profilePageBase();
+
+	
+	// Styles
+	document.body.insertAdjacentHTML("afterBegin", 
+		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;margin-top:1px;padding:3px;}</style>'
+	);
+	
+	
+	$('.profile_header').append('<span id="permlink"> SteamID64: <a href="https://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> </span>');
+	
+	SetRepBadges('#permlink');
+	
+	
+	// Games link - tab all games
+	var el = document.querySelector('.profile_count_link a[href$="games/"]');
+	if(el) el.href+='?tab=all';
+	// inventory gifts link
+	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
+	if(el)
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
+		
+	
+
+	var out = '', link;
+	for (var i=0; i < profilesLinks.length; i++){
+		link = profilesLinks[i];
+
+		if (link.hr) {
+			out +='<hr/>';
+		} else {
+			out += '<a class="popup_menu_item" href="'+link.href+'"><img style="width:18px;height:18px" src="'+link.icon+'"> '+link.text+'</a>';
+		}
+
+	}
+	document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("afterBegin", out);
+
+	
+
+}
 
 var state = window.document.readyState;
 if((state == 'interactive')||(state == 'complete'))
