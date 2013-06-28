@@ -6,7 +6,7 @@
 (function(){
 
 function init() {
-	
+
 	// for age check
 	if(window.location.pathname.indexOf('/agecheck')==0){
 		document.cookie='birthtime=-1704124799; expires=21-Dec-2015 00:00:00 GMT; path=/';
@@ -130,6 +130,10 @@ function init() {
 			{href:'http://plati.ru/asp/find.asp?agent=111350&searchstr='+gamename, icon:'http://plati.ru/favicon.ico', text:'Искать на Plati.ru'},
 			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text:'Искать на SteamPub.ru'},
 		];
+		
+		if(itemType=='app'){
+			links.push({href:'http://steamcommunity.com/my/gamecards/'+itemId, icon:'http://cdn.steamcommunity.com/public/images/skin_1/notification_icon_guide.png', text:'Посмотреть мои карты этой игры'})
+		}
 		
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
 	}
