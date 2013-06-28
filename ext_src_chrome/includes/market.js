@@ -94,8 +94,6 @@ function mainPage(tabContentsMyListings){
 		if(res){
 			market_name = window.g_rgAssets[res[2]][res[3]][res[4]].market_name;
 			
-			window.$J('#mylisting_'+res[1]+'_name').before('<a target="_blank" href="http://steamcommunity.com/market/search?q=appid%3A'+res[2]+'+'+encodeURIComponent(market_name)+'"><img src="http://cdn.steamcommunity.com/public/images/economy/search_icon.gif"></a> ');
-			
 			window.$J(el).before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
 			//window.$J(el).before('<a class="editprice" href="#editprice" data-listingid="'+res[1]+'" data-app="'+res[2]+'" data-context="'+res[3]+'" data-id="'+res[4]+'">Выставить с новой ценой</a>');
 			window.$J(el).remove();

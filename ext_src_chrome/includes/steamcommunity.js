@@ -7,10 +7,11 @@
 
 
 (function(){
-
 var $, steamid, profilesLinks;
 function init(){
+
 	$ = window.$J;
+	
 	if (window.ajaxFriendUrl) {
 		profilePageInit();
 	} 
@@ -146,7 +147,7 @@ function inventoryPageInit(){
 
 	// multi gifts sending
 	document.body.insertAdjacentHTML("afterBegin", 
-		'<style>.checkedForSend{background:#366836!important}</style>'
+		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#075007;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}#inventory_logos{display:none}</style>'
 	);
 	window.checkedForSend={};
 	window.checkForSend = function(giftId){
@@ -177,7 +178,7 @@ function inventoryPageInit(){
 	}
 	// END multi gifts sending
 	
-	//// for gifts
+	//// action for gifts and tf2 items
 	var BuildHover_orig = window.BuildHover;
 	window.BuildHover = function(){
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 753)){
@@ -207,6 +208,17 @@ function inventoryPageInit(){
 				}
 			}
 		}
+		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 440)){
+			var item = arguments[1];
+			if (item.actions.swt!=1) {
+				item.actions.swt=1;
+				item.actions.push({
+					link:'http://backpack.tf/stats/'+item.app_data.def_index+'/'+item.app_data.quality+'/0',
+					name:'Цена предмета'
+				});
+				
+			}
+		}
 		return BuildHover_orig.apply(this, arguments);
 	}
 	
@@ -231,25 +243,31 @@ function inventoryPageInit(){
 	}*/
 	
 	//// Hide Duplicates
-	window.hiddenDupGifts = [];
-	
 	window.UserYou.ReloadInventory_old = window.UserYou.ReloadInventory;
 	window.UserYou.ReloadInventory = function(){
 		window.hiddenDupGifts[arguments[0]] = false;
 		return window.UserYou.ReloadInventory_old.apply(this, arguments);
 	}
 	
-	var SelectInventory_old = window.SelectInventory;
-	window.SelectInventory = function(){
+	var SelectInventoryFromUser_old = window.SelectInventoryFromUser;
+	window.SelectInventoryFromUser = function(){
+		var appid = arguments[1];
+		var contextid = arguments[2];
 
-		if (window.localStorage.hideDupGifts && !window.hiddenDupGifts[arguments[0]]) {
-
-			var inventory = window.UserYou.getInventory( arguments[0], arguments[1] );
-
+		var inventory = window.UserYou.getInventory( appid, contextid );
+		if (window.localStorage.hideDupGifts && !inventory._hiddenDup) {
+			inventory.BuildItemElement_old = inventory.BuildItemElement;
+			inventory.BuildItemElement = function(){
+				var el = inventory.BuildItemElement_old.apply(this, arguments);
+				el.innerHTML+='<div class="itemcount">x'+el.rgItem._amount+'</div>'
+				return el;
+			}
+			
 			var itemsA = [];
-
+			
 			if(inventory.rgChildInventories) {
 				for(var x in inventory.rgChildInventories){
+					inventory.rgChildInventories[x].BuildItemElement = inventory.BuildItemElement;
 					itemsA.push(inventory.rgChildInventories[x].rgInventory);
 				}
 			} else {
@@ -258,21 +276,21 @@ function inventoryPageInit(){
 			}
 
 			if(itemsA.length){
-				window.hiddenDupGifts[arguments[0]] = true;
+				inventory._hiddenDup = true;
 				var items, newItems;
 				for(var i=0; i<itemsA.length; i++){
 					items = itemsA[i];
 					newItems=[];
 
 					for ( var j in items ){
-						if(items[j].is_stackable)
+						if(items[j]._is_stackable)
 							continue;
 						if(newItems[items[j].classid]){
-							newItems[items[j].classid].amount +=1;
+							newItems[items[j].classid]._amount +=1;
 							delete items[j];
 						} else {
-							items[j].is_stackable = true;
-							items[j].amount = 1;
+							items[j]._is_stackable = true;
+							items[j]._amount = 1;
 							newItems[items[j].classid] = items[j];
 						}
 					}
@@ -281,9 +299,10 @@ function inventoryPageInit(){
 			
 		}
 
-		return SelectInventory_old.apply(this, arguments);
+		return SelectInventoryFromUser_old.apply(this, arguments);
 	}
 
+	
 	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((window.localStorage.hideDupGifts)?'checked="true"':'')+'/>Прятать дубликаты, показывая кол-во';
 	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
 	
@@ -481,13 +500,38 @@ function profileNewPageInit(){
 	
 	// Styles
 	document.body.insertAdjacentHTML("afterBegin", 
-		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;margin-top:1px;padding:3px;}</style>'
+		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;margin-top:1px;padding:3px;}#swt_info{position:absolute;top:201px}</style>'
 	);
 	
 	
-	$('.profile_header').append('<span id="permlink"> SteamID64: <a href="https://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> </span>');
+	$('.profile_header').append('<div id="swt_info"><span id="permlink"> SteamID64: <a href="http://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> </span> <a href="#getMoreInfo" onclick="getMoreInfo();return false">Get more info</a></div>');
+	
 	
 	SetRepBadges('#permlink');
+	window.getMoreInfo = function() {
+		var Modal = window.ShowDialog('Extended Info', $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
+		window.setTimeout(function(){Modal.AdjustSizing();},1);
+		$.ajax({
+			url: '/profiles/'+steamid+'?xml=1',
+			context: document.body,
+			dataType: 'xml'
+		}).done(function(responseText, textStatus, xhr) {
+			var xml = $(xhr.responseXML);
+			var isLimitedAccount = xml.find('isLimitedAccount').text();
+			var tradeBanState = xml.find('tradeBanState').text();
+			var vacBanned = xml.find('vacBanned').text();
+			var accCrDate = xml.find('memberSince').text();
+			$('#swtexinfo').html(
+				'<table>'+
+				'<tr><td><b>Registration date</b></td><td>'+accCrDate+'</td>'+
+				'<tr><td><b>VAC</b></td><td>'+(vacBanned=='0'?'Clear':'Banned')+'</td>'+
+				'<tr><td><b>Trade Ban</b></td><td>'+tradeBanState+'</td>'+
+				'<tr><td><b>Is Limited Account</b></td><td>'+(vacBanned=='0'?'No':'Yes')+'</td>'+
+				'</table>'
+			);
+			window.setTimeout(function(){Modal.AdjustSizing();},1);
+		});
+	};
 	
 	
 	// Games link - tab all games
@@ -511,9 +555,12 @@ function profileNewPageInit(){
 		}
 
 	}
-	document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("afterBegin", out);
+	try {
+		document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("afterBegin", out);
+	} catch(err) {
+		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>More <img src="http://cdn.steamcommunity.com/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
+	}
 
-	
 
 }
 
