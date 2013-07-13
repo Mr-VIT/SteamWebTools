@@ -245,7 +245,7 @@ function inventoryPageInit(){
 	//// Hide Duplicates
 	window.UserYou.ReloadInventory_old = window.UserYou.ReloadInventory;
 	window.UserYou.ReloadInventory = function(){
-		window.hiddenDupGifts[arguments[0]] = false;
+		this._hiddenDup = false;
 		return window.UserYou.ReloadInventory_old.apply(this, arguments);
 	}
 	
@@ -255,7 +255,9 @@ function inventoryPageInit(){
 		var contextid = arguments[2];
 
 		var inventory = window.UserYou.getInventory( appid, contextid );
-		if (window.localStorage.hideDupGifts && !inventory._hiddenDup) {
+		if (window.localStorage.hideDupItems && !inventory._hiddenDup) {
+		
+			// display count
 			inventory.BuildItemElement_old = inventory.BuildItemElement;
 			inventory.BuildItemElement = function(){
 				var el = inventory.BuildItemElement_old.apply(this, arguments);
@@ -267,7 +269,7 @@ function inventoryPageInit(){
 			
 			if(inventory.rgChildInventories) {
 				for(var x in inventory.rgChildInventories){
-					inventory.rgChildInventories[x].BuildItemElement = inventory.BuildItemElement;
+					inventory.rgChildInventories[x].BuildItemElement = inventory.BuildItemElement; // display count
 					itemsA.push(inventory.rgChildInventories[x].rgInventory);
 				}
 			} else {
@@ -283,14 +285,16 @@ function inventoryPageInit(){
 					newItems=[];
 
 					for ( var j in items ){
-						if(items[j]._is_stackable)
+						if(items[j]._is_stackable || items[j].is_stackable)
 							continue;
 						if(newItems[items[j].classid]){
 							newItems[items[j].classid]._amount +=1;
+							newItems[items[j].classid]._ids.push(items[j].id);
 							delete items[j];
 						} else {
 							items[j]._is_stackable = true;
 							items[j]._amount = 1;
+							items[j]._ids = [items[j].id];
 							newItems[items[j].classid] = items[j];
 						}
 					}
@@ -303,18 +307,76 @@ function inventoryPageInit(){
 	}
 
 	
-	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((window.localStorage.hideDupGifts)?'checked="true"':'')+'/>Прятать дубликаты, показывая кол-во';
+	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((window.localStorage.hideDupItems)?'checked="true"':'')+'/>Прятать дубликаты, показывая кол-во';
 	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
 	
 	window.onchangehidedup = function(e){
 		if(e.target.checked){
-			window.localStorage.hideDupGifts = 1
+			window.localStorage.hideDupItems = 1
 		} else {
-			window.localStorage.removeItem('hideDupGifts')
+			window.localStorage.removeItem('hideDupItems')
 		}
 
 		window.location.reload();
 	};
+	
+	//// multisell
+	if(window.localStorage.hideDupItems){
+		var SellCurrentSelection_old = window.SellCurrentSelection;
+		window.SellCurrentSelection = function(){
+			var count = window.g_ActiveInventory.selectedItem._amount;
+			if(count>1) {
+				var amount =  parseInt(prompt('Сколько продавать? из '+count, '1')) || 1;
+				if (amount>count)
+					amount=count;
+
+				if(amount>1){
+					window.SellItemDialog._amount=amount;
+					window.SellItemDialog._itemNum=0;
+					window.SellItemDialog.OnConfirmationAccept_new = function(event){
+						window.$('market_sell_dialog_ok').stopObserving();
+
+						window.$('market_sell_dialog_error').hide();
+						window.$('market_sell_dialog_ok').fade({ duration: 0.25 });
+						window.$('market_sell_dialog_back').fade({ duration: 0.25 });
+						window.$('market_sell_dialog_throbber').show();
+						window.$('market_sell_dialog_throbber').fade({ duration: 0.25, from: 0, to: 1 });
+						
+						window.SellItemDialog.m_item.id=window.SellItemDialog.m_item._ids[window.SellItemDialog._itemNum];
+						window.SellItemDialog._itemNum++;
+						
+						new window.Ajax.Request( 'http://steamcommunity.com/market/sellitem/', {
+								method: 'post',
+								parameters: {
+									sessionid: window.g_sessionID,
+									appid: window.SellItemDialog.m_item.appid,
+									contextid: window.SellItemDialog.m_item.contextid,
+									assetid: window.SellItemDialog.m_item.id,
+									amount: window.SellItemDialog.m_nConfirmedQuantity,
+									price: window.SellItemDialog.m_nConfirmedPrice
+								},
+								onSuccess: function( transport ) {
+									alert('Выствлен №'+window.SellItemDialog._itemNum);
+									if(window.SellItemDialog._itemNum>=window.SellItemDialog._amount)
+										SellItemDialog.OnSuccess( transport );
+									else {
+										return window.SellItemDialog.OnConfirmationAccept_new.apply(window.SellItemDialog, arguments);
+									}
+								},
+								onFailure: function( transport ) { window.SellItemDialog.OnFailure( transport ); }
+						} );
+
+						event.stop();
+						
+					}
+					window.$J('#market_sell_dialog_ok').click(window.SellItemDialog.OnConfirmationAccept_new);
+				}
+			}
+			return SellCurrentSelection_old.apply(this, arguments);
+		}
+		
+	}
+	
 }
 
 function profilePageBase(){
@@ -512,7 +574,7 @@ function profileNewPageInit(){
 		var Modal = window.ShowDialog('Extended Info', $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
 		window.setTimeout(function(){Modal.AdjustSizing();},1);
 		$.ajax({
-			url: '/profiles/'+steamid+'?xml=1',
+			url: window.location.href+'?xml=1',
 			context: document.body,
 			dataType: 'xml'
 		}).done(function(responseText, textStatus, xhr) {
@@ -530,6 +592,8 @@ function profileNewPageInit(){
 				'</table>'
 			);
 			window.setTimeout(function(){Modal.AdjustSizing();},1);
+		}).fail(function(){
+			$('#swtexinfo').html('Request Error / Ошибка при получении данных')
 		});
 	};
 	

@@ -1,7 +1,7 @@
 {
 	"name": "Steam Web Tools",
 	"description": "Useful tools in Steam web sites",
-	"version": "0.3.3",
+	"version": "0.4",
 	
 	"background": {
         "page": "index.html"
@@ -39,7 +39,8 @@
 				"https://steamcommunity.com/profiles/*",
 				"http://steamcommunity.com/profiles/*"
 			],
-			"run_at": "document_start"
+			"run_at": "document_start",
+			"all_frames": true
 		},
 		{	"js": [ "includes/cart-page-launcher.js" ],
 			"matches": [
