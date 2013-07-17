@@ -7,15 +7,12 @@
 
 
 (function(){
-var $, steamid, profilesLinks;
+var $, steamid;
 function init(){
 
 	$ = window.$J;
 	
-	if (window.ajaxFriendUrl) {
-		profilePageInit();
-	} 
-	else if (window.g_rgProfileData) {
+	if (window.g_rgProfileData) {
 		profileNewPageInit();
 	}
 	else if (window.BuildHover) {
@@ -134,8 +131,7 @@ function inventoryPageInit(){
 		} else {
 			str += '<a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a>';
 			if(f) {
-				//str+= ' (!)';
-				//send to base
+				//send to base | Please do not spam!
 				includeJS('http://v1t.su/projects/steam/set_class-sub.php?class='+ajaxTarget.classid+'&sub='+subid+'&name='+ajaxTarget.giftName);
 			}
 		}
@@ -151,17 +147,37 @@ function inventoryPageInit(){
 	);
 	window.checkedForSend={};
 	window.checkForSend = function(giftId){
-		var item = window.UserYou.rgContexts[753][1].inventory.rgInventory[giftId];
+		var item = window.g_ActiveInventory.selectedItem;
 		if(item.checkedForSend){
 			item.checkedForSend=false;
 			item.element.removeClassName('checkedForSend');
-			delete window.checkedForSend[giftId];
+			if(item._amount>1){
+				for(var i=0;i<item._amount;i++){
+					delete window.checkedForSend[item._ids[i]];
+				}
+			} else {
+				delete window.checkedForSend[giftId];	
+			}
 
 		} else {
+			var amount = 1;
+			if(item._amount>1) {
+				amount =  parseInt(prompt('Сколько выбрать? из '+item._amount, '1')) || 1;
+				if (amount>item._amount)
+					amount=item._amount;
+			}
+			if(amount>1){
+				for(var i=0;i<amount;i++){
+					window.checkedForSend[item._ids[i]]=item.name;
+				}
+			} else {
+				window.checkedForSend[giftId]=item.name;
+			}
+		
 			item.checkedForSend=true;
 			item.element.addClassName('checkedForSend');
 			
-			window.checkedForSend[giftId]=item.name;
+			
 		}
 	}
 	window.sendChecked = function(){
@@ -235,12 +251,6 @@ function inventoryPageInit(){
 		return res;
 	}
 	
-	
-	/* mb in future 
-	window.SellItemDialog.Show_orig = window.SellItemDialog.Show;
-	window.SellItemDialog.Show = function (item) {
-		return window.SellItemDialog.Show_orig.apply(this, arguments);
-	}*/
 	
 	//// Hide Duplicates
 	window.UserYou.ReloadInventory_old = window.UserYou.ReloadInventory;
@@ -320,6 +330,9 @@ function inventoryPageInit(){
 		window.location.reload();
 	};
 	
+	//// sell dialog accept ssa checked
+	$('#market_sell_dialog_accept_ssa')[0].checked=true;
+	
 	//// multisell
 	if(window.localStorage.hideDupItems){
 		var SellCurrentSelection_old = window.SellCurrentSelection;
@@ -356,9 +369,9 @@ function inventoryPageInit(){
 									price: window.SellItemDialog.m_nConfirmedPrice
 								},
 								onSuccess: function( transport ) {
-									alert('Выствлен №'+window.SellItemDialog._itemNum);
+									$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text('Выствлен №'+window.SellItemDialog._itemNum);
 									if(window.SellItemDialog._itemNum>=window.SellItemDialog._amount)
-										SellItemDialog.OnSuccess( transport );
+										window.SellItemDialog.OnSuccess( transport );
 									else {
 										return window.SellItemDialog.OnConfirmationAccept_new.apply(window.SellItemDialog, arguments);
 									}
@@ -379,8 +392,11 @@ function inventoryPageInit(){
 	
 }
 
-function profilePageBase(){
-	profilesLinks = [
+function profileNewPageInit(){
+
+	steamid = window.g_rgProfileData.steamid;
+
+	var profilesLinks = [
 		{
 			id:   'srch_sr',
 			href: 'http://forums.steamrep.com/search/search?keywords='+steamid,
@@ -409,13 +425,13 @@ function profilePageBase(){
 		{
 			id:   'inv_tf2op',
 			href: 'http://tf2outpost.com/id/'+steamid,
-			icon: 'http://tf2outpost.com/favicon.ico',
+			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
 			text: 'Инвентарь TF2OutPost.com',
 		},
 		{
 			id:   'trds_tf2op',
 			href: 'http://tf2outpost.com/user/'+steamid,
-			icon: 'http://tf2outpost.com/favicon.ico',
+			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
 			text: 'Трэйды на TF2OutPost.com',
 		},
 		{
@@ -439,125 +455,6 @@ function profilePageBase(){
 		{hr:true},
 
 	];
-}
-
-
-
-function profilePageInit(){
-	
-	steamid = window.invitee;
-	if(!steamid){
-		steamid = window.ajaxFriendUrl.split('/');
-		steamid = steamid[steamid.length-1];
-	}
-	profilePageBase();
-	
-	function addLinks(links){
-		var out;
-		if (typeof links == 'string') {
-			out = links;
-		} else {
-			out='';
-			var link;
-			for (var i=0; i < links.length; i++){
-				link = links[i];
-
-				if (link.hr) {
-					if(addLinks.count)
-						out +='<hr/>';
-				} else {
-					if(link.id && (hiddenMenuItems.indexOf(link.id)>-1)){
-						continue;
-					}
-					addLinks.count++;
-					out += '<div '+(link.id ?'id="mi_'+link.id+'" ':'')+'class="actionItem"><div class="actionItemIcon"><a href="'+link.href+'">\
-		<img src="'+link.icon+'" width="16" height="16" border="0">\
-		</a></div><a class="linkActionMinor" href="'+link.href+'">'+link.text+'</a>';
-					if(link.id){
-						out += '<a href="#hide" onclick="hideMenuItem(\''+link.id+'\');return false" class="btn-hide" title="Не показывать этот пункт">[x]</a>';
-					}
-					out += '</div>';
-				}
-
-			}
-		}
-		document.querySelector('#rightActionBlock').insertAdjacentHTML("afterBegin", out);
-	}
-	addLinks.count=0;
-
-
-	// Styles
-	document.body.insertAdjacentHTML("afterBegin", 
-		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;float:right;font-size:.7em;margin-right:10px;margin-top:1px;padding:3px;}.btn-hide{float:right;visibility:hidden}.actionItem:hover>.btn-hide{visibility:visible}</style>'
-	);
-	SetRepBadges('#namehistory_link');
-
-	
-	// permanent URL and names history
-	document.querySelector('#profileBlock').insertAdjacentHTML('beforeBegin', '<div><a href="http://steamcommunity.com/profiles/'+steamid+'/namehistory">Последние 10 имен</a><br/>\
-	Постоянная ссылка:<br/><a href="http://steamcommunity.com/profiles/'+steamid+'">http://steamcommunity.com/profiles/'+steamid+'</a><br/><br/></div>');
-	
-	
-	
-	// Games link - tab all games
-	var el = document.querySelector('a.linkActionMinor[href$="games/"]');
-	if(el) el.href+='?tab=all';
-	// inventory gifts link
-	el = document.querySelector('a.linkActionMinor[href$="inventory/"]');
-	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
-
-	// load hiddenMenuItems
-	try {
-		var hiddenMenuItems = JSON.parse(window.localStorage.hiddenMenuItems);
-	} catch(err) {
-		var hiddenMenuItems = [];
-	}
-	
-	window.hideMenuItem = function(id){
-		document.querySelector('#mi_'+id).remove();
-		hiddenMenuItems.push(id);
-		window.localStorage.hiddenMenuItems=JSON.stringify(hiddenMenuItems);
-	}
-	
-	
-	// reset menu button
-	document.querySelector('.rightSectionHeader').innerHTML+='<a href="#resetmenu" onclick="resetMenu();return false" title="Восстановить меню"><img src="http://cdn.steamcommunity.com/public/images/community/icon_manage.png" style="float:right"/></a>'
-	window.resetMenu = function(){
-		delete window.localStorage.hiddenMenuItems;
-		window.location.reload();
-	}
-	
-	
-	var	links = [];
-
-	// "add friend" & "del friend"
-	if(!window.g_steamID) {
-		links.push({
-			href: 'steam://friends/add/'+steamid,
-			icon: 'http://cdn.steamcommunity.com/public/images/skin_1/iconAddFriend.png',
-			text: 'Добавить в друзья',
-		});
-		links.push({hr:true});
-	} else if(document.querySelector('#inCommon .YouAreFriends')) {
-		window.ajaxFriendUrl = "http://steamcommunity.com/actions/RemoveFriendAjax/"+steamid;
-
-		addLinks('<div class="notificationSpacer"><div id="NotificationArea" style="display:none"></div><div class="actionItem" id="AddFriendItem"><div class="actionItemIcon"><a  href="javascript:ajaxAddFriend()"><img src="http://cdn.steamcommunity.com/public/images/skin_1/iconFriends.png" width="16" height="16" border="0" /></a></div><a class="linkActionMinor " href="javascript:ajaxAddFriend()">Удалить из друзей</a></div></div>');
-		
-	}
-
-	// base links
-	links = links.concat(profilesLinks);
-
-	addLinks(links);
-
-}
-
-function profileNewPageInit(){
-
-	steamid = window.g_rgProfileData.steamid;
-
-	profilePageBase();
 
 	
 	// Styles
@@ -598,13 +495,19 @@ function profileNewPageInit(){
 	};
 	
 	
+	// PM buttons
+	try {
+		var pm_btn = $('.profile_header_actions>a.btn_profile_action[href^="javascript:LaunchWebChat"]')[0];
+		pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">Chat: Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
+	} catch(e) {};
+	
 	// Games link - tab all games
 	var el = document.querySelector('.profile_count_link a[href$="games/"]');
 	if(el) el.href+='?tab=all';
 	// inventory gifts link
 	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img src="http://cdn.store.steampowered.com/public/images/ico/ico_cards.gif"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
 		
 	
 
