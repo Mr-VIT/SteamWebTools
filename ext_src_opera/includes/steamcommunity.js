@@ -11,14 +11,36 @@ var $, steamid;
 function init(){
 
 	$ = window.$J;
-	
 	if (window.g_rgProfileData) {
 		profileNewPageInit();
 	}
 	else if (window.BuildHover) {
 		inventoryPageInit();
 	}
+	else if (window.location.pathname.indexOf('/badges')>-1){
+		badgesPageInit();
+	}
+	else if (/\/gamecards\/\d+/.test(window.location.pathname)){
+		gamecardsPageInit();
+	}
+}
 
+
+function gamecardsPageInit(){
+	$('.badge_card_to_collect_info>.badge_card_set_text:nth-child(1)').each(function(i,el){
+		$(el).append(' <b>:: <a href="/market/search?q=appid%3A753+card+'+el.innerHTML+'">найти на маркете</a></b>');
+	})
+}
+
+function badgesPageInit(){
+	$('.profile_badges_sortoptions').append('<a href="#" onclick="showWithDrop()">Показать с невыпавшими картами</a>');
+	window.showWithDrop=function(){
+		$('.badge_row').filter(function(i,el){
+			return !($('a.btn_green_white_innerfade',el).length)
+		}).remove()
+		return false;
+	}
+	
 }
 
 function includeJS(url){
@@ -162,7 +184,7 @@ function inventoryPageInit(){
 		} else {
 			var amount = 1;
 			if(item._amount>1) {
-				amount =  parseInt(prompt('Сколько выбрать? из '+item._amount, '1')) || 1;
+				amount =  parseInt(prompt('Сколько выбрать? из '+item._amount, item._amount)) || 1;
 				if (amount>item._amount)
 					amount=item._amount;
 			}
@@ -243,10 +265,11 @@ function inventoryPageInit(){
 	var PopulateMarketActions_orig = window.PopulateMarketActions;
 	window.PopulateMarketActions = function (elActions, item) {
 		var res = PopulateMarketActions_orig.apply(this, arguments);
-		if (!item.marketable || (item.is_currency && window.CurrencyIsWalletFunds(item))) {
+		if (!item.marketable) {
 			return res;
 		}
 		elActions.appendChild(window.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/search?q='+item.market_name, 'Найти на маркете'));
+		$(elActions).css('display', 'block');
 	
 		return res;
 	}
@@ -335,25 +358,27 @@ function inventoryPageInit(){
 	
 	//// multisell
 	if(window.localStorage.hideDupItems){
+		window.SellItemDialog.OnConfirmationAccept_old = window.SellItemDialog.OnConfirmationAccept;
 		var SellCurrentSelection_old = window.SellCurrentSelection;
 		window.SellCurrentSelection = function(){
+			var res = SellCurrentSelection_old.apply(this, arguments);
 			var count = window.g_ActiveInventory.selectedItem._amount;
 			if(count>1) {
-				var amount =  parseInt(prompt('Сколько продавать? из '+count, '1')) || 1;
+				var amount =  parseInt(prompt('Сколько продавать? из '+count, count)) || 1;
 				if (amount>count)
 					amount=count;
-
+				
+				window.$('market_sell_dialog_ok').stopObserving();
 				if(amount>1){
 					window.SellItemDialog._amount=amount;
 					window.SellItemDialog._itemNum=0;
 					window.SellItemDialog.OnConfirmationAccept_new = function(event){
-						window.$('market_sell_dialog_ok').stopObserving();
 
 						window.$('market_sell_dialog_error').hide();
-						window.$('market_sell_dialog_ok').fade({ duration: 0.25 });
-						window.$('market_sell_dialog_back').fade({ duration: 0.25 });
+						window.$('market_sell_dialog_ok').fade({duration:0.25});
+						window.$('market_sell_dialog_back').fade({duration:0.25});
 						window.$('market_sell_dialog_throbber').show();
-						window.$('market_sell_dialog_throbber').fade({ duration: 0.25, from: 0, to: 1 });
+						window.$('market_sell_dialog_throbber').fade({duration:0.25,from:0,to:1});
 						
 						window.SellItemDialog.m_item.id=window.SellItemDialog.m_item._ids[window.SellItemDialog._itemNum];
 						window.SellItemDialog._itemNum++;
@@ -369,7 +394,7 @@ function inventoryPageInit(){
 									price: window.SellItemDialog.m_nConfirmedPrice
 								},
 								onSuccess: function( transport ) {
-									$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text('Выствлен №'+window.SellItemDialog._itemNum);
+									$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text('Выставлен №'+window.SellItemDialog._itemNum);
 									if(window.SellItemDialog._itemNum>=window.SellItemDialog._amount)
 										window.SellItemDialog.OnSuccess( transport );
 									else {
@@ -382,10 +407,14 @@ function inventoryPageInit(){
 						event.stop();
 						
 					}
-					window.$J('#market_sell_dialog_ok').click(window.SellItemDialog.OnConfirmationAccept_new);
+					window.SellItemDialog.OnConfirmationAccept = window.SellItemDialog.OnConfirmationAccept_new;
+				} else {
+					window.SellItemDialog.OnConfirmationAccept = window.SellItemDialog.OnConfirmationAccept_old;
 				}
+				window.$J('#market_sell_dialog_ok').click(window.SellItemDialog.OnConfirmationAccept);
+				
 			}
-			return SellCurrentSelection_old.apply(this, arguments);
+			return res;
 		}
 		
 	}
@@ -495,7 +524,7 @@ function profileNewPageInit(){
 	};
 	
 	
-	// PM buttons
+	// chat button
 	try {
 		var pm_btn = $('.profile_header_actions>a.btn_profile_action[href^="javascript:LaunchWebChat"]')[0];
 		pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">Chat: Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
@@ -507,7 +536,7 @@ function profileNewPageInit(){
 	// inventory gifts link
 	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_0"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img src="http://cdn.store.steampowered.com/public/images/ico/ico_cards.gif"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img src="http://cdn.store.steampowered.com/public/images/ico/ico_cards.gif"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
 		
 	
 
@@ -525,6 +554,7 @@ function profileNewPageInit(){
 	try {
 		document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("afterBegin", out);
 	} catch(err) {
+		// "More" button for self profile
 		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>More <img src="http://cdn.steamcommunity.com/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
 	}
 

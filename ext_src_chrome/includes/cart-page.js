@@ -13,7 +13,7 @@ function init() {
 
 	links = [
 		{href:'javascript:document.cookie=\'shoppingCartGID=0; path=/\';location.href=\'/cart/\';', text:'Очистить Корзину'},
-		{href:'https://store.steampowered.com/checkout/?purchasetype=gift#fastbuy',blank:1, text:'Бысто купить в инвентарь со Steam Wallet'},
+		{href:'https://store.steampowered.com/checkout/?purchasetype=gift#fastbuy',blank:1, text:'Быстро купить в инвентарь со Steam Wallet'},
 	];
 
 	el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));

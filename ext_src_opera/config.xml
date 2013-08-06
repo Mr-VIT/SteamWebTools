@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget xmlns="http://www.w3.org/ns/widgets" id="http://v1t.su/projects/steam/webtools/" version="0.4.1">
+<widget xmlns="http://www.w3.org/ns/widgets" id="http://v1t.su/projects/steam/webtools/" version="0.4.2">
 	<update-description href="http://v1t.su/projects/steam/webtools/ext-opera-update.xml"/>
 	<name>Steam Web Tools</name>
   	<author href="http://v1t.su/projects/steam/webtools/" email="vit@v1t.su">VIT</author>

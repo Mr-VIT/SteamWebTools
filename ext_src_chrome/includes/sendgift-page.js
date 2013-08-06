@@ -18,11 +18,12 @@ function init() {
 		var gifts = window.location.hash.substr(11,window.location.hash.lenght);
 		gifts = JSON.parse(decodeURIComponent(gifts))
 		var el=document.querySelector('.checkout_tab');
-		var gids=[], names=[], str='';
+		var gids=[], names=[], str='', i=0;
 		for(x in gifts){
 			gids.push(x);
 			names.push(gifts[x]);
-			str+='<p>'+gifts[x]+'</p>'
+			str+='<p>'+gifts[x]+' <span id="giftN'+i+'"></span></p>';
+			i++;
 		}
 		el.innerHTML='<p><b>Гифты для отправки: '+gids.length+'</b></p>'+str+'';
 		
@@ -54,7 +55,7 @@ function init() {
 		var OnSendGiftSuccess_old = window.OnSendGiftSuccess;
 		window.OnSendGiftSuccess = function(){
 
-			alert('Гифт #'+(curGift+1)+' '+names[curGift]+' отправлен.')
+			window.$('giftN'+curGift).innerHTML='- Отправлен';
 			var r = OnSendGiftSuccess_old.apply(this, arguments);
 			
 			if(window.g_gidGift = gids[++curGift]){
@@ -63,13 +64,10 @@ function init() {
 				}
 			
 				window.SendGift();
-				
 			}
 			
 			return r;
-		}
-		
-	
+		}	
 	}
 	
 }
