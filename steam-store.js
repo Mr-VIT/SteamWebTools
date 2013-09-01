@@ -44,11 +44,12 @@ function init() {
 
 		var itemType = res[1], itemId = res[2];
 		
-		var els = document.querySelectorAll('input[name="subid"]');
+		var els = document.querySelectorAll('.game_area_purchase_game');
 
 		var subid, el;
 		for(var i=0; i < els.length; i++){
-			el = els[i];
+			el = els[i].querySelector('input[name="subid"]');
+			if(!el) continue;
 			subid = el.value;
 			el.parentElement.parentElement.insertAdjacentHTML('beforeEnd', '<div>Subscription id = <a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a></div>');
 			if(i==0){
