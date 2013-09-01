@@ -164,8 +164,8 @@ function inventoryPageInit(){
 	}
 
 	// multi gifts sending
-	document.body.insertAdjacentHTML("afterBegin", 
-		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#075007;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}#inventory_logos{display:none}</style>'
+	document.body.insertAdjacentHTML("afterBegin",
+		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}#inventory_logos{display:none}</style>'
 	);
 	window.checkedForSend={};
 	window.checkForSend = function(giftId){
@@ -219,9 +219,9 @@ function inventoryPageInit(){
 	//// action for gifts and tf2 items
 	var BuildHover_orig = window.BuildHover;
 	window.BuildHover = function(){
+		var item = arguments[1];
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 753)){
-			var item = arguments[1];
-			if (!item.descriptions.withClassid && item.contextid==1) {
+			if ((item.contextid==1) && !item.descriptions.withClassid) {
 				item.descriptions.withClassid=true;
 				
 				if(!item.descriptions)
@@ -244,10 +244,16 @@ function inventoryPageInit(){
 						name:'Отправить выбранные'
 					});
 				}
+			} else if ((item.contextid==6) && !item.descriptions.swt) {
+				item.descriptions.swt=1;
+				if(item.tags[2].internal_name=="item_class_4"){
+					item.descriptions.push({value:'<img src="http://cdn.steamcommunity.com/economy/emoticon/'+item.name+'"/>'});
+				}
+				
+			
 			}
-		}
+		} else
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 440)){
-			var item = arguments[1];
 			if (item.actions.swt!=1) {
 				item.actions.swt=1;
 				item.actions.push({
@@ -382,26 +388,31 @@ function inventoryPageInit(){
 						
 						window.SellItemDialog.m_item.id=window.SellItemDialog.m_item._ids[window.SellItemDialog._itemNum];
 						window.SellItemDialog._itemNum++;
-						
-						new window.Ajax.Request( 'http://steamcommunity.com/market/sellitem/', {
-								method: 'post',
-								parameters: {
-									sessionid: window.g_sessionID,
-									appid: window.SellItemDialog.m_item.appid,
-									contextid: window.SellItemDialog.m_item.contextid,
-									assetid: window.SellItemDialog.m_item.id,
-									amount: window.SellItemDialog.m_nConfirmedQuantity,
-									price: window.SellItemDialog.m_nConfirmedPrice
-								},
-								onSuccess: function( transport ) {
-									$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text('Выставлен №'+window.SellItemDialog._itemNum);
-									if(window.SellItemDialog._itemNum>=window.SellItemDialog._amount)
-										window.SellItemDialog.OnSuccess( transport );
-									else {
-										return window.SellItemDialog.OnConfirmationAccept_new.apply(window.SellItemDialog, arguments);
-									}
-								},
-								onFailure: function( transport ) { window.SellItemDialog.OnFailure( transport ); }
+
+						$.ajax( {
+							url: 'https://steamcommunity.com/market/sellitem/',
+							type: 'POST',
+							data: {
+								sessionid: window.g_sessionID,
+								appid: window.SellItemDialog.m_item.appid,
+								contextid: window.SellItemDialog.m_item.contextid,
+								assetid: window.SellItemDialog.m_item.id,
+								amount: window.SellItemDialog.m_nConfirmedQuantity,
+								price: window.SellItemDialog.m_nConfirmedPrice
+							},
+							crossDomain: true,
+							xhrFields: { withCredentials: true }
+						} ).done( function ( data ) {
+							$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text('Выставлен №'+window.SellItemDialog._itemNum);
+							if(window.SellItemDialog._itemNum>=window.SellItemDialog._amount)
+								window.SellItemDialog.OnSuccess( { responseJSON: data } );
+							else {
+								return window.SellItemDialog.OnConfirmationAccept_new.apply(window.SellItemDialog, arguments);
+							}
+						} ).fail( function( jqxhr ) {
+							// jquery doesn't parse json on fail
+							var data = $.parseJSON( jqxhr.responseText );
+							window.SellItemDialog.OnFailure( { responseJSON: data } );
 						} );
 
 						event.stop();
@@ -453,7 +464,7 @@ function profileNewPageInit(){
 		},
 		{
 			id:   'inv_tf2op',
-			href: 'http://tf2outpost.com/id/'+steamid,
+			href: 'http://tf2outpost.com/backpack/'+steamid,
 			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
 			text: 'Инвентарь TF2OutPost.com',
 		},
