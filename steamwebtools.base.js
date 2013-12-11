@@ -1,6 +1,6 @@
 var url = document.URL;
 
-var CDN = 'http://mr-vit.github.com/SteamWebTools/';
+var CDN = '//mr-vit.github.io/SteamWebTools/';
 
 var scripts = [
 	{

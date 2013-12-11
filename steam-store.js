@@ -137,13 +137,15 @@ function init() {
 		}
 		
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
+	} else {
+		window.$J('a.linkbar[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="linkbar" href="http://steamdb.info/sales/">All Specials - SteamDB.Info</a>');
 	}
 	
 	
 };
 
 _cc = {
-	defList : 'ru us ua fr de gb au br',
+	defList : 'ru ua us ar fr no gb au br de jp',
 	updHTMLccList : function(){
 		var s='';
 		_cc.ListA = _cc.curList.split(' ');
