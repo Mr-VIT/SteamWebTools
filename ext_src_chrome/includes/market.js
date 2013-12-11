@@ -11,12 +11,12 @@ function init(){
 	if(el)
 	{
 		mainPage(el);
+	} else
+	if(document.getElementById('largeiteminfo_item_name'))
+	{
+		itemPage();
 	}
 
-}
-
-function includeJS(url){
-	document.getElementsByTagName('head')[0].appendChild(document.createElement('SCRIPT')).src=url;
 }
 
 function mainPage(tabContentsMyListings){
@@ -69,23 +69,30 @@ function mainPage(tabContentsMyListings){
 	var rows = window.$J('#tabContentsMyListings .market_listing_row').detach();
 	window.$J('.market_content_block.my_listing_section.market_home_listing_table').append('<div class="scrollbl_listing"></div>').click;
 	rows.prependTo("#tabContentsMyListings .scrollbl_listing");
-
+	
 	window.$J('.market_listing_cancel_button a').each(function(i, el){
-		var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i), market_name;
+		var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i);
 		if(res){
-			market_name = window.g_rgAssets[res[2]][res[3]][res[4]].market_name;
-			
 			window.$J(el).before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
-
 			window.$J(el).remove();
 		}
 	});
-
-
+	var myListings = window.$J('#tabContentsMyListings span.market_listing_price');
+	if(myListings){
+	
+		var total = 0;
+		for(var i=0; myListings.length>i; i++){
+			total += parseFloat(myListings[i].innerHTML.match(/(\d+(?:[.,]\d{1,2})?)/)[1].replace(',','.'))*100;
+		}
+		window.$J('#my_market_activelistings_number').append(' / '+window.v_currencyformat(total, window.GetCurrencyCode(window.g_rgWalletInfo.wallet_currency)));
+	}
 
 }
 
-
+function itemPage(){
+	//// accept ssa checked
+	window.$('market_buynow_dialog_accept_ssa').checked=true;
+}
 
 var state = window.document.readyState;
 if((state == 'interactive')||(state == 'complete'))

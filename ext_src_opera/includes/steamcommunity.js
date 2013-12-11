@@ -27,9 +27,7 @@ function init(){
 
 
 function gamecardsPageInit(){
-	$('.badge_card_to_collect_info>.badge_card_set_text:nth-child(1)').each(function(i,el){
-		$(el).append(' <b>:: <a href="/market/search?q=appid%3A753+card+'+el.innerHTML+'">найти на маркете</a></b>');
-	})
+	/**/
 }
 
 function badgesPageInit(){
@@ -216,6 +214,21 @@ function inventoryPageInit(){
 	}
 	// END multi gifts sending
 	
+	//// gifts notes
+	var giftsNotes = window.localStorage.giftsNotes;
+	if(giftsNotes)
+		giftsNotes = JSON.parse(giftsNotes);
+	else giftsNotes={};
+	window.loadGiftNote = function(){
+		var gid = window.g_ActiveInventory.selectedItem.id;
+		if(!$('#iteminfo'+window.iActiveSelectView+'_item_tags_content textarea.giftnote').length)
+			$('#iteminfo'+window.iActiveSelectView+'_item_tags_content').append('<br/><textarea class="giftnote" style="width:100%">'+(giftsNotes[gid]||'')+'</textarea><button onclick="saveGiftNote(\''+gid+'\')">Save</button>');
+	}
+	window.saveGiftNote = function(gid){
+		giftsNotes[gid]=$('#iteminfo'+window.iActiveSelectView+'_content textarea.giftnote').val();
+		window.localStorage.giftsNotes = JSON.stringify(giftsNotes);
+	}
+	
 	//// action for gifts and tf2 items
 	var BuildHover_orig = window.BuildHover;
 	window.BuildHover = function(){
@@ -228,7 +241,7 @@ function inventoryPageInit(){
 					item.descriptions = [];
 					
 				item.descriptions.push({value:'ClassID = '+item.classid});
-				item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target, \''+item.id+'\');return false">Получить SubscriptionID</a>'});
+				item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target,\''+item.id+'\');return false">Получить SubscriptionID</a>'});
 				
 				if(!ajaxTarget.descriptions[item.classid])
 					ajaxTarget.descriptions[item.classid] = item.descriptions;
@@ -242,6 +255,10 @@ function inventoryPageInit(){
 					item.owner_actions.push({
 						link:'javascript:sendChecked()',
 						name:'Отправить выбранные'
+					});
+					item.owner_actions.push({
+						link:'javascript:loadGiftNote()',
+						name:'Посмотреть заметку'
 					});
 				}
 			} else if ((item.contextid==6) && !item.descriptions.swt) {
@@ -267,16 +284,34 @@ function inventoryPageInit(){
 	}
 	
 	
-	//// Search on Market Button
+	//// View in Market Button
 	var PopulateMarketActions_orig = window.PopulateMarketActions;
 	window.PopulateMarketActions = function (elActions, item) {
 		var res = PopulateMarketActions_orig.apply(this, arguments);
 		if (!item.marketable) {
 			return res;
 		}
-		elActions.appendChild(window.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/search?q='+item.market_name, 'Найти на маркете'));
+		var market_hash_name = item.market_hash_name ? item.market_hash_name : item.market_name;
+		elActions.appendChild(window.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, 'Посмотреть на маркете'));
 		$(elActions).css('display', 'block');
-	
+		$(elActions).append('<br/>Мин цена: <span id="swt_lowestItemPrice_'+item.classid+'">?</span>');
+		
+		$.ajax( {
+			url: 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name+'/render/?query=&search_descriptions=0&start=0&count=10',
+			type: 'GET'
+		} ).done( function ( data ) {
+			var price='ERROR';
+			if(data.success){
+				var res = data.results_html.match(/market_listing_price_with_fee">\s*(\d.+?)\s*<\/span>/i);
+				if(res)
+					price = res[1];
+			}
+			$('#swt_lowestItemPrice_'+item.classid).html(price);
+		} ).fail( function( jqxhr ) {
+			$('#swt_lowestItemPrice_'+item.classid).text('ERROR');
+		} );
+		
+		
 		return res;
 	}
 	
@@ -297,11 +332,13 @@ function inventoryPageInit(){
 		if (window.localStorage.hideDupItems && !inventory._hiddenDup) {
 		
 			// display count
-			inventory.BuildItemElement_old = inventory.BuildItemElement;
-			inventory.BuildItemElement = function(){
-				var el = inventory.BuildItemElement_old.apply(this, arguments);
-				el.innerHTML+='<div class="itemcount">x'+el.rgItem._amount+'</div>'
-				return el;
+			if(!inventory.BuildItemElement_old){
+				inventory.BuildItemElement_old = inventory.BuildItemElement;
+				inventory.BuildItemElement = function(){
+					var el = inventory.BuildItemElement_old.apply(this, arguments);
+					el.innerHTML+='<div class="itemcount">x'+el.rgItem._amount+'</div>';
+					return el;
+				}
 			}
 			
 			var itemsA = [];
@@ -369,12 +406,13 @@ function inventoryPageInit(){
 		window.SellCurrentSelection = function(){
 			var res = SellCurrentSelection_old.apply(this, arguments);
 			var count = window.g_ActiveInventory.selectedItem._amount;
+			window.$('market_sell_dialog_ok').stopObserving();
+			$('#market_sell_dialog_ok').unbind();
 			if(count>1) {
 				var amount =  parseInt(prompt('Сколько продавать? из '+count, count)) || 1;
 				if (amount>count)
 					amount=count;
-				
-				window.$('market_sell_dialog_ok').stopObserving();
+
 				if(amount>1){
 					window.SellItemDialog._amount=amount;
 					window.SellItemDialog._itemNum=0;
@@ -414,17 +452,19 @@ function inventoryPageInit(){
 							var data = $.parseJSON( jqxhr.responseText );
 							window.SellItemDialog.OnFailure( { responseJSON: data } );
 						} );
-
-						event.stop();
+						//window.SellItemDialog.Dismiss();
+						//event.stop();
 						
 					}
 					window.SellItemDialog.OnConfirmationAccept = window.SellItemDialog.OnConfirmationAccept_new;
 				} else {
 					window.SellItemDialog.OnConfirmationAccept = window.SellItemDialog.OnConfirmationAccept_old;
 				}
-				window.$J('#market_sell_dialog_ok').click(window.SellItemDialog.OnConfirmationAccept);
 				
-			}
+				
+			} else
+				window.SellItemDialog.OnConfirmationAccept = window.SellItemDialog.OnConfirmationAccept_old;
+			$('#market_sell_dialog_ok').on("click", $.proxy(window.SellItemDialog.OnConfirmationAccept, window.SellItemDialog));
 			return res;
 		}
 		
@@ -482,7 +522,7 @@ function profileNewPageInit(){
 		},
 		{
 			id:   'inv_sm',
-			href: 'http://steammoney.com/userpage.php?id='+steamid,
+			href: 'http://steammoney.com/trade/user/'+steamid,
 			icon: 'http://steammoney.com/favicon.ico',
 			text: 'Инвентарь SteamMoney.com',
 		},
@@ -520,12 +560,23 @@ function profileNewPageInit(){
 			var tradeBanState = xml.find('tradeBanState').text();
 			var vacBanned = xml.find('vacBanned').text();
 			var accCrDate = xml.find('memberSince').text();
+			
+			// calc STEAMID
+			var steamid2 = parseInt(steamid.substr(-10),10);
+			var srv = steamid2 % 2;
+			var accountid = steamid2 - 7960265728;
+			steamid2 = "STEAM_0:" + srv + ":" + ((accountid-srv)/2);
+
+			
 			$('#swtexinfo').html(
 				'<table>'+
+				'<tr><td><b>CommunityID</b></td><td>'+steamid+'</td>'+
+				'<tr><td><b>SteamID</b></td><td>'+steamid2+'</td>'+
+				'<tr><td><b>AccountID</b></td><td>'+accountid+'</td>'+
 				'<tr><td><b>Registration date</b></td><td>'+accCrDate+'</td>'+
 				'<tr><td><b>VAC</b></td><td>'+(vacBanned=='0'?'Clear':'Banned')+'</td>'+
 				'<tr><td><b>Trade Ban</b></td><td>'+tradeBanState+'</td>'+
-				'<tr><td><b>Is Limited Account</b></td><td>'+(vacBanned=='0'?'No':'Yes')+'</td>'+
+				'<tr><td><b>Is Limited Account</b></td><td>'+(isLimitedAccount=='0'?'No':'Yes')+'</td>'+
 				'</table>'
 			);
 			window.setTimeout(function(){Modal.AdjustSizing();},1);
@@ -547,7 +598,7 @@ function profileNewPageInit(){
 	// inventory gifts link
 	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://cdn.store.steampowered.com/public/images/v5/inbox_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img src="http://cdn.store.steampowered.com/public/images/ico/ico_cards.gif"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a></span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img src="http://cdn.store.steampowered.com/public/images/ico/ico_cards.gif"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
 		
 	
 

@@ -8,27 +8,26 @@
 function init() {
 	if(window.location.hash!="#fastbuy")
 		return;
-		
+
 	alert('fastbuy');
-	
+
 	window.$('send_self').checked=true;
 	window.$('send_self').onchange();
-	
+
 	var FinalizeTransaction_old = window.FinalizeTransaction;
 	window.FinalizeTransaction = function(){
 		window.$('accept_ssa').checked=true;			
 		return FinalizeTransaction_old.apply(this, arguments);
 	}	
-	
+
 	var OnGetFinalPriceSuccess_old = window.OnGetFinalPriceSuccess;
 	window.OnGetFinalPriceSuccess = function(){
 		var res = OnGetFinalPriceSuccess_old.apply(this, arguments);	
 		window.FinalizeTransaction();
 		return res;
 	}
-	
+
 	window.InitializeTransaction();
-	
 
 }
 
