@@ -1,15 +1,12 @@
 {
 	"name": "Steam Web Tools",
 	"description": "Useful tools in Steam web sites",
-	"version": "0.4.4",
+	"version": "0.4.5",
 	
 	"background": {
         "page": "index.html"
     },
 	"manifest_version": 2,
-	"permissions": [
-		"tabs"
-	],
 	
 	"icons": {
 		"128": "icons/icon-64.png",
