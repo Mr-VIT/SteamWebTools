@@ -14,7 +14,7 @@ function init(){
 	if (window.g_rgProfileData) {
 		profileNewPageInit();
 	}
-	else if (window.BuildHover) {
+	else if (window.g_strInventoryLoadURL) {
 		inventoryPageInit();
 	}
 	else if (window.location.pathname.indexOf('/badges')>-1){
@@ -27,11 +27,12 @@ function init(){
 
 
 function gamecardsPageInit(){
-	/**/
+	var app = window.location.pathname.match(/\/gamecards\/(\d+)/)[1];
+	$('.gamecards_inventorylink').append('<a class="btn_grey_grey btn_small_thin" href="http://backpack.tf/cardswap?appid='+app+'"><span>Backpack.tf/cardswap</span></a>');
 }
 
 function badgesPageInit(){
-	$('.profile_badges_sortoptions').append('<a href="#" onclick="showWithDrop()">Показать с невыпавшими картами</a>');
+	$('.badge_details_set_favorite').append('<div class="btn_grey_black btn_small_thin" onclick="showWithDrop()"><span>Показать с невыпавшими картами</span></div>');
 	window.showWithDrop=function(){
 		$('.badge_row').filter(function(i,el){
 			return !($('a.btn_green_white_innerfade',el).length)
@@ -261,13 +262,6 @@ function inventoryPageInit(){
 						name:'Посмотреть заметку'
 					});
 				}
-			} else if ((item.contextid==6) && !item.descriptions.swt) {
-				item.descriptions.swt=1;
-				if(item.tags[2].internal_name=="item_class_4"){
-					item.descriptions.push({value:'<img src="http://cdn.steamcommunity.com/economy/emoticon/'+item.name+'"/>'});
-				}
-				
-			
 			}
 		} else
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 440)){
@@ -292,22 +286,20 @@ function inventoryPageInit(){
 			return res;
 		}
 		var market_hash_name = item.market_hash_name ? item.market_hash_name : item.market_name;
-		elActions.appendChild(window.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, 'Посмотреть на маркете'));
+		elActions.appendChild(window.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, 'Мин цена на маркете: <span id="swt_lowestItemPrice_'+item.classid+'">?</span>'));
 		$(elActions).css('display', 'block');
-		$(elActions).append('<br/>Мин цена: <span id="swt_lowestItemPrice_'+item.classid+'">?</span>');
-		
 		$.ajax( {
 			url: 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name+'/render/?query=&search_descriptions=0&start=0&count=10',
 			type: 'GET'
 		} ).done( function ( data ) {
 			var price='ERROR';
 			if(data.success){
-				var res = data.results_html.match(/market_listing_price_with_fee">\s*(\d.+?)\s*<\/span>/i);
+				var res = data.results_html.match(/market_listing_price_with_fee">\s*(.*?\d.*?)\s*<\/span>/i);
 				if(res)
 					price = res[1];
 			}
 			$('#swt_lowestItemPrice_'+item.classid).html(price);
-		} ).fail( function( jqxhr ) {
+		} ).fail(function(jqxhr) {
 			$('#swt_lowestItemPrice_'+item.classid).text('ERROR');
 		} );
 		
@@ -397,7 +389,7 @@ function inventoryPageInit(){
 	};
 	
 	//// sell dialog accept ssa checked
-	$('#market_sell_dialog_accept_ssa')[0].checked=true;
+	$('#market_sell_dialog_accept_ssa').attr('checked',true);
 	
 	//// multisell
 	if(window.localStorage.hideDupItems){
@@ -539,7 +531,7 @@ function profileNewPageInit(){
 	
 	// Styles
 	document.body.insertAdjacentHTML("afterBegin", 
-		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;margin-top:1px;padding:3px;}#swt_info{position:absolute;top:201px}</style>'
+		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;padding:3px;position:relative;top:-2px}#swt_info{position:absolute;top:201px}</style>'
 	);
 	
 	
@@ -598,7 +590,7 @@ function profileNewPageInit(){
 	// inventory gifts link
 	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img src="http://cdn.store.steampowered.com/public/images/ico/ico_cards.gif"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img src="http://cdn4.store.steampowered.com/public/images/ico/ico_cards.gif"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
 		
 	
 

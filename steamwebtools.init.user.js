@@ -5,7 +5,7 @@
 // @version     latest
 // @date 	2013-01-15
 // @creator vit@v1t.su
-// @icon http://mr-vit.github.com/SteamWebTools/icon-64.png
+// @icon http://mr-vit.github.io/SteamWebTools/icon-64.png
 // @include	http://store.steampowered.com/*
 // @include	https://store.steampowered.com/*
 // @include	http://steamcommunity.com/*

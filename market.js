@@ -12,6 +12,10 @@ function init(){
 	{
 		mainPage(el);
 	} else
+	if(document.getElementById('searchResults'))
+	{
+		addGotoBtn();
+	} else
 	if(document.getElementById('largeiteminfo_item_name'))
 	{
 		itemPage();
@@ -92,6 +96,15 @@ function mainPage(tabContentsMyListings){
 function itemPage(){
 	//// accept ssa checked
 	window.$('market_buynow_dialog_accept_ssa').checked=true;
+	
+	addGotoBtn()
+}
+
+function addGotoBtn(){
+	window.$J("#searchResults_btn_next").after(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">Go</span>');
+	window.$('swt_gotopagebtn').onclick=function(){
+		window.g_oSearchResults.GoToPage(window.$('swt_gotopagevl').value-1);
+	}
 }
 
 var state = window.document.readyState;
