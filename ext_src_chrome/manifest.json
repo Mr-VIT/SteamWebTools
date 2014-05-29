@@ -1,74 +1,25 @@
 {
 	"name": "Steam Web Tools",
 	"description": "Useful tools in Steam web sites",
-	"version": "0.4.5",
-	
-	"background": {
-        "page": "index.html"
-    },
+	"version": "1.0",
+
 	"manifest_version": 2,
-	
+
 	"icons": {
-		"128": "icons/icon-64.png",
-		"64": "icons/icon-64.png",
-		"18": "icons/icon-18.png"
+		"64": "icons/icon-64.png"
 	},
-	
+
 	"content_scripts": [
-		{	"js": [ "includes/steam-store-launcher.js" ],
+		{	"js": [ "steamwebtools.base.js" ],
 			"matches": [
+				"http://store.steampowered.com/*",
 				"https://store.steampowered.com/*",
-				"http://store.steampowered.com/*"
+				"http://steamcommunity.com/*",
+				"https://steamcommunity.com/*"
 			],
-			"run_at": "document_start"
-		},
-		{	"js": [ "includes/sendgift-page-launcher.js" ],
-			"matches": [
-				"http://store.steampowered.com/checkout/*",
-				"https://store.steampowered.com/checkout/*"
-			],
-			"run_at": "document_start"
-		},
-		{	"js": [ "includes/steamcommunity-launcher.js" ],
-			"matches": [
-				"https://steamcommunity.com/id/*",
-				"http://steamcommunity.com/id/*",
-				"https://steamcommunity.com/profiles/*",
-				"http://steamcommunity.com/profiles/*"
-			],
-			"run_at": "document_start",
-			"all_frames": true
-		},
-		{	"js": [ "includes/cart-page-launcher.js" ],
-			"matches": [
-				"http://store.steampowered.com/cart*",
-				"https://store.steampowered.com/cart*"
-			],
-			"run_at": "document_start"
-		},
-		{	"js": [ "includes/checkout-fastbuy-launcher.js" ],
-			"matches": [
-				"https://store.steampowered.com/checkout/?purchasetype=gift",
-				"http://store.steampowered.com/checkout/?purchasetype=gift"
-			],
-			"run_at": "document_start"
-		},
-		{	"js": [ "includes/market-launcher.js" ],
-			"matches": [
-				"http://steamcommunity.com/market*"
-			],
-			"run_at": "document_start"
+			"run_at": "document_end"
 		}
 	],
-	
-	"web_accessible_resources": [
-		"includes/cart-page.js",
-		"includes/checkout-fastbuy.js",
-		"includes/sendgift-page.js",
-		"includes/steamcommunity.js",
-		"includes/market.js",
-		"includes/steam-store.js"
-	],
-	
+
 	"update_url": "http://v1t.su/projects/steam/webtools/ext-chrome-update.xml"
 }
