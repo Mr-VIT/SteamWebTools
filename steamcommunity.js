@@ -279,34 +279,38 @@ function inventoryPageInit(){
 	
 	
 	//// View in Market Button
-	var PopulateMarketActions_orig = window.PopulateMarketActions;
-	window.PopulateMarketActions = function (elActions, item) {
-		var res = PopulateMarketActions_orig.apply(this, arguments);
-		if (!item.marketable) {
+	// not for me
+	if (window.UserYou.strSteamId!=window.g_steamID){
+		var PopulateMarketActions_orig = window.PopulateMarketActions;
+		window.PopulateMarketActions = function (elActions, item) {
+			var res = PopulateMarketActions_orig.apply(this, arguments);
+			if (!item.marketable) {
+				return res;
+			}
+			var market_hash_name = item.market_hash_name ? item.market_hash_name : item.market_name;
+			elActions.appendChild(window.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, 'Мин цена на маркете: <span id="swt_lowestItemPrice_'+item.classid+'">?</span>'));
+			$(elActions).css('display', 'block');
+			$.ajax( {
+				url: 'http://steamcommunity.com/market/priceoverview/',
+				type: 'GET',
+				data: {
+					appid: item.appid,
+					market_hash_name: market_hash_name
+				}
+			} ).done( function ( data ) {
+				var price='ERROR';
+				if(data.success){
+					price=data.lowest_price
+				}
+				$('#swt_lowestItemPrice_'+item.classid).html(price);
+			} ).fail(function(jqxhr) {
+				$('#swt_lowestItemPrice_'+item.classid).text('ERROR');
+			} );
+			
+			
 			return res;
 		}
-		var market_hash_name = item.market_hash_name ? item.market_hash_name : item.market_name;
-		elActions.appendChild(window.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, 'Мин цена на маркете: <span id="swt_lowestItemPrice_'+item.classid+'">?</span>'));
-		$(elActions).css('display', 'block');
-		$.ajax( {
-			url: 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name+'/render/?query=&search_descriptions=0&start=0&count=10',
-			type: 'GET'
-		} ).done( function ( data ) {
-			var price='ERROR';
-			if(data.success){
-				var res = data.results_html.match(/market_listing_price_with_fee">\s*(.*?\d.*?)\s*<\/span>/i);
-				if(res)
-					price = res[1];
-			}
-			$('#swt_lowestItemPrice_'+item.classid).html(price);
-		} ).fail(function(jqxhr) {
-			$('#swt_lowestItemPrice_'+item.classid).text('ERROR');
-		} );
-		
-		
-		return res;
 	}
-	
 	
 	//// Hide Duplicates
 	window.UserYou.ReloadInventory_old = window.UserYou.ReloadInventory;
@@ -485,7 +489,7 @@ function profileNewPageInit(){
 		{	
 			id:   'inv_bptf',
 			href: 'http://backpack.tf/id/'+steamid,
-			icon: 'http://backpack.tf/favicon.ico',
+			icon: 'http://backpack.tf/favicon_440.ico',
 			text: 'Инвентарь Backpack.tf',
 		},
 		{

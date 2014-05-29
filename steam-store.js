@@ -32,7 +32,7 @@ function init() {
 	
 		global_action_menu.insertAdjacentHTML('afterBegin', changeCCmenuHTML);
 	
-		_cc.updHTMLccList();
+		_cc.updHTMLccList(curCC);
 		
 		document.getElementById('cc_defbtn').onclick = _cc.setDefCcList;
 		document.getElementById('cc_okbtn' ).onclick = _cc.saveNewList;
@@ -64,8 +64,8 @@ function init() {
 				var reqUrl = 'http://store.steampowered.com/api/';
 				
 				reqUrl += ((itemType=='app')
-					? 'appdetails/?l=english&v=1&appids='
-					: 'packagedetails/?l=english&v=1&packageids='
+					? 'appdetails/?filters=basic,price_overview,packages&v=1&appids='
+					: 'packagedetails/?filters=basic,price_overview,packages&v=1&packageids='
 				)
 				
 				reqUrl += itemId+'&cc='+cc;
@@ -118,6 +118,7 @@ function init() {
 			for(var i=0; i < _cc.ListA.length; i++){
 				getPrice(_cc.ListA[i]);
 			}
+			setTimeout(function(){getPrice(_cc.curCC)}, 2500);
 			
 			
 			return false;
@@ -153,13 +154,15 @@ function init() {
 		
 		// ajax add to cart
 		window.addToCart = function(subid){
-			var el = window.$J('[name="add_to_cart_'+subid+'"]').parent().find('.game_purchase_action_bg .btn_addtocart_content');
+			var form = window.$J('[name="add_to_cart_'+subid+'"]');
+			var el = form.parent().find('.game_purchase_action_bg .btn_addtocart_content');
+			el.text('Wait...');
 			window.$J.ajax( {
-				url: 'http://store.steampowered.com/cart/',
+				url: form.attr('action'),
 				type: 'POST',
 				data: {subid:subid, action:'add_to_cart'}
 			} ).done( function ( data ) {
-				el.css('background-image','none').text('✔ Added').attr('href','/cart');
+				el.css('background-image','none').text('✔ Added').attr('href','/cart/');
 			} )
 			
 		};
@@ -173,7 +176,8 @@ function init() {
 
 _cc = {
 	defList : 'ru ua us ar fr no gb au br de jp',
-	updHTMLccList : function(){
+	curCC : false,
+	updHTMLccList : function(curCC){
 		var s='';
 		_cc.ListA = _cc.curList.split(' ');
 		for(var i=0; i < _cc.ListA.length; i++){
@@ -181,6 +185,10 @@ _cc = {
 		}
 		s += '<a class="popup_menu_item" title="Редактировать" href="#" onclick="ShowMenu(this, \'cc_list_edit\', \'right\', \'bottom\', true);return false"><img src="http://cdn.steamcommunity.com/public/images/skin_1/iconEdit.gif" style="width:16px"/></a>';
 		document.getElementById('cc_list').innerHTML=s;
+		if (curCC)
+			_cc.curCC=curCC
+		else
+			_cc.curCC=_cc.ListA[0];
 	},
 	saveNewList : function(){
 		_cc.curList=document.getElementById('ccListEdit').value;

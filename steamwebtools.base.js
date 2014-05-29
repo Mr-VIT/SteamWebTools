@@ -1,3 +1,11 @@
+// ==UserScript==
+// @include	http://store.steampowered.com/*
+// @include	https://store.steampowered.com/*
+// @include	http://steamcommunity.com/*
+// @include	https://steamcommunity.com/*
+// ==/UserScript==
+
+
 var url = document.URL;
 
 var CDN = '//mr-vit.github.io/SteamWebTools/';
@@ -52,7 +60,7 @@ function include(scriptName){
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.src = CDN+scriptName;
-	document.body.appendChild(script);
+	document.head.appendChild(script);
 };
 
 
