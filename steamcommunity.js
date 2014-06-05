@@ -234,6 +234,7 @@ function inventoryPageInit(){
 	var BuildHover_orig = window.BuildHover;
 	window.BuildHover = function(){
 		var item = arguments[1];
+		// gifts
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 753)){
 			if ((item.contextid==1) && !item.descriptions.withClassid) {
 				item.descriptions.withClassid=true;
@@ -263,7 +264,9 @@ function inventoryPageInit(){
 					});
 				}
 			}
-		} else
+		} /*else
+		// tf2 items
+		//need fix link
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 440)){
 			if (item.actions.swt!=1) {
 				item.actions.swt=1;
@@ -274,6 +277,7 @@ function inventoryPageInit(){
 				
 			}
 		}
+		*/
 		return BuildHover_orig.apply(this, arguments);
 	}
 	
@@ -313,11 +317,11 @@ function inventoryPageInit(){
 	}
 	
 	//// Hide Duplicates
-	window.UserYou.ReloadInventory_old = window.UserYou.ReloadInventory;
+	/*window.UserYou.ReloadInventory_old = window.UserYou.ReloadInventory;
 	window.UserYou.ReloadInventory = function(){
-		this._hiddenDup = false;
+		g_ActiveInventory._hiddenDup = false;
 		return window.UserYou.ReloadInventory_old.apply(this, arguments);
-	}
+	}*/
 	
 	var SelectInventoryFromUser_old = window.SelectInventoryFromUser;
 	window.SelectInventoryFromUser = function(){
@@ -488,7 +492,7 @@ function profileNewPageInit(){
 		{hr:true},
 		{	
 			id:   'inv_bptf',
-			href: 'http://backpack.tf/id/'+steamid,
+			href: 'http://backpack.tf/profiles/'+steamid,
 			icon: 'http://backpack.tf/favicon_440.ico',
 			text: 'Инвентарь Backpack.tf',
 		},
@@ -504,6 +508,7 @@ function profileNewPageInit(){
 			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
 			text: 'Инвентарь TF2OutPost.com',
 		},
+		{hr:true},
 		{
 			id:   'trds_tf2op',
 			href: 'http://tf2outpost.com/user/'+steamid,
@@ -517,6 +522,13 @@ function profileNewPageInit(){
 			text: 'Трэйды на Dota2Lounge.com',
 		},
 		{
+			id:   'trds_csgolng',
+			href: 'http://csgolounge.com/profile?id='+steamid,
+			icon: 'http://csgolounge.com/favicon.ico',
+			text: 'Трэйды на CSGOLounge.com',
+		},
+		{hr:true},
+		{
 			id:   'inv_sm',
 			href: 'http://steammoney.com/trade/user/'+steamid,
 			icon: 'http://steammoney.com/favicon.ico',
@@ -528,7 +540,7 @@ function profileNewPageInit(){
 			icon: 'http://steampub.ru/favicon.ico',
 			text: 'Профиль на SteamPub.ru',
 		},
-		{hr:true},
+		{hr:true}
 
 	];
 
@@ -591,10 +603,10 @@ function profileNewPageInit(){
 	// Games link - tab all games
 	var el = document.querySelector('.profile_count_link a[href$="games/"]');
 	if(el) el.href+='?tab=all';
-	// inventory gifts link
+	// inventory links
 	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img src="http://cdn4.store.steampowered.com/public/images/ico/ico_cards.gif"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="http://store.akamai.steamstatic.com/public/images/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
 		
 	
 

@@ -118,7 +118,7 @@ function init() {
 			for(var i=0; i < _cc.ListA.length; i++){
 				getPrice(_cc.ListA[i]);
 			}
-			setTimeout(function(){getPrice(_cc.curCC)}, 2500);
+			setTimeout(function(){getPrice(_cc.curCC)}, 3500);
 			
 			
 			return false;
@@ -160,7 +160,7 @@ function init() {
 			window.$J.ajax( {
 				url: form.attr('action'),
 				type: 'POST',
-				data: {subid:subid, action:'add_to_cart'}
+				data: {subid:subid, action:'add_to_cart', sessionid:window.g_sessionID}
 			} ).done( function ( data ) {
 				el.css('background-image','none').text('✔ Added').attr('href','/cart/');
 			} )

@@ -1,11 +1,15 @@
 ﻿// ==UserScript==
-// @include https://store.steampowered.com/checkout/?purchasetype=gift
-// @include http://store.steampowered.com/checkout/?purchasetype=gift
+// @include https://store.steampowered.com/checkout/?purchasetype=gift*
+// @include http://store.steampowered.com/checkout/?purchasetype=gift*
 // ==/UserScript==
 
 (function(){
 
 function init() {
+
+	window.$('send_self').checked=true;
+	window.$('accept_ssa').checked=true;
+
 	if(window.location.hash!="#fastbuy")
 		return;
 
