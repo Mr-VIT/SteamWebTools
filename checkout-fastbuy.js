@@ -8,15 +8,13 @@
 function init() {
 
 	window.$('send_self').checked=true;
+	window.$('send_self').onchange();
 	window.$('accept_ssa').checked=true;
 
 	if(window.location.hash!="#fastbuy")
 		return;
 
 	alert('fastbuy');
-
-	window.$('send_self').checked=true;
-	window.$('send_self').onchange();
 
 	var FinalizeTransaction_old = window.FinalizeTransaction;
 	window.FinalizeTransaction = function(){
