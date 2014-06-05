@@ -1,12 +1,14 @@
 {
 	"name": "Steam Web Tools",
 	"description": "Useful tools in Steam web sites",
-	"version": "1.0",
+	"version": "1.0.1",
 
+	"homepage_url": "http://v1t.su/projects/steam/webtools/",
+	
 	"manifest_version": 2,
 
 	"icons": {
-		"64": "icons/icon-64.png"
+		"64": "icon-64.png"
 	},
 
 	"content_scripts": [
@@ -17,7 +19,8 @@
 				"http://steamcommunity.com/*",
 				"https://steamcommunity.com/*"
 			],
-			"run_at": "document_end"
+			"run_at": "document_end",
+			"all_frames": true
 		}
 	],
 
