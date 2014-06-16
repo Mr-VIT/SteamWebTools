@@ -298,6 +298,8 @@ function inventoryPageInit(){
 				url: 'http://steamcommunity.com/market/priceoverview/',
 				type: 'GET',
 				data: {
+					country: window.g_strCountryCode,
+					currency: typeof(window.g_rgWalletInfo) != 'undefined' ? window.g_rgWalletInfo['wallet_currency'] : 1,
 					appid: item.appid,
 					market_hash_name: market_hash_name
 				}
