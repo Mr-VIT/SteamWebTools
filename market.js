@@ -7,10 +7,10 @@
 
 function init(){
 
-	var el = document.getElementById('tabContentsMyListings');
+	var el = window.$J('.pick_and_sell_button').length;
 	if(el)
 	{
-		mainPage(el);
+		mainPage();
 	} else
 	if(document.getElementById('searchResults'))
 	{
@@ -20,18 +20,17 @@ function init(){
 	{
 		itemPage();
 	}
-
 }
 
-function mainPage(tabContentsMyListings){
+function mainPage(){
 	// styles
 	document.body.insertAdjacentHTML("afterBegin", 
-		'<style>.scrollbl_listing{max-height:500px;overflow-y:scroll;} .lfremove{display:inline-block}</style>'
+		'<style>.scrollbl{max-height:500px;overflow-y:scroll;} .lfremove{display:inline-block}</style>'
 	);
 
 	//// Remove button
 	// add
-	var el = document.querySelector('#tabContentsMyListings .market_listing_edit_buttons').innerHTML='<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">Выбрать все</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">Удалить выбранные</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>';
+	var el = document.querySelector('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_edit_buttons').innerHTML='<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">Выбрать все</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">Удалить выбранные</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>';
 	
 	// set function
 	window.$J('#btnCheckAllListings').click(function(){
@@ -67,9 +66,15 @@ function mainPage(tabContentsMyListings){
 		return false;
 	});
 
-	var rows = window.$J('#tabContentsMyListings .market_listing_row').detach();
-	window.$J('.market_content_block.my_listing_section.market_home_listing_table').append('<div class="scrollbl_listing"></div>').click;
-	rows.prependTo("#tabContentsMyListings .scrollbl_listing");
+	
+	// scroll table:sell
+	var rows = window.$J('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_row').detach();
+	window.$J('.market_content_block.my_listing_section.market_home_listing_table:nth-child(1)').append('<div class="scrollbl tablesell"></div>').click;
+	rows.prependTo("#tabContentsMyListings .scrollbl.tablesell");	
+	// scroll table:buy
+	var rows = window.$J('#tabContentsMyListings .market_home_listing_table:nth-child(2) .market_listing_row').detach();
+	window.$J('.market_content_block.my_listing_section.market_home_listing_table:nth-child(2)').append('<div class="scrollbl tablebuy"></div>').click;
+	rows.prependTo("#tabContentsMyListings .scrollbl.tablebuy");
 	
 	window.$J('.market_listing_cancel_button a').each(function(i, el){
 		var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i);
@@ -93,7 +98,6 @@ function mainPage(tabContentsMyListings){
 function itemPage(){
 	//// accept ssa checked
 	window.$('market_buynow_dialog_accept_ssa').checked=true;
-	
 	addGotoBtn()
 }
 
