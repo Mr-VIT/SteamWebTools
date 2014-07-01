@@ -29,11 +29,11 @@ function init() {
 	<div class="popup_body popup_menu shadow_content">\
 	<input id="ccListEdit" type="text" value="'+_cc.curList+'"/><br/><a title="OK" href="#" id="cc_okbtn">[OK]</a> <a title="Default" href="#" id="cc_defbtn">[D]</a>\
 	</div></div>';
-	
+
 		global_action_menu.insertAdjacentHTML('afterBegin', changeCCmenuHTML);
-	
+
 		_cc.updHTMLccList(curCC);
-		
+
 		document.getElementById('cc_defbtn').onclick = _cc.setDefCcList;
 		document.getElementById('cc_okbtn' ).onclick = _cc.saveNewList;
 	}
@@ -43,7 +43,7 @@ function init() {
 	if(res){
 
 		var itemType = res[1], itemId = res[2];
-		
+
 		var els = document.querySelectorAll('.game_area_purchase_game');
 
 		var subid, el, subs=[], tmp;
@@ -57,34 +57,34 @@ function init() {
 			el = window.$J(el).append(tmp);
 			subs.push({subid:subid,el:tmp[0]});
 		}
-		
+
 		window.getPrices = function(e, itemType, itemId){
-			
+
 			function getPrice(cc){
 				var reqUrl = 'http://store.steampowered.com/api/';
-				
+
 				reqUrl += ((itemType=='app')
 					? 'appdetails/?filters=basic,price_overview,packages&v=1&appids='
 					: 'packagedetails/?filters=basic,price_overview,packages&v=1&packageids='
 				)
-				
+
 				reqUrl += itemId+'&cc='+cc;
-				
+
 				new window.Ajax.Request( reqUrl, {
 					method: 'get',
 					onSuccess: function( transport ) {
 						var s='';
-						
+
 						if(transport.responseJSON[itemId].success){
 							var data = transport.responseJSON[itemId].data;
 							var price = data.price_overview || data.price;
-							
+
 							if(price.discount_percent>0){
 								s += '<s>'+(price.initial/100)+'</s> <span class="discount_pct">-'+price.discount_percent+'%</span> ';
 							}
-							
+
 							s += '<b>'+(price.final/100)+'</b> '+price.currency;
-							
+
 							if(data.packages)
 								s += ' (subID:<a href="http://steamdb.info/sub/'+data.packages[0]+'">'+data.packages[0]+'</a>)';
 							// for non-main subs
@@ -104,14 +104,13 @@ function init() {
 					}
 				});
 			}
-			
-			
-			
+
+
 			for(var k=0; k < subs.length; k++) {
 				var str = 'Цены для других стран:';
 				for(var i=0; i < _cc.ListA.length; i++){
 					str += '<div class="swt_price_'+k+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
-				
+
 				}
 				subs[k].el.innerHTML = str;
 			}
@@ -119,11 +118,11 @@ function init() {
 				getPrice(_cc.ListA[i]);
 			}
 			setTimeout(function(){getPrice(_cc.curCC)}, 3500);
-			
-			
+
+
 			return false;
 		}
-		
+
 
 		var gamenameEl = document.querySelector('.game_title_area .game_name .blockbg');
 		if (!gamenameEl){
@@ -135,23 +134,22 @@ function init() {
 			el = el.parentElement;
 		else
 			el = document.querySelector('.share').parentElement.parentElement;
-			
+
 
 		links = [
 			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'http://steamdb.info/favicon.ico', text:'Посмотреть в SteamDB.info'},
 			{href:'http://steamgamesales.com/'+itemType+'/'+itemId, icon:'http://steamgamesales.com/favicon.ico', text:'Посмотреть на SteamGameSales.com'},
-			{href:'http://www.steamprices.com/ru/'+itemType+'/'+itemId, icon:'http://www.steamprices.com/favicon.png', text:'Посмотреть на SteamPrices.com'},
-			//{href:'http://steammoney.com/?price=up&s='+gamename, icon:'http://steammoney.com/favicon.ico', text:'Искать на SteamMoney.com'}, don't work
+			{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'http://www.steamprices.com/favicon.png', text:'Посмотреть на SteamPrices.com'},
 			{href:'http://plati.ru/asp/find.asp?agent=111350&searchstr='+gamename, icon:'http://plati.ru/favicon.ico', text:'Искать на Plati.ru'},
 			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text:'Искать на SteamPub.ru'},
 		];
-		
+
 		if(itemType=='app'){
 			links.push({href:'http://steamcommunity.com/my/gamecards/'+itemId, icon:'http://cdn.steamcommunity.com/public/images/skin_1/notification_icon_guide.png', text:'Посмотреть мои карты этой игры'})
 		}
-		
+
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
-		
+
 		// ajax add to cart
 		window.addToCart = function(subid){
 			var form = window.$J('[name="add_to_cart_'+subid+'"]');
@@ -164,14 +162,14 @@ function init() {
 			} ).done( function ( data ) {
 				el.css('background-image','none').text('✔ Added').attr('href','/cart/');
 			} )
-			
+
 		};
-		
+
 	} else {
 		window.$J('a.linkbar[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="linkbar" href="http://steamdb.info/sales/">All Specials - SteamDB.Info</a>');
 	}
-	
-	
+
+
 };
 
 _cc = {

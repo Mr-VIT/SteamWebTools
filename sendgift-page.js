@@ -26,50 +26,49 @@ function init() {
 			i++;
 		}
 		el.innerHTML='<p><b>Гифты для отправки: '+gids.length+'</b></p>'+str+'';
-		
-		window.$('email_input').insertAdjacentHTML("afterEnd", 
+
+		window.$('email_input').insertAdjacentHTML("afterEnd",
 			'<br/><br/>Если хотите отправить гифты на разыне Email введите их ниже по одному на строку. Гифты будут отправленны по порядку. Если гифтов больше чем адресов, оставшиеся гифты будут отправлены на последний адрес<br/><textarea id="emails" rows=3></textarea>'
 		);
-		
+
 		var curGift = 0, emails=[];
 		window.g_gidGift = gids[0];
-		
+
 		var SubmitGiftDeliveryForm_old = window.SubmitGiftDeliveryForm;
 		window.SubmitGiftDeliveryForm = function(){
 			if (!window.$('send_via_email').checked)
 				return SubmitGiftDeliveryForm_old.apply(this, arguments);
-			
+
 			if (!window.$('emails').value)
 				return SubmitGiftDeliveryForm_old.apply(this, arguments);
-				
+
 			emails = window.$('emails').value.split(/\r?\n/);
-			
+
 			if(emails.length){
 				window.$('email_input').value = emails[0];
 			}
-			
+
 			return SubmitGiftDeliveryForm_old.apply(this, arguments);
 
 		}
-		
+
 		var OnSendGiftSuccess_old = window.OnSendGiftSuccess;
 		window.OnSendGiftSuccess = function(){
 
 			window.$('giftN'+curGift).innerHTML='- Отправлен';
-			var r = OnSendGiftSuccess_old.apply(this, arguments);
-			
+
 			if(window.g_gidGift = gids[++curGift]){
 				if(emails.length>1){
 					window.$('email_input').value = emails[Math.min(curGift, (emails.length-1))]
 				}
-			
+
 				window.SendGift();
+			} else {
+				OnSendGiftSuccess_old.apply(this, arguments);
 			}
-			
-			return r;
-		}	
+		}
 	}
-	
+
 }
 
 var state = window.document.readyState;
@@ -77,5 +76,5 @@ if((state == 'interactive')||(state == 'complete'))
 	init();
 else
 	window.addEventListener("DOMContentLoaded", init,false);
-	
+
 })();

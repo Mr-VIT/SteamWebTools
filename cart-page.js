@@ -28,8 +28,8 @@ function init() {
 	})
 }
 
-	
-	
+
+
 // block
 function createBlock(title, links){
 	var out='<div class="block">\

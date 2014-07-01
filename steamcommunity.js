@@ -39,7 +39,7 @@ function badgesPageInit(){
 		}).remove()
 		return false;
 	}
-	
+
 }
 
 function includeJS(url){
@@ -50,7 +50,7 @@ function SetRepBadges(selector){
 	document.querySelector(selector).insertAdjacentHTML('afterEnd',
 		'<a id="csmbadge" class="badge" href="http://check.csmania.ru/#steam:'+steamid+'">CSm: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a>'
 	);
-	
+
 	var badges = {
 		0:{
 			text : 'неизвестен',
@@ -77,7 +77,7 @@ function SetRepBadges(selector){
 			color : '606060'
 		}
 	};
-	
+
 
 	window.setRepStatus = function(res) {
 		if(!(res.csm >= 0)){
@@ -85,7 +85,7 @@ function SetRepBadges(selector){
 		}
 		document.querySelector('#csmbadge').style.background = '#'+badges[res.csm].color;
 		document.querySelector('#csmbadge span').innerHTML = badges[res.csm].text;
-		
+
 		var srbcolor;
 		if(!res.srcom){
 			res.srcom = badges[0].text;
@@ -106,15 +106,15 @@ function SetRepBadges(selector){
 				srbcolor = badges[0].color;
 			}
 		}
-		
+
 		document.querySelector('#srbadge').style.background = '#'+srbcolor;
 		document.querySelector('#srbadge span').innerHTML = res.srcom;
-		
+
 	}
-	
+
 	// get rep status
 	includeJS('http://check.csmania.ru/api/swt9Hk02yFhf/0/repforext/'+steamid);
-	
+
 }
 
 function inventoryPageInit(){
@@ -123,13 +123,13 @@ function inventoryPageInit(){
 
 	window.getSubid = function(target, itemid){
 		ajaxTarget.element = target;
-		
+
 		var item = window.UserYou.rgContexts[753][1].inventory.rgInventory[itemid];
 
 		ajaxTarget.classid = item.classid;
 		ajaxTarget.giftId = itemid;
 		ajaxTarget.giftName = encodeURIComponent(item.name);
-		
+
 		includeJS('http://v1t.su/projects/steam/class-sub.php?jsonp=setSubID&get=sub&value='+item.classid);
 	}
 
@@ -137,7 +137,7 @@ function inventoryPageInit(){
 		var str = 'SubscriptionID = ';
 
 		if (subid=="0"){
-			
+
 			if(window.g_bViewingOwnProfile){
 				new window.Ajax.Request( 'http://steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
 					method: 'post',
@@ -177,7 +177,7 @@ function inventoryPageInit(){
 					delete window.checkedForSend[item._ids[i]];
 				}
 			} else {
-				delete window.checkedForSend[giftId];	
+				delete window.checkedForSend[giftId];
 			}
 
 		} else {
@@ -194,11 +194,11 @@ function inventoryPageInit(){
 			} else {
 				window.checkedForSend[giftId]=item.name;
 			}
-		
+
 			item.checkedForSend=true;
 			item.element.addClassName('checkedForSend');
-			
-			
+
+
 		}
 	}
 	window.sendChecked = function(){
@@ -207,14 +207,14 @@ function inventoryPageInit(){
 		for(var gid in window.checkedForSend){
 			break;
 		}
-		
+
 		url+=gid+'#multisend='+encodeURIComponent(JSON.stringify(window.checkedForSend))
-		
+
 		window.location.href=url;
-		
+
 	}
 	// END multi gifts sending
-	
+
 	//// gifts notes
 	var giftsNotes = window.localStorage.giftsNotes;
 	if(giftsNotes)
@@ -229,7 +229,7 @@ function inventoryPageInit(){
 		giftsNotes[gid]=$('#iteminfo'+window.iActiveSelectView+'_content textarea.giftnote').val();
 		window.localStorage.giftsNotes = JSON.stringify(giftsNotes);
 	}
-	
+
 	//// action for gifts and tf2 items
 	var BuildHover_orig = window.BuildHover;
 	window.BuildHover = function(){
@@ -238,16 +238,16 @@ function inventoryPageInit(){
 		if(window.g_ActiveInventory && (window.g_ActiveInventory.appid == 753)){
 			if ((item.contextid==1) && !item.descriptions.withClassid) {
 				item.descriptions.withClassid=true;
-				
+
 				if(!item.descriptions)
 					item.descriptions = [];
-					
+
 				item.descriptions.push({value:'ClassID = '+item.classid});
 				item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target,\''+item.id+'\');return false">Получить SubscriptionID</a>'});
-				
+
 				if(!ajaxTarget.descriptions[item.classid])
 					ajaxTarget.descriptions[item.classid] = item.descriptions;
-			
+
 
 				if(item.owner_actions) {
 					item.owner_actions.push({
@@ -274,14 +274,14 @@ function inventoryPageInit(){
 					link:'http://backpack.tf/stats/'+item.app_data.def_index+'/'+item.app_data.quality+'/0',
 					name:'Цена предмета'
 				});
-				
+
 			}
 		}
 		*/
 		return BuildHover_orig.apply(this, arguments);
 	}
-	
-	
+
+
 	//// View in Market Button
 	// not for me
 	if (window.UserYou.strSteamId!=window.g_steamID){
@@ -312,19 +312,19 @@ function inventoryPageInit(){
 			} ).fail(function(jqxhr) {
 				$('#swt_lowestItemPrice_'+item.classid).text('ERROR');
 			} );
-			
-			
+
+
 			return res;
 		}
 	}
-	
+
 	//// Hide Duplicates
 	/*window.UserYou.ReloadInventory_old = window.UserYou.ReloadInventory;
 	window.UserYou.ReloadInventory = function(){
 		g_ActiveInventory._hiddenDup = false;
 		return window.UserYou.ReloadInventory_old.apply(this, arguments);
 	}*/
-	
+
 	var SelectInventoryFromUser_old = window.SelectInventoryFromUser;
 	window.SelectInventoryFromUser = function(){
 		var appid = arguments[1];
@@ -332,7 +332,7 @@ function inventoryPageInit(){
 
 		var inventory = window.UserYou.getInventory( appid, contextid );
 		if (window.localStorage.hideDupItems && !inventory._hiddenDup) {
-		
+
 			// display count
 			if(!inventory.BuildItemElement_old){
 				inventory.BuildItemElement_old = inventory.BuildItemElement;
@@ -342,9 +342,9 @@ function inventoryPageInit(){
 					return el;
 				}
 			}
-			
+
 			var itemsA = [];
-			
+
 			if(inventory.rgChildInventories) {
 				for(var x in inventory.rgChildInventories){
 					inventory.rgChildInventories[x].BuildItemElement = inventory.BuildItemElement; // display count
@@ -378,16 +378,16 @@ function inventoryPageInit(){
 					}
 				}
 			}
-			
+
 		}
 
 		return SelectInventoryFromUser_old.apply(this, arguments);
 	}
 
-	
+
 	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((window.localStorage.hideDupItems)?'checked="true"':'')+'/>Прятать дубликаты, показывая кол-во';
 	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
-	
+
 	window.onchangehidedup = function(e){
 		if(e.target.checked){
 			window.localStorage.hideDupItems = 1
@@ -397,10 +397,10 @@ function inventoryPageInit(){
 
 		window.location.reload();
 	};
-	
+
 	//// sell dialog accept ssa checked
 	$('#market_sell_dialog_accept_ssa').attr('checked',true);
-	
+
 	//// multisell
 	if(window.localStorage.hideDupItems){
 		window.SellItemDialog.OnConfirmationAccept_old = window.SellItemDialog.OnConfirmationAccept;
@@ -425,7 +425,7 @@ function inventoryPageInit(){
 						window.$('market_sell_dialog_back').fade({duration:0.25});
 						window.$('market_sell_dialog_throbber').show();
 						window.$('market_sell_dialog_throbber').fade({duration:0.25,from:0,to:1});
-						
+
 						window.SellItemDialog.m_item.id=window.SellItemDialog.m_item._ids[window.SellItemDialog._itemNum];
 						window.SellItemDialog._itemNum++;
 
@@ -456,22 +456,22 @@ function inventoryPageInit(){
 						} );
 						//window.SellItemDialog.Dismiss();
 						//event.stop();
-						
+
 					}
 					window.SellItemDialog.OnConfirmationAccept = window.SellItemDialog.OnConfirmationAccept_new;
 				} else {
 					window.SellItemDialog.OnConfirmationAccept = window.SellItemDialog.OnConfirmationAccept_old;
 				}
-				
-				
+
+
 			} else
 				window.SellItemDialog.OnConfirmationAccept = window.SellItemDialog.OnConfirmationAccept_old;
 			$('#market_sell_dialog_ok').on("click", $.proxy(window.SellItemDialog.OnConfirmationAccept, window.SellItemDialog));
 			return res;
 		}
-		
+
 	}
-	
+
 }
 
 function profileNewPageInit(){
@@ -480,58 +480,54 @@ function profileNewPageInit(){
 
 	var profilesLinks = [
 		{
-			id:   'srch_sr',
 			href: 'http://forums.steamrep.com/search/search?keywords='+steamid,
 			icon: 'http://steamrep.com/favicon.ico',
 			text: 'Искать на форумах SteamRep.com',
 		},
 		{
-			id:   'srch_sop',
 			href: 'http://forums.sourceop.com/search.php?do=process&query='+steamid,
 			icon: 'http://forums.sourceop.com/favicon.ico',
 			text: 'Искать на форумах SourceOP.com',
 		},
+		{
+			href: 'http://www.steamtrades.com/user/id/'+steamid,
+			icon: 'http://www.steamtrades.com/favicon.ico',
+			text: 'Отзывы на SteamTrades.com',
+		},
 		{hr:true},
-		{	
-			id:   'inv_bptf',
+		{
 			href: 'http://backpack.tf/profiles/'+steamid,
 			icon: 'http://backpack.tf/favicon_440.ico',
 			text: 'Инвентарь Backpack.tf',
 		},
 		{
-			id:   'inv_tf2b',
 			href: 'http://tf2b.com/tf2/'+steamid,
 			icon: 'http://tf2b.com/favicon.ico',
 			text: 'Инвентарь TF2B.com',
 		},
 		{
-			id:   'inv_tf2op',
 			href: 'http://tf2outpost.com/backpack/'+steamid,
 			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
 			text: 'Инвентарь TF2OutPost.com',
 		},
 		{hr:true},
 		{
-			id:   'trds_tf2op',
 			href: 'http://tf2outpost.com/user/'+steamid,
 			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
 			text: 'Трэйды на TF2OutPost.com',
 		},
 		{
-			id:   'trds_d2lng',
 			href: 'http://dota2lounge.com/profile?id='+steamid,
 			icon: 'http://dota2lounge.com/favicon.ico',
 			text: 'Трэйды на Dota2Lounge.com',
 		},
 		{
-			id:   'trds_csgolng',
 			href: 'http://csgolounge.com/profile?id='+steamid,
 			icon: 'http://csgolounge.com/favicon.ico',
 			text: 'Трэйды на CSGOLounge.com',
 		},
 		{hr:true},
 		{
-			id:   'inv_sm',
 			href: 'http://steammoney.com/trade/user/'+steamid,
 			icon: 'http://steammoney.com/favicon.ico',
 			text: 'Инвентарь SteamMoney.com',
@@ -546,16 +542,16 @@ function profileNewPageInit(){
 
 	];
 
-	
+
 	// Styles
-	document.body.insertAdjacentHTML("afterBegin", 
+	document.body.insertAdjacentHTML("afterBegin",
 		'<style>.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;padding:3px;position:relative;top:-2px}#swt_info{position:absolute;top:201px}</style>'
 	);
-	
-	
+
+
 	$('.profile_header').append('<div id="swt_info"><span id="permlink"> SteamID64: <a href="http://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> </span> <a href="#getMoreInfo" onclick="getMoreInfo();return false">Get more info</a></div>');
-	
-	
+
+
 	SetRepBadges('#permlink');
 	window.getMoreInfo = function() {
 		var Modal = window.ShowDialog('Extended Info', $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
@@ -570,14 +566,14 @@ function profileNewPageInit(){
 			var tradeBanState = xml.find('tradeBanState').text();
 			var vacBanned = xml.find('vacBanned').text();
 			var accCrDate = xml.find('memberSince').text();
-			
+
 			// calc STEAMID
 			var steamid2 = parseInt(steamid.substr(-10),10);
 			var srv = steamid2 % 2;
 			var accountid = steamid2 - 7960265728;
 			steamid2 = "STEAM_0:" + srv + ":" + ((accountid-srv)/2);
 
-			
+
 			$('#swtexinfo').html(
 				'<table>'+
 				'<tr><td><b>CommunityID</b></td><td>'+steamid+'</td>'+
@@ -594,14 +590,14 @@ function profileNewPageInit(){
 			$('#swtexinfo').html('Request Error / Ошибка при получении данных')
 		});
 	};
-	
-	
+
+
 	// chat button
 	try {
 		var pm_btn = $('.profile_header_actions>a.btn_profile_action[href^="javascript:LaunchWebChat"]')[0];
 		pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">Chat: Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
 	} catch(e) {};
-	
+
 	// Games link - tab all games
 	var el = document.querySelector('.profile_count_link a[href$="games/"]');
 	if(el) el.href+='?tab=all';
@@ -609,8 +605,8 @@ function profileNewPageInit(){
 	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
 		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="http://store.akamai.steamstatic.com/public/images/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
-		
-	
+
+
 
 	var out = '', link;
 	for (var i=0; i < profilesLinks.length; i++){
@@ -638,5 +634,5 @@ if((state == 'interactive')||(state == 'complete'))
 	init();
 else
 	window.addEventListener("DOMContentLoaded", init,false);
-	
+
 })();
