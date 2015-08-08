@@ -1,1 +1,3 @@
-main scripts files in "gh-pages" branch
+built file in "gh-pages" branch
+## Install
+http://mr-vit.github.io/SteamWebTools/steamwebtools.user.js

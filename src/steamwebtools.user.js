@@ -1,46 +1,64 @@
 // ==UserScript==
+// @name 	Steam Web Tools
+// @namespace 	http://v1t.su/projects/steam/webtools/
+// @description Useful tools in Steam web sites
+// @version     0.4.7
+// @date 	2015-08-08
+// @author Mr-VIT
+// @homepage	http://v1t.su/projects/steam/webtools/
+// @updateURL http://mr-vit.github.io/SteamWebTools/version.js
+// @icon http://mr-vit.github.io/SteamWebTools/icon-64.png
+// @run-at document-end
 // @include	http://store.steampowered.com/*
 // @include	https://store.steampowered.com/*
 // @include	http://steamcommunity.com/*
 // @include	https://steamcommunity.com/*
 // ==/UserScript==
 
-
+W = unsafeWindow;
 var url = document.URL;
-
-var CDN = '//mr-vit.github.io/SteamWebTools/';
 
 var scripts = [
 	{
-		script:'cart-page.js',
+		run:function(){
+			//!include cart-page.js
+		},
 		include:[
 			'http://store.steampowered.com/cart/',
 			'https://store.steampowered.com/cart/',
 		]
 	},
 	{
-		script:'checkout-fastbuy.js',
+		run:function(){
+			//!include checkout-fastbuy.js
+		},
 		include:[
 			'http://store.steampowered.com/checkout/?purchasetype=gift',
 			'https://store.steampowered.com/checkout/?purchasetype=gift',
 		]
 	},
 	{
-		script:'sendgift-page.js',
+		run:function(){
+			//!include sendgift-page.js
+		},
 		include:[
 			'http://store.steampowered.com/checkout/',
 			'https://store.steampowered.com/checkout/',
 		]
 	},
 	{
-		script:'steam-store.js',
+		run:function(){
+			//!include steam-store.js
+		},
 		include:[
 			'http://store.steampowered.com/',
 			'https://store.steampowered.com/',
 		]
 	},
 	{
-		script:'steamcommunity.js',
+		run:function(){
+			//!include steamcommunity.js
+		},
 		include:[
 			'https://steamcommunity.com/id/',
 			'http://steamcommunity.com/id/',
@@ -49,25 +67,19 @@ var scripts = [
 		]
 	},
 	{
-		script:'market.js',
+		run:function(){
+			//!include market.js
+		},
 		include:[
 			'http://steamcommunity.com/market'
 		]
 	}
 ];
 
-function include(scriptName){
-	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.src = CDN+scriptName;
-	document.head.appendChild(script);
-};
-
-
 for(var i = 0; i<scripts.length; i++) {
 	for(var j = 0; j < scripts[i].include.length; j++) {
 		if(url.indexOf(scripts[i].include[j]) == 0) {
-			include(scripts[i].script);
+			scripts[i].run();
 			break;
 		}
 	}
