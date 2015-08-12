@@ -7,8 +7,6 @@ import os.path
 OUT_DIR=sys.argv[2]+'/' if len(sys.argv)==3 else '.'
 FILENAME0 = os.path.basename(sys.argv[1])
 
-
-
 re_name = re.compile(r'^\s*//!include (.+?)\s*$',)
 
 def build(fileName):
@@ -25,7 +23,6 @@ def build(fileName):
         f.close()
     except:
         return '\n'
-
 
     return res+'\n'
 

@@ -1,9 +1,4 @@
-﻿// ==UserScript==
-// @include http://steamcommunity.com/market*
-// ==/UserScript==
-
-function init(){
-
+﻿function init(){
 	var el = W.$J('.pick_and_sell_button').length;
 	if(el)
 	{

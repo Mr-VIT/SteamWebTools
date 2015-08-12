@@ -1,0 +1,2 @@
+var app = W.location.pathname.match(/\/gamecards\/(\d+)/)[1];
+W.$J('.gamecards_inventorylink').append('<a class="btn_grey_grey btn_small_thin" href="http://www.steamcardexchange.net/index.php?inventorygame-appid-'+app+'"><span>www.SteamCardExchange.net</span></a>');

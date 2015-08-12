@@ -1,9 +1,4 @@
-﻿// ==UserScript==
-// @include https://store.steampowered.com/*
-// @include http://store.steampowered.com/*
-// ==/UserScript==
-
-function init() {
+﻿function init() {
 
 	// for age check
 	if(W.location.pathname.indexOf('/agecheck')==0){
@@ -122,17 +117,13 @@ function init() {
 		}
 
 
-		var gamenameEl = document.querySelector('.game_title_area .game_name .blockbg');
+		var gamenameEl = document.querySelector('.game_title_area .pageheader');
 		if (!gamenameEl){
-			gamenameEl = document.querySelector('.apphub_AppName');
+			gamenameEl = document.querySelector('.game_title_area .apphub_AppName');
 		}
 		var gamename = encodeURIComponent(gamenameEl.textContent.trim());
-		el = document.querySelector('#demo_block');
-		if(el)
-			el = el.parentElement;
-		else
-			el = document.querySelector('.share').parentElement.parentElement;
-
+		
+		var el = document.querySelector('.rightcol.game_meta_data');
 
 		links = [
 			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/favicon-16x16.png', text:'Посмотреть в SteamDB.info'},
@@ -150,20 +141,29 @@ function init() {
 		// ajax add to cart
 		W.addToCart = function(subid){
 			var form = W.$J('[name="add_to_cart_'+subid+'"]');
-			var el = form.parent().find('.game_purchase_action_bg .btn_addtocart>a');
-			el.text('Wait...');
-			W.$J.ajax( {
+			var el=form.parent();
+			el.find('.game_purchase_action_bg .btn_addtocart:last>a').after('<a id="swtcartdone" href="#">Wait...</a>');
+			W.$J.ajax({
 				url: form.attr('action'),
 				type: 'POST',
 				data: {subid:subid, action:'add_to_cart', sessionid:W.g_sessionID}
-			} ).done( function ( data ) {
-				el.css('background-image','none').text('✔ Added').attr('href','/cart/');
-			} )
-
+			}).done(function(data){
+				var cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
+				if(cartHistory.length>=20) cartHistory.shift();
+				cartHistory.push({
+					subid: subid,
+					name: el.find('h1').text().match(/\S+\s(.+)/i)[1],
+					price: el.find('.game_purchase_price.price').text().trim() || el.find('.discount_final_price').text().trim(),
+					link: itemType+'/'+itemId
+				});
+				W.localStorage['swtcarthistory'] = JSON.stringify(cartHistory);
+				
+				el.find('#swtcartdone').css('background-image','none').text('✔ Added').attr('href','/cart/');
+			})
 		};
 
 	} else {
-		W.$J('a.linkbar[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="linkbar" href="http://steamdb.info/sales/">All Specials - SteamDB.Info</a>');
+		W.$J('a.btn_small_tall[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="btnv6_blue_hoverfade btn_small_tall" href="http://steamdb.info/sales/"><span>All Specials - SteamDB.Info</span></a>');
 	}
 
 

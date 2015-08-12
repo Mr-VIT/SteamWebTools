@@ -1,13 +1,4 @@
-﻿// ==UserScript==
-// @include https://store.steampowered.com/checkout/?purchasetype=gift*
-// @include http://store.steampowered.com/checkout/?purchasetype=gift*
-// ==/UserScript==
-
-W.$('send_self').checked=true;
-W.$('send_self').onchange();
-W.$('accept_ssa').checked=true;
-
-if(W.location.hash!="#fastbuy")
+﻿if(W.location.hash!="#fastbuy")
 	return;
 
 alert('fastbuy');
