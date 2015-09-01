@@ -1,4 +1,11 @@
 ﻿function init(){
+	if(settings.cur.globalHideWalletBalance){
+		var el = W.$J('#marketWalletBalanceAmount')[0];
+		if(el){
+			el.title = el.innerHTML;
+			el.innerHTML = '['+t('balance')+']';
+		}
+	}
 	var el = W.$J('.pick_and_sell_button').length;
 	if(el)
 	{
@@ -22,7 +29,7 @@ function mainPage(){
 
 	//// Remove button
 	// add
-	var el = document.querySelector('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_edit_buttons').innerHTML='<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">Выбрать все</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">Удалить выбранные</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>';
+	var el = document.querySelector('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_edit_buttons').innerHTML='<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('checkAll')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('deleteChecked')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>';
 
 	// set function
 	W.$J('#btnCheckAllListings').click(function(){
@@ -107,7 +114,7 @@ function itemPage(){
 }
 
 function addGotoBtn(){
-	W.$J("#searchResults_btn_next").after(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">Go</span>');
+	W.$J("#searchResults_btn_next").after(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">'+t('go')+'</span>');
 	W.$('swt_gotopagebtn').onclick=function(){
 		W.g_oSearchResults.GoToPage(W.$('swt_gotopagevl').value-1);
 	}

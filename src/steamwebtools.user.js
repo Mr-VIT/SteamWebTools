@@ -2,11 +2,11 @@
 // @name		Steam Web Tools
 // @namespace	http://v1t.su/projects/steam/webtools/
 // @description	Useful tools in Steam web sites
-// @version		0.4.8
-// @date		2015-08-12
+// @version		0.5
+// @date		2015-09-01
 // @author		Mr-VIT
 // @homepage	http://v1t.su/projects/steam/webtools/
-// @updateURL	http://mr-vit.github.io/SteamWebTools/version.js
+// @updateURL	https://mr-vit.github.io/SteamWebTools/version.js
 // @icon		http://mr-vit.github.io/SteamWebTools/icon-64.png
 // @run-at		document-end
 // @include		http://store.steampowered.com/*
@@ -16,7 +16,11 @@
 // ==/UserScript==
 
 W = unsafeWindow;
-var url = document.URL;
+
+//!include settings.js
+//!include lang.js
+
+//!include global.js
 
 var scripts = [
 	{
@@ -40,7 +44,7 @@ var scripts = [
 			'https?://store\\.steampowered\\.com/checkout/\\?purchasetype=gift.*',
 		],
 		run:function(){
-			//!include checkout-fastbuy.js
+			//!include checkout-quickpurchase.js
 		}
 	},
 	{
@@ -99,14 +103,39 @@ var scripts = [
 	},
 	{
 		match:[
-			'http://steamcommunity.com/market.*'
+			'https?://steamcommunity\\.com/app/\\d+/guides*'
+		],
+		run:function(){
+			//!include gamehub-guides.js
+		}
+	},
+	{
+		match:[
+			'http://steamcommunity\\.com/market.*'
 		],
 		run:function(){
 			//!include market.js
 		}
+	},
+	{
+		match:[
+			'http://steamcommunity\\.com/groups/SteamClientBeta#swt-settings'
+		],
+		run:function(){
+			//!include settings-page.js
+		}
+	},
+	{
+		match:[
+			'http://store\\.steampowered\\.com/about/#swt-settings.*',
+		],
+		run:function(){
+			//!include settings-store-save.js
+		}
 	}
 ];
 
+var url = document.URL;
 for(var i = 0; i<scripts.length; i++) {
 	for(var j = 0; j < scripts[i].match.length; j++) {
 		var expr = new RegExp('^'+scripts[i].match[j]+'$', 'i');

@@ -8,7 +8,7 @@ for (var i=0; i < divs.length; i++){
 
 if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 	var gifts = W.location.hash.substr(11,W.location.hash.lenght);
-	gifts = JSON.parse(decodeURIComponent(gifts))
+	gifts = JSON.parse(decodeURIComponent(gifts));
 	var el=document.querySelector('.checkout_tab');
 	var gids=[], names=[], str='', i=0;
 	for(var x in gifts){
@@ -17,10 +17,10 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 		str+='<p>'+gifts[x]+' <span id="giftN'+i+'"></span></p>';
 		i++;
 	}
-	el.innerHTML='<p><b>Гифты для отправки: '+gids.length+'</b></p>'+str+'';
+	el.innerHTML='<p><b>'+t('giftForSend')+': '+gids.length+'</b></p>'+str+'';
 
 	W.$('email_input').insertAdjacentHTML("afterEnd",
-		'<br/><br/>Если хотите отправить гифты на разыне Email введите их ниже по одному на строку. Гифты будут отправленны по порядку. Если гифтов больше чем адресов, оставшиеся гифты будут отправлены на последний адрес<br/><textarea id="emails" rows=3></textarea>'
+		'<br/><br/>'+t('giftForSendNote')+'<br/><textarea id="emails" rows=3></textarea>'
 	);
 
 	var curGift = 0, emails=[];
@@ -47,7 +47,7 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 	var OnSendGiftSuccess_old = W.OnSendGiftSuccess;
 	W.OnSendGiftSuccess = function(){
 
-		W.$('giftN'+curGift).innerHTML='- Отправлен';
+		W.$('giftN'+curGift).innerHTML='- '+t('sent');
 
 		if(W.g_gidGift = gids[++curGift]){
 			if(emails.length>1){

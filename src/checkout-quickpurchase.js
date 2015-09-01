@@ -1,7 +1,5 @@
-﻿if(W.location.hash!="#fastbuy")
+﻿if(W.location.hash!="#quick")
 	return;
-
-alert('fastbuy');
 
 var FinalizeTransaction_old = W.FinalizeTransaction;
 W.FinalizeTransaction = function(){
