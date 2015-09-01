@@ -2,11 +2,11 @@
 // @name		Steam Web Tools
 // @namespace	http://v1t.su/projects/steam/webtools/
 // @description	Useful tools in Steam web sites
-// @version		0.4.8
-// @date		2015-08-12
+// @version		0.5
+// @date		2015-09-01
 // @author		Mr-VIT
 // @homepage	http://v1t.su/projects/steam/webtools/
-// @updateURL	http://mr-vit.github.io/SteamWebTools/version.js
+// @updateURL	https://mr-vit.github.io/SteamWebTools/version.js
 // @icon		http://mr-vit.github.io/SteamWebTools/icon-64.png
 // @run-at		document-end
 // @include		http://store.steampowered.com/*
@@ -16,7 +16,216 @@
 // ==/UserScript==
 
 W = unsafeWindow;
-var url = document.URL;
+
+var settings = {
+	defaults : {
+		version : 1,
+
+		globalLang : 'en',
+		globalHideAccName : true,
+		globalHideWalletBalance : true,
+
+		storeShowCCbtn : true,
+		storeCCList : 'ru ua us ar fr no gb au br de jp',
+		storeShowCartBtn : true,
+		storeCartAjax : true,
+		storeShowSubid : true,
+		storeShowBtnGetPrices : true,
+	},
+	cur : {},
+	storage : {
+		key : 'SWTSettings',
+		gm : window.GM_getValue ? true : false,
+		set : function(data){
+			if(this.gm){
+				GM_setValue(this.key, data);
+			} else
+				W.localStorage.setItem(this.key, data);
+		},
+		get : function(){
+			if(this.gm){
+				return GM_getValue(this.key);
+			} else
+				return W.localStorage.getItem(this.key);
+		},
+		del : function(){
+			if(this.gm){
+				GM_deleteValue(this.key);
+			} else
+				W.localStorage.removeItem(this.key);
+		},
+	},
+	load : function(){
+		this.cur = W.$J.extend({}, this.defaults);
+
+		var data = this.storage.get(this.storage.key);
+		if(data) {
+			W.$J.extend(this.cur, JSON.parse(data));
+		} else {
+			// first launch - open settings page
+			this.save();
+			W.location='http://steamcommunity.com/groups/SteamClientBeta#swt-settings';
+		}
+	},
+	save : function(){
+		if(this.cur) {
+			this.storage.set(JSON.stringify(this.cur));
+		}
+	},
+	reset : function(){
+		this.storage.del();
+		this.cur = this.defaults;
+	}
+}
+
+settings.load();
+W.swt_settings=settings;
+function t(key){
+	return t.text[key] || key;
+}
+t.loadText = function(text){
+	if(!this.text){ //first default text
+		this.text=text;
+	} else if(text['lang.code']==settings.cur.globalLang){
+		W.$J.extend(this.text, text);
+	}
+}
+t.loadText({  //default text
+'lang.current' : 'English',
+'lang.code' : 'en',
+'getMoreInfo' : 'Get more Info',
+'extInfo' : 'Extended Info',
+'reqErr' : 'Request Error',
+'checkin' : 'Check in',
+'searchinforums' : 'Search in forums',
+'inventory' : 'Inventory',
+'profile' : 'Profile',
+'trades' : 'Trades',
+'chat' : 'Chat',
+'more' : 'More',
+'showDropsCard' : 'Show only with cards drops remaining',
+'howmany' : 'How many? of ',
+'save' : 'Save',
+'get' : 'Get',
+'checkForSend' : 'Check for send',
+'sendChecked' : 'Send checked',
+'showNote' : 'Show Note',
+'minMarketPrice' : 'Min. Market price',
+'hideDup' : 'Hide duplicates, show amount',
+'go' : 'Go',
+'checkAll' : 'Check all',
+'deleteChecked' : 'Delete checked',
+'addSubidsToCart' : 'Add SubIDs to cart',
+'add' : 'Add',
+'addChecked' : 'Add checked',
+'cartHist' : 'Cart history',
+'clearCart' : 'Clear cart',
+'quickPurchase' : 'One-Click Buy to inventory (SteamWallet only)',
+'giftForSend' : 'Gifts for send',
+'giftForSendNote' : 'If you want to send Gifts to different Emails enter them below one per line. Gifts will be sent on the order. If quantity of gifts greater than address the remaining Gifts will be sent to the last address',
+'sent' : 'Sent',
+'def' : 'Default',
+'getPrices' : 'Get prices for other countries (Need logout)',
+'prices' : 'Prices for other countries',
+'viewin' : 'View in',
+'searchin' : 'Search in',
+'viewMyCardsGame' : 'View my cards/badge this game',
+'adding' : 'adding',
+'added' : 'Added | View in cart',
+'allSpecials' : 'All Specials',
+'balance' : 'Balance',
+'acc' : 'Account',
+'acceptAllToInv' : 'Accept all to inventory',
+// settings page
+'set.ext' : 'extension',
+'set.settings' : 'Settings',
+'set.homePage' : 'Home Page',
+'set.global' : 'Global',
+'set.lang' : 'Language',
+'set.hideAccName' : 'Hide Account name. It will be displayed in the tooltip when you hover.',
+'set.hideBalance' : 'Hide Wallet Balance. It will be displayed in the tooltip when you hover.',
+'set.store' : 'Store',
+'set.showCCBtn' : 'Show button change country',
+'set.CCList' : 'Your list of countries. Enter your country first',
+'set.showCartBtn' : 'Always show Cart button',
+'set.cartAjax' : 'Adding to cart without reloading the page',
+'set.showSubid' : 'Show SubID',
+'set.showBtnGetPrices' : 'Show button "Get prices for other countries"',
+'set.def' : 'Restore the default',
+});
+t.loadText({
+'lang.current' : 'Русский',
+'lang.code' : 'ru',
+'getMoreInfo' : 'Получить больше Информации',
+'extInfo' : 'Расширенная Информация',
+'reqErr' : 'Ошибка при получении данных',
+'checkin' : 'Проверить на',
+'searchinforums' : 'Искать на форумах',
+'inventory' : 'Инвентарь',
+'profile' : 'Профиль',
+'trades' : 'Трэйды',
+'chat' : 'Чат',
+'more' : 'Ещё',
+'showDropsCard' : 'Показать с невыпавшими картами',
+'howmany' : 'Сколько выбрать? из ',
+'save' : 'Сохранить',
+'get' : 'Получить',
+'checkForSend' : 'Выбрать для отправки',
+'sendChecked' : 'Отправить выбранные',
+'showNote' : 'Посмотреть заметку',
+'minMarketPrice' : 'Мин цена на маркете',
+'hideDup' : 'Прятать дубликаты, показывая кол-во',
+'go' : 'Перейти',
+'checkAll' : 'Выбрать все',
+'deleteChecked' : 'Удалить выбранные',
+'addSubidsToCart' : 'Добавить SubID\'ы в корзину',
+'add' : 'Добавить',
+'addChecked' : 'Добавить выбранные',
+'cartHist' : 'История корзины',
+'clearCart' : 'Очистить Корзину',
+'quickPurchase' : 'Купить в инвентарь за один клик (только со Steam Кошелека)',
+'giftForSend' : 'Гифты для отправки',
+'giftForSendNote' : 'Если хотите отправить гифты на разные Email введите их ниже по одному на строку. Гифты будут отправленны по порядку. Если гифтов больше чем адресов, оставшиеся гифты будут отправлены на последний адрес',
+'sent' : 'Отправлен',
+'def' : 'По умолчанию',
+'getPrices' : 'Получить цены для других стран (Нужно выйти из аккаунта)',
+'prices' : 'Цены для других стран',
+'viewin' : 'Посмотреть на',
+'searchin' : 'Искать на',
+'viewMyCardsGame' : 'Посмотреть мои карты/значек этой игры',
+'adding' : 'добавление',
+'added' : 'Добавлено | Корзина',
+'allSpecials' : 'Все спец. предложения',
+'balance' : 'Баланс',
+'acc' : 'Аккаунт',
+'acceptAllToInv' : 'Принять все в инвентарь',
+// settings page
+'set.ext' : 'расширение',
+'set.settings' : 'Настройки',
+'set.homePage' : 'Домашняя страница',
+'set.global' : 'Глобальные',
+'set.lang' : 'Язык',
+'set.hideAccName' : 'Скрывать имя аккаунта. Будет показываться в подсказке при наведении',
+'set.hideBalance' : 'Скрывать баланс кошелька. Будет показываться в подсказке при наведении',
+'set.store' : 'Магазин',
+'set.showCCBtn' : 'Показывать кнопку переключения страны',
+'set.CCList' : 'Ваш список стран. Вашу страну укажите первой',
+'set.showCartBtn' : 'Показывать кнопку корзины, даже если она пуста',
+'set.cartAjax' : 'Добавлять в корзину без перезагрузки страницы',
+'set.showSubid' : 'Отображать номер подписки',
+'set.showBtnGetPrices' : 'Показывать кнопку получения цен для других стран',
+'set.def' : 'Восстановить по умолчанию',
+});
+
+W.$J('.submenu_community').append('<a class="submenuitem" href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings">SWT - '+t('set.settings')+'</a>');
+
+if(settings.cur.globalHideAccName){
+	var acBtnEl = W.$J('#account_pulldown')[0];
+	if(acBtnEl){
+		acBtnEl.title = acBtnEl.innerHTML;
+		acBtnEl.innerHTML = '['+t('acc')+']';
+	}
+}
 
 var scripts = [
 	{
@@ -34,7 +243,7 @@ function createBlock(title, links){
 		out+='<a class="btn_small btnv6_blue_hoverfade" href="'+link.href+'"'+(link.blank ? ' target="_blank"':'')+'><span>'+link.text+'</span></a><br/>'
 	}
 
-	out+='<br/><h2>Добавить SubID\'ы в корзину</h2> <form id="addtocartsubids" method="post"><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subids" placeholder="1, 2, 3"/><input type="submit" value="Добавить" class="btn_small btnv6_blue_hoverfade"></form><br><form method="post"><input type="submit" value="Добавить выбранные" style="float:right" class="btn_small btnv6_blue_hoverfade"><h2>История корзины</h2><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart">';
+	out+='<br/><h2>'+t('addSubidsToCart')+'</h2> <form id="addtocartsubids" method="post"><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subids" placeholder="1, 2, 3"/><input type="submit" value="'+t('add')+'" class="btn_small btnv6_blue_hoverfade"></form><br><form method="post"><input type="submit" value="'+t('addChecked')+'" style="float:right" class="btn_small btnv6_blue_hoverfade"><h2>'+t('cartHist')+'</h2><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart">';
 	
 	var cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
 	var chStr = '';
@@ -55,8 +264,8 @@ var cookie_date = new Date();
 cookie_date.setTime(cookie_date.getTime()-1);
 
 links = [
-	{href:'javascript:document.cookie=\'shoppingCartGID=; path=/; expires='+cookie_date.toGMTString()+'\'; location.href=\'/cart/\';', text:'Очистить Корзину'},
-	{href:'https://store.steampowered.com/checkout/?purchasetype=gift#fastbuy',blank:1, text:'Быстро купить в инвентарь со Steam Wallet'},
+	{href:'javascript:document.cookie=\'shoppingCartGID=; path=/; expires='+cookie_date.toGMTString()+'\'; location.href=\'/cart/\';', text:t('clearCart')},
+	{href:'https://store.steampowered.com/checkout/?purchasetype=gift#quick',blank:1, text:t('quickPurchase')},
 ];
 
 el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
@@ -100,10 +309,8 @@ if(W.$('send_self')){
 			'https?://store\\.steampowered\\.com/checkout/\\?purchasetype=gift.*',
 		],
 		run:function(){
-﻿if(W.location.hash!="#fastbuy")
+﻿if(W.location.hash!="#quick")
 	return;
-
-alert('fastbuy');
 
 var FinalizeTransaction_old = W.FinalizeTransaction;
 W.FinalizeTransaction = function(){
@@ -138,7 +345,7 @@ for (var i=0; i < divs.length; i++){
 
 if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 	var gifts = W.location.hash.substr(11,W.location.hash.lenght);
-	gifts = JSON.parse(decodeURIComponent(gifts))
+	gifts = JSON.parse(decodeURIComponent(gifts));
 	var el=document.querySelector('.checkout_tab');
 	var gids=[], names=[], str='', i=0;
 	for(var x in gifts){
@@ -147,10 +354,10 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 		str+='<p>'+gifts[x]+' <span id="giftN'+i+'"></span></p>';
 		i++;
 	}
-	el.innerHTML='<p><b>Гифты для отправки: '+gids.length+'</b></p>'+str+'';
+	el.innerHTML='<p><b>'+t('giftForSend')+': '+gids.length+'</b></p>'+str+'';
 
 	W.$('email_input').insertAdjacentHTML("afterEnd",
-		'<br/><br/>Если хотите отправить гифты на разыне Email введите их ниже по одному на строку. Гифты будут отправленны по порядку. Если гифтов больше чем адресов, оставшиеся гифты будут отправлены на последний адрес<br/><textarea id="emails" rows=3></textarea>'
+		'<br/><br/>'+t('giftForSendNote')+'<br/><textarea id="emails" rows=3></textarea>'
 	);
 
 	var curGift = 0, emails=[];
@@ -177,7 +384,7 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 	var OnSendGiftSuccess_old = W.OnSendGiftSuccess;
 	W.OnSendGiftSuccess = function(){
 
-		W.$('giftN'+curGift).innerHTML='- Отправлен';
+		W.$('giftN'+curGift).innerHTML='- '+t('sent');
 
 		if(W.g_gidGift = gids[++curGift]){
 			if(emails.length>1){
@@ -202,34 +409,44 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 ﻿function init() {
 
 	// for age check
-	if(W.location.pathname.indexOf('/agecheck')==0){
+	if(W.location.pathname.indexOf('/agecheck')===0){
 		document.cookie='birthtime=-1704124799; expires=21-Dec-2025 00:00:00 GMT; path=/';
 		W.location.reload();
 	}
 
-	// cc switcher
-	var global_action_menu = document.getElementById('global_action_menu');
-	if(global_action_menu) {
-		var curCC = false;
-		if(curCC = document.cookie.match(/fakeCC=(\w+?);/i)){
-			curCC = curCC[1];
+	if(settings.cur.globalHideWalletBalance){
+		var el = W.$J('#header_wallet_balance')[0];
+		if(el){
+			el.title = el.innerHTML;
+			el.innerHTML = '['+t('balance')+']';
 		}
-		var changeCCmenuHTML = '\
-		<style>#cc_menu_btn{min-width:59px;z-index:999;position:fixed;right:0;top:0;background-color:#000;opacity:0.5;}#cc_menu_btn:hover{opacity:1}#cc_list .popup_menu_item{white-space:nowrap}</style>\
-		<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="http://cdn.steamcommunity.com/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
-<div class="popup_block_new" id="cc_menu" style="display:none;">\
-<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>\
-	<div class="popup_block_new" id="cc_list_edit" style="display:none;">\
-	<div class="popup_body popup_menu shadow_content">\
-	<input id="ccListEdit" type="text" value="'+_cc.curList+'"/><br/><a title="OK" href="#" id="cc_okbtn">[OK]</a> <a title="Default" href="#" id="cc_defbtn">[D]</a>\
-	</div></div>';
+	}
 
-		global_action_menu.insertAdjacentHTML('afterBegin', changeCCmenuHTML);
+	if(settings.cur.storeShowCartBtn){
+		var el = W.$J('#store_header_cart_btn');
+		if(el.length){
+			el.css('display','block');
+		}
+	}
 
-		_cc.updHTMLccList(curCC);
+	// cc switcher
+	if(settings.cur.storeShowCCbtn) {
+		var global_action_menu = document.getElementById('global_action_menu');
+		if(global_action_menu) {
+			var curCC = false;
+			if(curCC = document.cookie.match(/fakeCC=(\w+?);/i)){
+				curCC = curCC[1];
+			}
+			var changeCCmenuHTML = '\
+			<style>#cc_menu_btn{min-width:59px;z-index:999;position:fixed;right:0;top:0;background-color:#000;opacity:0.5;}#cc_menu_btn:hover{opacity:1}#cc_list .popup_menu_item{white-space:nowrap}</style>\
+			<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="http://cdn.steamcommunity.com/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
+	<div class="popup_block_new" id="cc_menu" style="display:none;">\
+	<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
 
-		document.getElementById('cc_defbtn').onclick = _cc.setDefCcList;
-		document.getElementById('cc_okbtn' ).onclick = _cc.saveNewList;
+			global_action_menu.insertAdjacentHTML('afterBegin', changeCCmenuHTML);
+
+			_cc.updHTMLccList(curCC);
+		}
 	}
 
 	// for app/sub page
@@ -239,166 +456,162 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 		var itemType = res[1], itemId = res[2];
 
 		var els = document.querySelectorAll('.game_area_purchase_game');
-
-		var subid, el, subs=[], tmp;
-		for(var i=0; i < els.length; i++){
-			el = els[i].querySelector('input[name="subid"]');
-			if(!el) continue;
-			subid = el.value;
-			el = el.parentElement.parentElement
-			el.insertAdjacentHTML('beforeEnd', '<div>Subscription id = <a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a></div>');
-			tmp = W.$J('<div><a onclick="getPrices(event, \''+itemType+'\', '+itemId+');return false" href="#getPrices">Получить цены для других стран</a></div>');
-			el = W.$J(el).append(tmp);
-			subs.push({subid:subid,el:tmp[0]});
-		}
-
-		W.getPrices = function(e, itemType, itemId){
-
-			function getPrice(cc){
-				var reqUrl = 'http://store.steampowered.com/api/';
-
-				reqUrl += ((itemType=='app')
-					? 'appdetails/?filters=basic,price_overview,packages&v=1&appids='
-					: 'packagedetails/?filters=basic,price_overview,packages&v=1&packageids='
-				)
-
-				reqUrl += itemId+'&cc='+cc;
-
-				W.$J.ajax( {
-					url: reqUrl,
-					method: 'get'
-				}).done(function( data ) {
-					var s='';
-
-					if(data[itemId].success){
-						var data = data[itemId].data;
-						var price = data.price_overview || data.price;
-
-						if(price.discount_percent>0){
-							s += '<s>'+(price.initial/100)+'</s> <span class="discount_pct">-'+price.discount_percent+'%</span> ';
-						}
-
-						s += '<b>'+(price.final/100)+'</b> '+price.currency;
-
-						if(data.packages)
-							s += ' (subID:<a href="http://steamdb.info/sub/'+data.packages[0]+'">'+data.packages[0]+'</a>)';
-						// for non-main subs
-						try{
-							var pg = data.package_groups[0].subs;
-							if(pg.length>1){
-								for(var i=1;i<pg.length;i++){
-									var tmp = pg[i].option_text.match(/- \D*(\d+(?:[.,]\d{2})?)/i);
-									document.querySelector('.swt_price_'+i+'_'+cc+'>span').innerHTML = '<b>'+tmp[tmp.length-1]+'</b> '+price.currency+' (subID:<a href="http://steamdb.info/sub/'+pg[i].packageid+'">'+pg[i].packageid+'</a>)';
-								}
-							}
-						}catch(e){};
-					} else {
-						s+='NA';
-					}
-					document.querySelector('.swt_price_0_'+cc+'>span').innerHTML = s;
-				});
-			}
-
-
-			for(var k=0; k < subs.length; k++) {
-				var str = 'Цены для других стран:';
-				for(var i=0; i < _cc.ListA.length; i++){
-					str += '<div class="swt_price_'+k+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
-
+		if(settings.cur.storeShowSubid || settings.cur.storeShowBtnGetPrices){
+			var subid, el, subs=[], tmp;
+			for(var i=0; i < els.length; i++){
+				el = els[i].querySelector('input[name="subid"]');
+				if(!el) continue;
+				subid = el.value;
+				el = el.parentElement.parentElement
+				if(settings.cur.storeShowSubid) {
+					el.insertAdjacentHTML('beforeEnd', '<div>Subscription id = <a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a></div>');
 				}
-				subs[k].el.innerHTML = str;
+				if(settings.cur.storeShowBtnGetPrices) {
+					tmp = W.$J('<div><a onclick="getPrices(event, \''+itemType+'\', '+itemId+');return false" href="#getPrices">'+t('getPrices')+'</a></div>');
+					el = W.$J(el).append(tmp);
+					subs.push({subid:subid,el:tmp[0]});
+				}
 			}
-			for(var i=0; i < _cc.ListA.length; i++){
-				getPrice(_cc.ListA[i]);
-			}
-			setTimeout(function(){getPrice(_cc.curCC)}, 3500);
+			if(settings.cur.storeShowBtnGetPrices) W.getPrices = function(e, itemType, itemId){
+
+				function getPrice(cc){
+					var reqUrl = 'http://store.steampowered.com/api/';
+
+					reqUrl += ((itemType=='app')
+						? 'appdetails/?filters=basic,price_overview,packages&v=1&appids='
+						: 'packagedetails/?filters=basic,price_overview,packages&v=1&packageids='
+					)
+
+					reqUrl += itemId+'&cc='+cc;
+
+					W.$J.ajax( {
+						url: reqUrl,
+						method: 'get'
+					}).done(function( data ) {
+						var s='';
+
+						if(data[itemId].success){
+							var data = data[itemId].data;
+							var price = data.price_overview || data.price;
+
+							if(price.discount_percent>0){
+								s += '<s>'+(price.initial/100)+'</s> <span class="discount_pct">-'+price.discount_percent+'%</span> ';
+							}
+
+							s += '<b>'+(price.final/100)+'</b> '+price.currency;
+
+							if(data.packages)
+								s += ' (subID:<a href="http://steamdb.info/sub/'+data.packages[0]+'">'+data.packages[0]+'</a>)';
+							// for non-main subs
+							try{
+								var pg = data.package_groups[0].subs;
+								if(pg.length>1){
+									for(var i=1;i<pg.length;i++){
+										var tmp = pg[i].option_text.match(/- \D*(\d+(?:[.,]\d{2})?)/i);
+										document.querySelector('.swt_price_'+i+'_'+cc+'>span').innerHTML = '<b>'+tmp[tmp.length-1]+'</b> '+price.currency+' (subID:<a href="http://steamdb.info/sub/'+pg[i].packageid+'">'+pg[i].packageid+'</a>)';
+									}
+								}
+							}catch(e){};
+						} else {
+							s+='N/A';
+						}
+						document.querySelector('.swt_price_0_'+cc+'>span').innerHTML = s;
+					});
+				}
 
 
-			return false;
+				for(var k=0; k < subs.length; k++) {
+					var str = t('prices')+':';
+					for(var i=0; i < _cc.ListA.length; i++){
+						str += '<div class="swt_price_'+k+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
+
+					}
+					subs[k].el.innerHTML = str;
+				}
+				for(var i=0; i < _cc.ListA.length; i++){
+					getPrice(_cc.ListA[i]);
+				}
+				setTimeout(function(){getPrice(_cc.curCC)}, 3500); // set default CC
+
+
+				return false;
+			}
+
 		}
-
-
 		var gamenameEl = document.querySelector('.game_title_area .pageheader');
 		if (!gamenameEl){
 			gamenameEl = document.querySelector('.game_title_area .apphub_AppName');
 		}
 		var gamename = encodeURIComponent(gamenameEl.textContent.trim());
-		
+
 		var el = document.querySelector('.rightcol.game_meta_data');
 
 		links = [
-			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/favicon-16x16.png', text:'Посмотреть в SteamDB.info'},
-			{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png?v=a', text:'Посмотреть на SteamPrices.com'},
-			{href:'http://plati.ru/asp/find.asp?agent=111350&searchstr='+gamename, icon:'http://plati.ru/favicon.ico', text:'Искать на Plati.ru'},
-			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text:'Искать на SteamPub.ru'},
+			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/favicon-16x16.png', text: t('viewin')+' SteamDB.info'},
+			{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png?v=a', text: t('viewin')+' SteamPrices.com'},
+			{href:'http://plati.ru/asp/find.asp?agent=111350&searchstr='+gamename, icon:'http://plati.ru/favicon.ico', text: t('searchin')+' Plati.ru'},
+			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
 		];
 
 		if(itemType=='app'){
-			links.push({href:'http://steamcommunity.com/my/gamecards/'+itemId, icon:'http://store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text:'Посмотреть мои карты этой игры'})
+			links.push({href:'http://steamcommunity.com/my/gamecards/'+itemId, icon:'http://store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')})
 		}
 
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
 
-		// ajax add to cart
+		// ajax add to cart | cart history
+		var addToCart_old = W.addToCart;
 		W.addToCart = function(subid){
 			var form = W.$J('[name="add_to_cart_'+subid+'"]');
 			var el=form.parent();
-			el.find('.game_purchase_action_bg .btn_addtocart:last>a').after('<a id="swtcartdone" href="#">Wait...</a>');
-			W.$J.ajax({
-				url: form.attr('action'),
-				type: 'POST',
-				data: {subid:subid, action:'add_to_cart', sessionid:W.g_sessionID}
-			}).done(function(data){
-				var cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
-				if(cartHistory.length>=20) cartHistory.shift();
-				cartHistory.push({
-					subid: subid,
-					name: el.find('h1').text().match(/\S+\s(.+)/i)[1],
-					price: el.find('.game_purchase_price.price').text().trim() || el.find('.discount_final_price').text().trim(),
-					link: itemType+'/'+itemId
+			
+			var cartHistory = W.localStorage.swtcarthistory && JSON.parse(W.localStorage.swtcarthistory) || [];
+			if(cartHistory.length>=20) cartHistory.shift();
+			cartHistory.push({
+				subid: subid,
+				name: el.find('h1').text().match(/\S+\s(.+)/i)[1],
+				price: el.find('.game_purchase_price.price').text().trim() || el.find('.discount_final_price').text().trim(),
+				link: itemType+'/'+itemId
+			});
+			W.localStorage.swtcarthistory = JSON.stringify(cartHistory);
+			
+			if(settings.cur.storeCartAjax){
+				el.find('.game_purchase_action_bg .btn_addtocart:last>a').after('<a id="swtcartdone" href="#">'+t('adding')+'</a>');
+				W.$J.ajax({
+					url: form.attr('action'),
+					type: 'POST',
+					data: {subid:subid, action:'add_to_cart', sessionid:W.g_sessionID}
+				}).done(function(data){
+					el.find('#swtcartdone').css('background-image','none').text('✔ '+t('added')).attr('href','/cart/');
 				});
-				W.localStorage['swtcarthistory'] = JSON.stringify(cartHistory);
-				
-				el.find('#swtcartdone').css('background-image','none').text('✔ Added').attr('href','/cart/');
-			})
+			} else {
+				return addToCart_old.apply(this, arguments);
+			}
 		};
 
 	} else {
-		W.$J('a.btn_small_tall[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="btnv6_blue_hoverfade btn_small_tall" href="http://steamdb.info/sales/"><span>All Specials - SteamDB.Info</span></a>');
+		W.$J('a.btn_small_tall[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="btnv6_blue_hoverfade btn_small_tall" href="http://steamdb.info/sales/"><span>'+t('allSpecials')+' - SteamDB.Info</span></a>');
 	}
 
 
 };
 
 _cc = {
-	defList : 'ru ua us ar fr no gb au br de jp',
 	curCC : false,
 	updHTMLccList : function(curCC){
 		var s='';
-		_cc.ListA = _cc.curList.split(' ');
+		_cc.ListA = settings.cur.storeCCList.split(' ');
 		for(var i=0; i < _cc.ListA.length; i++){
 			s += '<a class="popup_menu_item" href="'+_cc.url+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a>';
 		}
-		s += '<a class="popup_menu_item" title="Редактировать" href="#" onclick="ShowMenu(this, \'cc_list_edit\', \'right\', \'bottom\', true);return false"><img src="http://cdn.steamcommunity.com/public/images/skin_1/iconEdit.gif" style="width:16px"/></a>';
+
 		document.getElementById('cc_list').innerHTML=s;
 		if (curCC)
 			_cc.curCC=curCC
 		else
 			_cc.curCC=_cc.ListA[0];
-	},
-	saveNewList : function(){
-		_cc.curList=document.getElementById('ccListEdit').value;
-		W.localStorage.ccList=_cc.curList;
-		_cc.updHTMLccList();
-		return false;
-	},
-	setDefCcList : function(){
-		document.getElementById('ccListEdit').value = _cc.defList;
-		return false;
 	}
 };
-
-_cc.curList = W.localStorage.ccList || _cc.defList;
 
 _cc.url = String(W.location);
 if (_cc.url.indexOf('?')==-1) {
@@ -447,72 +660,72 @@ function profilePageInit(){
 		{
 			href: 'http://check.csmania.ru/#steam:'+steamid,
 			icon: 'http://check.csmania.ru/favicon.ico',
-			text: 'Проверить на Check.CSMania.RU',
+			text: t('checkin')+' Check.CSMania.RU',
 		},
 		{
 			href: 'http://steamrep.com/profiles/'+steamid,
 			icon: 'http://steamrep.com/favicon.ico',
-			text: 'Проверить на SteamRep.com',
+			text: t('checkin')+' SteamRep.com',
 		},
 		{hr:true},
 		{
 			href: 'http://forums.steamrep.com/search/search?keywords='+steamid,
 			icon: 'http://steamrep.com/favicon.ico',
-			text: 'Искать на форумах SteamRep.com',
+			text: t('searchinforums')+' SteamRep.com',
 		},
 		{
 			href: 'http://www.google.com/#q='+steamid+' inurl:sourceop.com',
 			icon: 'http://forums.sourceop.com/favicon.ico',
-			text: 'Искать на форумах SourceOP.com',
+			text: t('searchinforums')+' SourceOP.com',
 		},
 		{
 			href: 'http://www.steamtrades.com/user/id/'+steamid,
 			icon: 'http://www.steamgifts.com/favicon.ico',
-			text: 'Профиль на SteamGifts.com',
+			text: t('profile')+' SteamGifts.com',
 		},
 		{hr:true},
 		{
 			href: 'http://backpack.tf/profiles/'+steamid,
 			icon: 'http://backpack.tf/favicon_440.ico',
-			text: 'Инвентарь Backpack.tf',
+			text: t('inventory')+' Backpack.tf',
 		},
 		{
 			href: 'http://tf2b.com/tf2/'+steamid,
 			icon: 'http://tf2b.com/favicon.ico',
-			text: 'Инвентарь TF2B.com',
+			text: t('inventory')+' TF2B.com',
 		},
 		{
 			href: 'http://tf2outpost.com/backpack/'+steamid,
 			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
-			text: 'Инвентарь TF2OutPost.com',
+			text: t('inventory')+' TF2OutPost.com',
 		},
 		{hr:true},
 		{
 			href: 'http://tf2outpost.com/user/'+steamid,
 			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
-			text: 'Трэйды на TF2OutPost.com',
+			text: t('trades')+' TF2OutPost.com',
 		},
 		{
 			href: 'http://dota2lounge.com/profile?id='+steamid,
 			icon: 'http://dota2lounge.com/favicon.ico',
-			text: 'Трэйды на Dota2Lounge.com',
+			text: t('trades')+' Dota2Lounge.com',
 		},
 		{
 			href: 'http://csgolounge.com/profile?id='+steamid,
 			icon: 'http://csgolounge.com/favicon.ico',
-			text: 'Трэйды на CSGOLounge.com',
+			text: t('trades')+' CSGOLounge.com',
 		},
 		{hr:true},
 		{
 			href: 'http://steammoney.com/trade/user/'+steamid,
 			icon: 'http://steammoney.com/favicon.ico',
-			text: 'Инвентарь SteamMoney.com',
+			text: t('profile')+' SteamMoney.com',
 		},
 		{
 			id:   'inv_spub',
 			href: 'http://steampub.ru/user/'+steamid,
 			icon: 'http://steampub.ru/favicon.ico',
-			text: 'Профиль на SteamPub.ru',
+			text: t('profile')+' SteamPub.ru',
 		},
 		{hr:true}
 
@@ -525,10 +738,10 @@ function profilePageInit(){
 	);
 
 
-	$('.profile_header').append('<div id="swt_info">SteamID64: <a href="http://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> | <a href="#getMoreInfo" onclick="getMoreInfo();return false">Get more info</a></div>');
+	$('.profile_header').append('<div id="swt_info">SteamID64: <a href="http://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> | <a href="#getMoreInfo" onclick="getMoreInfo();return false">'+t('getMoreInfo')+'</a></div>');
 
 	W.getMoreInfo = function() {
-		var Modal = W.ShowDialog('Extended Info', $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
+		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
 		W.setTimeout(function(){Modal.AdjustSizing();},1);
 		$.ajax({
 			url: W.location.href+'?xml=1',
@@ -561,7 +774,7 @@ function profilePageInit(){
 			);
 			W.setTimeout(function(){Modal.AdjustSizing();},1);
 		}).fail(function(){
-			$('#swtexinfo').html('Request Error / Ошибка при получении данных')
+			$('#swtexinfo').html(t('reqErr'));
 		});
 	};
 
@@ -569,7 +782,7 @@ function profilePageInit(){
 	// chat button
 	try {
 		var pm_btn = $('.profile_header_actions>a.btn_profile_action[href^="javascript:LaunchWebChat"]')[0];
-		pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">Chat: Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
+		pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">'+t('chat')+': Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
 	} catch(e) {};
 
 	// Games link - tab all games
@@ -579,7 +792,6 @@ function profilePageInit(){
 	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
 		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="http://store.akamai.steamstatic.com/public/images/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
-
 
 
 	var out = '', link;
@@ -597,12 +809,10 @@ function profilePageInit(){
 		document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("afterBegin", out);
 	} catch(err) {
 		// "More" button for self profile
-		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>More <img src="http://cdn.steamcommunity.com/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
+		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>'+t('more')+' <img src="http://cdn.steamcommunity.com/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
 	}
 
-
 }
-
 
 if (W.g_rgProfileData) {
 	profilePageInit();
@@ -648,10 +858,12 @@ function inventoryPageInit(){
 	}
 
 
-	// multi gifts sending
+	// styles
 	document.body.insertAdjacentHTML("afterBegin",
-		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}#inventory_logos{display:none}</style>'
+		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}.swt_icon{position:absolute;top:0;left:0}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}#swt_subItemsSpoiler,.swt_hidden{display:none}</style>'
 	);
+
+	// multi gifts sending
 	W.checkedForSend={};
 	W.checkForSend = function(giftId){
 		var item = W.g_ActiveInventory.selectedItem;
@@ -669,7 +881,7 @@ function inventoryPageInit(){
 		} else {
 			var amount = 1;
 			if(item._amount>1) {
-				amount =  parseInt(prompt('Сколько выбрать? из '+item._amount, item._amount)) || 1;
+				amount =  parseInt(prompt(t('howmany')+item._amount, item._amount)) || 1;
 				if (amount>item._amount)
 					amount=item._amount;
 			}
@@ -694,29 +906,49 @@ function inventoryPageInit(){
 			break;
 		}
 
-		url+=gid+'#multisend='+encodeURIComponent(JSON.stringify(W.checkedForSend))
+		url+=gid+'#multisend='+encodeURIComponent(JSON.stringify(W.checkedForSend));
 
 		W.location.href=url;
 
 	}
 	// END multi gifts sending
 
-	//// gifts notes
-	var giftsNotes = W.localStorage.giftsNotes;
-	if(giftsNotes)
-		giftsNotes = JSON.parse(giftsNotes);
-	else giftsNotes={};
-	W.loadGiftNote = function(){
-		var gid = W.g_ActiveInventory.selectedItem.id;
-		if(!$('#iteminfo'+W.iActiveSelectView+'_item_tags_content textarea.giftnote').length)
-			$('#iteminfo'+W.iActiveSelectView+'_item_tags_content').append('<br/><textarea class="giftnote" style="width:100%">'+(giftsNotes[gid]||'')+'</textarea><button onclick="saveGiftNote(\''+gid+'\')">Save</button>');
-	}
-	W.saveGiftNote = function(gid){
-		giftsNotes[gid]=$('#iteminfo'+W.iActiveSelectView+'_content textarea.giftnote').val();
-		W.localStorage.giftsNotes = JSON.stringify(giftsNotes);
+
+	if(W.g_bViewingOwnProfile){
+		//// gifts notes
+		var giftsNotes = W.localStorage.giftsNotes;
+		if(giftsNotes)
+			giftsNotes = JSON.parse(giftsNotes);
+		else giftsNotes={};
+		W.loadGiftNote = function(){
+			var gid = W.g_ActiveInventory.selectedItem.id;
+			if(!$('#iteminfo'+W.iActiveSelectView+'_item_tags_content textarea.giftnote').length)
+				$('#iteminfo'+W.iActiveSelectView+'_item_tags_content').append('<br/><textarea class="giftnote" style="width:100%">'+(giftsNotes[gid]||'')+'</textarea><button onclick="saveGiftNote(\''+gid+'\')">'+t('save')+'</button>');
+		}
+		W.saveGiftNote = function(gid){
+			giftsNotes[gid]=$('#iteminfo'+W.iActiveSelectView+'_content textarea.giftnote').val();
+			W.localStorage.giftsNotes = JSON.stringify(giftsNotes);
+		}
+
+		// accept all gifts Btn
+		var el = $('div.pending_gift:first');
+		if(el.length){
+			el.before('<a id="swt_acceptAllGifts" class="btn_darkblue_white_innerfade btn_medium new_trade_offer_btn" href="#"><span>'+t('acceptAllToInv')+'</span></a>');
+			$('#swt_acceptAllGifts').click(function(){
+				var pg = $('div.pending_gift');
+				if(pg.length){
+					var gid;
+					pg=pg.find('>div[id^="pending_gift_"]');
+					for(var i=0; i<pg.length; i++){
+						gid = pg[i].id.split('_')[2];
+						DoAcceptGift(gid, false);
+					}
+				}
+			});
+		}
 	}
 
-	//// action for gifts and tf2 items
+	//// action for gifts and items
 	var BuildHover_orig = W.BuildHover;
 	W.BuildHover = function(){
 		var item = arguments[1];
@@ -730,7 +962,7 @@ function inventoryPageInit(){
 
 				item.descriptions.push({value:'ClassID = '+item.classid});
 				if(W.g_bViewingOwnProfile)
-					item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target,\''+item.id+'\');return false">Получить SubscriptionID</a>',type:'html'});
+					item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target,\''+item.id+'\');return false">'+t('get')+' SubscriptionID</a>',type:'html'});
 
 				if(!ajaxTarget.descriptions[item.classid])
 					ajaxTarget.descriptions[item.classid] = item.descriptions;
@@ -739,26 +971,33 @@ function inventoryPageInit(){
 				if(item.owner_actions) {
 					item.owner_actions.push({
 						link:'javascript:checkForSend("%assetid%")',
-						name:'Выбрать для отправки'
+						name:t('checkForSend')
 					});
 					item.owner_actions.push({
 						link:'javascript:sendChecked()',
-						name:'Отправить выбранные'
+						name:t('sendChecked')
 					});
 					item.owner_actions.push({
 						link:'javascript:loadGiftNote()',
-						name:'Посмотреть заметку'
+						name:t('showNote')
 					});
 				}
 			}
+		}
+		if(item._amount>1){
+			$('#swt_subItemsSpoiler .swt_hidden').hide().empty().append(item._subItems);
+			$('#swt_subItemsSpoiler #swt_subItemsMore').text(item._amount-1);
+			$('#swt_subItemsSpoiler').show();
+		} else{
+			$('#swt_subItemsSpoiler').hide();
 		}
 		return BuildHover_orig.apply(this, arguments);
 	}
 
 
 	//// View in Market Button
-	// not for me
-	if (W.UserYou.strSteamId!=W.g_steamID){
+	// for foreign inventory
+	if (!W.g_bViewingOwnProfile){
 		var PopulateMarketActions_orig = W.PopulateMarketActions;
 		W.PopulateMarketActions = function (elActions, item) {
 			var res = PopulateMarketActions_orig.apply(this, arguments);
@@ -766,7 +1005,7 @@ function inventoryPageInit(){
 				return res;
 			}
 			var market_hash_name = item.market_hash_name ? item.market_hash_name : item.market_name;
-			elActions.appendChild(W.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, 'Мин цена на маркете: <span id="swt_lowestItemPrice_'+item.classid+'">?</span>'));
+			elActions.appendChild(W.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, t('minMarketPrice')+': <span id="swt_lowestItemPrice_'+item.classid+'">?</span>'));
 			$(elActions).css('display', 'block');
 			$.ajax( {
 				url: 'http://steamcommunity.com/market/priceoverview/',
@@ -778,13 +1017,13 @@ function inventoryPageInit(){
 					market_hash_name: market_hash_name
 				}
 			} ).done( function ( data ) {
-				var price='ERROR';
+				var price=t('reqErr');
 				if(data.success){
 					price=data.lowest_price
 				}
 				$('#swt_lowestItemPrice_'+item.classid).html(price);
 			} ).fail(function(jqxhr) {
-				$('#swt_lowestItemPrice_'+item.classid).text('ERROR');
+				$('#swt_lowestItemPrice_'+item.classid).text(t('reqErr'));
 			} );
 
 
@@ -792,7 +1031,7 @@ function inventoryPageInit(){
 		}
 	}
 
-	//// Hide Duplicates
+	//// inv
 
 	var SelectInventoryFromUser_old = W.SelectInventoryFromUser;
 	W.SelectInventoryFromUser = function(){
@@ -800,18 +1039,80 @@ function inventoryPageInit(){
 		var contextid = arguments[2];
 
 		var inventory = W.UserYou.getInventory( appid, contextid );
-		if (W.localStorage.hideDupItems && !inventory._hiddenDup) {
 
-			// display count
-			if(!inventory.BuildItemElement_old){
-				inventory.BuildItemElement_old = inventory.BuildItemElement;
-				inventory.BuildItemElement = function(){
-					var el = inventory.BuildItemElement_old.apply(this, arguments);
-					var a = el.rgItem._amount;
-					if (a)
-						el.innerHTML+='<div class="itemcount">x'+a+'</div>';
-					return el;
+		if(!inventory.BuildItemElement_old){
+			inventory.BuildItemElement_old = inventory.BuildItemElement;
+			inventory.BuildItemElement = function(){
+				var el = inventory.BuildItemElement_old.apply(this, arguments);
+				var fncs = this.BuildItemElement.fncs;
+				for (var i=0;i<fncs.length;i++) {
+					fncs[i].apply(this, [el]);
 				}
+				return el;
+			};
+			inventory.BuildItemElement.fncs=[];
+		}
+
+		if (appid==730) { //CSGO
+			// Item color by Rarity
+			if(!inventory.BuildItemElement.fncs.csgoItemColor) {
+				inventory.BuildItemElement.fncs.csgoItemColor = true;
+				inventory.BuildItemElement.fncs.push(function(el){
+					var icons='<div class="swt_icon">',
+						tags = el.rgItem.tags;
+					for (var i=0;i<tags.length;i++) {
+						switch (tags[i].category) {
+							case "Quality":
+								switch (tags[i].internal_name) {
+									case "strange":
+										icons+='<span class="swt_icon-st">ST</span>';
+										break;
+									case "unusual":
+										el.style.borderColor='#'+tags[i].color;
+										tags.colored=true;
+										break;
+									case "tournament":
+										icons+='<span class="swt_icon-t">S</span>';
+										break;
+								}
+								break;
+							case "Rarity":
+								if (!tags.colored)
+									el.style.borderColor='#'+tags[i].color;
+								break;
+						}
+					};
+					el.innerHTML+=icons+'</div>';
+				});
+			}
+		}
+
+		if (W.localStorage.hideDupItems && !inventory._hiddenDup) {
+			/* //show dup
+			if(!$('#swt_subItemsSpoiler').length) {
+				$('div.inventory_page_right').prepend('<div id="swt_subItemsSpoiler"><div>Показать еще <span id="swt_subItemsMore"></span></div><div class="swt_hidden"></div></div>');
+				$('#swt_subItemsSpoiler>div:first').click(function(){
+					$(this).next().slideToggle();
+				});
+			}
+			*/
+			// display amount
+			if(!inventory.BuildItemElement.fncs.itemcount) {
+				inventory.BuildItemElement.fncs.itemcount = true;
+				inventory.BuildItemElement.fncs.push(function(el){
+					var a = el.rgItem._amount;
+					if (!a) return;
+					el.innerHTML+='<div class="itemcount">x'+a+'</div>';
+					//el.parentElement.innerHTML+='<a id="swt_dropmenubtn" class="slot_actionmenu_button" href="javascript:void(0)"></a>';
+					/*if (a>1) {
+						for(var i=0;i<el.rgItem._subItems.length;i++){
+							el.rgItem._subItems[i]=$(inventory.BuildItemElement(el.rgItem._subItems[i])).wrap("<div class='itemHolder'></div>");
+							inventory.LoadItemImage( el.rgItem._subItems[i] );
+						}
+						//$(el.rgItem._subItems).wrap("<div class='itemHolder'></div>");
+					}*/
+
+				});
 			}
 
 			var itemsA = [];
@@ -839,11 +1140,13 @@ function inventoryPageInit(){
 						if(newItems[items[j].classid]){
 							newItems[items[j].classid]._amount +=1;
 							newItems[items[j].classid]._ids.push(items[j].id);
+							newItems[items[j].classid]._subItems.push(items[j]);
 							delete items[j];
 						} else {
 							items[j]._is_stackable = true;
 							items[j]._amount = 1;
 							items[j]._ids = [items[j].id];
+							items[j]._subItems = [];
 							newItems[items[j].classid] = items[j];
 						}
 					}
@@ -856,7 +1159,7 @@ function inventoryPageInit(){
 	}
 
 
-	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>Прятать дубликаты, показывая кол-во';
+	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup');
 	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
 
 	W.onchangehidedup = function(e){
@@ -879,10 +1182,13 @@ function inventoryPageInit(){
 		W.SellCurrentSelection = function(){
 			var res = SellCurrentSelection_old.apply(this, arguments);
 			var count = W.g_ActiveInventory.selectedItem._amount;
+
+			// unbind Sell btn
 			W.$('market_sell_dialog_ok').stopObserving();
 			$('#market_sell_dialog_ok').unbind();
+
 			if(count>1) {
-				var amount =  parseInt(prompt('Сколько продавать? из '+count, count)) || 1;
+				var amount =  parseInt(prompt(t('howmany')+count, count)) || 1;
 				if (amount>count)
 					amount=count;
 
@@ -916,7 +1222,7 @@ function inventoryPageInit(){
 						} ).done( function ( data ) {
 							$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text('Выставлен №'+W.SellItemDialog._itemNum);
 							if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
-								W.SellItemDialog.OnSuccess( { responseJSON: data } );
+								W.SellItemDialog.OnSuccess.apply(W.SellItemDialog, [{ responseJSON: data }])
 							else {
 								return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
 							}
@@ -925,8 +1231,6 @@ function inventoryPageInit(){
 							var data = $.parseJSON( jqxhr.responseText );
 							W.SellItemDialog.OnFailure( { responseJSON: data } );
 						} );
-						//W.SellItemDialog.Dismiss();
-						//event.stop();
 
 					}
 					W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_new;
@@ -937,7 +1241,9 @@ function inventoryPageInit(){
 
 			} else
 				W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_old;
-			$('#market_sell_dialog_ok').on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
+			//$('#market_sell_dialog_ok').on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
+			W.$('market_sell_dialog_ok').observe( 'click', W.SellItemDialog.OnConfirmationAccept.bindAsEventListener(W.SellItemDialog) );
+
 			return res;
 		}
 
@@ -967,7 +1273,7 @@ W.$J('.gamecards_inventorylink').append('<a class="btn_grey_grey btn_small_thin"
 			'https?://steamcommunity\\.com/profiles/\\d+/badges.*',
 		],
 		run:function(){
-W.$J('.badge_details_set_favorite').append('<div class="btn_grey_black btn_small_thin" onclick="showWithDrop()"><span>Показать с невыпавшими картами</span></div>');
+W.$J('.badge_details_set_favorite').append('<div class="btn_grey_black btn_small_thin" onclick="showWithDrop()"><span>'+t('showDropsCard')+'</span></div>');
 W.showWithDrop=function(){
 	W.$J('.badge_row').filter(function(i,el){
 		return !(W.$J('a.btn_green_white_innerfade',el).length)
@@ -978,10 +1284,30 @@ W.showWithDrop=function(){
 	},
 	{
 		match:[
-			'http://steamcommunity.com/market.*'
+			'https?://steamcommunity\\.com/app/\\d+/guides*'
+		],
+		run:function(){
+$J('.workshopItemCollection').wrap(function() {
+	var el = $J( this )
+		url = el.attr('onclick').match(/href='(.+)'/)[1];
+	el.attr('onclick', false);
+	return "<a href='" + url + "'></a>";
+});
+		}
+	},
+	{
+		match:[
+			'http://steamcommunity\\.com/market.*'
 		],
 		run:function(){
 ﻿function init(){
+	if(settings.cur.globalHideWalletBalance){
+		var el = W.$J('#marketWalletBalanceAmount')[0];
+		if(el){
+			el.title = el.innerHTML;
+			el.innerHTML = '['+t('balance')+']';
+		}
+	}
 	var el = W.$J('.pick_and_sell_button').length;
 	if(el)
 	{
@@ -1005,7 +1331,7 @@ function mainPage(){
 
 	//// Remove button
 	// add
-	var el = document.querySelector('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_edit_buttons').innerHTML='<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">Выбрать все</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">Удалить выбранные</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>';
+	var el = document.querySelector('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_edit_buttons').innerHTML='<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('checkAll')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('deleteChecked')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>';
 
 	// set function
 	W.$J('#btnCheckAllListings').click(function(){
@@ -1090,7 +1416,7 @@ function itemPage(){
 }
 
 function addGotoBtn(){
-	W.$J("#searchResults_btn_next").after(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">Go</span>');
+	W.$J("#searchResults_btn_next").after(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">'+t('go')+'</span>');
 	W.$('swt_gotopagebtn').onclick=function(){
 		W.g_oSearchResults.GoToPage(W.$('swt_gotopagevl').value-1);
 	}
@@ -1098,9 +1424,195 @@ function addGotoBtn(){
 
 init();
 		}
+	},
+	{
+		match:[
+			'http://steamcommunity\\.com/groups/SteamClientBeta#swt-settings'
+		],
+		run:function(){
+var $ = W.$J;
+
+$('#group_tab_content_overview').attr('id','swt_content1');
+
+$('head').append($('<link href="http://steamcommunity-a.akamaihd.net/public/css/skin_1/groupadmin.css" rel="stylesheet" type="text/css">'));
+
+$('.grouppage_logo').css('background-image','none');
+$('.grouppage_logo>img')[0].src='http://v1t.su/projects/steam/webtools/imgs/steam-big-icon.png';
+
+$('.grouppage_header_label').text('Steam '+t('set.ext'));
+$('.grouppage_header_name').html('Steam Web Tools <span class="grouppage_header_abbrev" style="font-size:21px">'+t('set.settings')+'</span>');
+$('.grouppage_join_area a')[0].href='http://v1t.su/projects/steam/webtools/';
+$('.grouppage_join_area a span').text(t('set.homePage'));
+$('.grouppage_friendsingroup').remove();
+$('.grouppage_member_tiles').remove();
+$('.group_tabs').remove();
+$('.rightcol ').remove();
+
+
+var createForm = function(data){
+	var res = '';
+	createForm.fields = [];
+
+	var rows, row, i, j;
+	for(i=0;i<data.length;i++){
+		res+=createForm.create_groupStart(data[i].group);
+		rows = data[i].rows;
+		for(j=0;j<rows.length;j++){
+			row=rows[j];
+
+			createForm.fields.push(row.name);
+
+			row.value = settings.cur[row.name];
+
+			res+='<div class="formRow">';
+			res+=createForm['create_'+row.type](row);
+			res+='</div>';
+		}
+		res+=createForm.create_groupEnd();
+	}
+	$('.maincontent>.leftcol ')[0].innerHTML='<form class="smallForm" id="editForm" name="editForm">'+res+'<div class="group_content_bodytext"><div class="forum_manage_actions"><a href="#swt-settings" class="btn_grey_white_innerfade btn_medium" id="swt_btnDef"><span>'+t('set.def')+'</span></a><button type="submit" class="btn_green_white_innerfade btn_medium"><span>'+t('save')+'</span></button></div></div></form>';
+}
+createForm.create_groupStart = function(title){
+	return '<div class="group_content group_summary"><div class="formRow"><h1>'+title+'</h1></div>';
+}
+createForm.create_groupEnd = function(){
+	return '</div>';
+}
+createForm.create_checkbox = function(data){
+	return '<input type="checkbox"'+(data.value?' checked="checked"':'')+' name="'+data.name+'" id="'+data.name+'"><label for="'+data.name+'">'+data.title+'</label>';
+}
+createForm.create_select = function(data){
+	var res = '<div class="formRowTitle">'+data.title+'</div><div class="formRowFields"><select name="'+data.name+'" id="'+data.name+'" class="gray_bevel">';
+
+	var ops = data.options;
+	for(var i=0;i<ops.length;i++){
+		res+='<option value="'+ops[i].value+'"'+(ops[i].value==data.value ?' selected="selected"':'')+'>'+ops[i].text+'</option>';
+	}
+
+	res+='</select></div>';
+	return res;
+}
+createForm.create_textLong = function(data){
+	return '<div>'+data.title+'</div><div class="formRowFields"><div class="gray_bevel for_text_input fullwidth"><input type="text" name="'+data.name+'" id="'+data.name+'" value="'+data.value+'"></div></div>';
+}
+
+createForm([
+	{
+		group:t('set.global'),
+		rows:[
+			{
+				type:'select',
+				title:t('set.lang'),
+				name:'globalLang',
+				options:[
+					{
+						text : 'English',
+						value : 'en'
+					},
+					{
+						text : 'Русский',
+						value : 'ru',
+					},
+				],
+			},
+			{
+				type:'checkbox',
+				title:t('set.hideAccName'),
+				name:'globalHideAccName',
+			},
+			{
+				type:'checkbox',
+				title:t('set.hideBalance'),
+				name:'globalHideWalletBalance',
+			},
+		],
+	},
+	{
+		group:t('set.store'),
+		rows:[
+			{
+				type:'checkbox',
+				title:t('set.showCCBtn'),
+				name:'storeShowCCbtn',
+			},
+			{
+				type:'textLong',
+				title:t('set.CCList'),
+				name:'storeCCList',
+			},
+			{
+				type:'checkbox',
+				title:t('set.showCartBtn'),
+				name:'storeShowCartBtn',
+			},
+			{
+				type:'checkbox',
+				title:t('set.cartAjax'),
+				name:'storeCartAjax',
+			},
+			{
+				type:'checkbox',
+				title:t('set.showSubid'),
+				name:'storeShowSubid',
+			},
+			{
+				type:'checkbox',
+				title:t('set.showBtnGetPrices'),
+				name:'storeShowBtnGetPrices',
+			},
+		],
+	},
+]);
+
+$('#swt_btnDef').click(function(){
+	settings.reset();
+	settings.save();
+	if(!settings.storage.gm) {
+		W.location.href="http://store.steampowered.com/about/#swt-settings-del";
+	} else
+		W.location.reload();
+});
+
+$("form#editForm").submit(function(event) {
+	var i, f, el;
+	for(i=0;i<createForm.fields.length;i++){
+		f=createForm.fields[i];
+		el=$('#'+f);
+		settings.cur[f] = (el.prop('type')=='checkbox') ? el.prop('checked') : el.val();
+	}
+	settings.save();
+
+	event.preventDefault();
+	if(!settings.storage.gm) {
+		W.location.href="http://store.steampowered.com/about/#swt-settings-save="+encodeURIComponent(JSON.stringify(settings.cur));
+	} else
+		W.location.reload();
+});
+
+
+		}
+	},
+	{
+		match:[
+			'http://store\\.steampowered\\.com/about/#swt-settings.*',
+		],
+		run:function(){
+var h = W.location.hash;
+if(h && h.substr(1,13)=='swt-settings-'){
+	if(h.substr(14,4)=='save'){
+		var data = h.substr(19);
+		data = decodeURIComponent(data);
+		settings.storage.set(data);
+	} else if(h.substr(14,3)=='del'){
+		settings.storage.del();
+	}
+}
+W.location.href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings";
+		}
 	}
 ];
 
+var url = document.URL;
 for(var i = 0; i<scripts.length; i++) {
 	for(var j = 0; j < scripts[i].match.length; j++) {
 		var expr = new RegExp('^'+scripts[i].match[j]+'$', 'i');
