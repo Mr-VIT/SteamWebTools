@@ -9,7 +9,7 @@
 	var el = W.$J('.pick_and_sell_button').length;
 	if(el)
 	{
-		mainPage();
+		if(settings.cur.marketMainPageFuncs) mainPage();
 	} else
 	if(document.getElementById('searchResults'))
 	{

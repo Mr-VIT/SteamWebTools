@@ -319,7 +319,7 @@ function inventoryPageInit(){
 							items[j]._is_stackable = true;
 							items[j]._amount = 1;
 							items[j]._ids = [items[j].id];
-							items[j]._subItems = [];
+							items[j]._subItems = [items[j]];
 							newItems[items[j].classid] = items[j];
 						}
 					}
@@ -368,6 +368,7 @@ function inventoryPageInit(){
 				if(amount>1){
 					W.SellItemDialog._amount=amount;
 					W.SellItemDialog._itemNum=0;
+					W.SellItemDialog._itemsFailNum=0;
 					W.SellItemDialog.OnConfirmationAccept_new = function(event){
 
 						W.$('market_sell_dialog_error').hide();
@@ -375,9 +376,13 @@ function inventoryPageInit(){
 						W.$('market_sell_dialog_back').fade({duration:0.25});
 						W.$('market_sell_dialog_throbber').show();
 						W.$('market_sell_dialog_throbber').fade({duration:0.25,from:0,to:1});
-
-						W.SellItemDialog.m_item.id=W.SellItemDialog.m_item._ids[W.SellItemDialog._itemNum];
-						W.SellItemDialog._itemNum++;
+						
+						var item;
+						do {
+							item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum];
+							W.SellItemDialog._itemNum++;
+						} while(!item.marketable);
+						W.SellItemDialog.m_item.id=item.id;
 
 						$.ajax( {
 							url: 'https://steamcommunity.com/market/sellitem/',
@@ -393,7 +398,7 @@ function inventoryPageInit(){
 							crossDomain: true,
 							xhrFields: { withCredentials: true }
 						} ).done( function ( data ) {
-							$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text('Выставлен №'+W.SellItemDialog._itemNum);
+							$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text(t('listed')+W.SellItemDialog._itemNum+(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : ''));
 							if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
 								W.SellItemDialog.OnSuccess.apply(W.SellItemDialog, [{ responseJSON: data }])
 							else {
@@ -402,7 +407,12 @@ function inventoryPageInit(){
 						} ).fail( function( jqxhr ) {
 							// jquery doesn't parse json on fail
 							var data = $.parseJSON( jqxhr.responseText );
-							W.SellItemDialog.OnFailure( { responseJSON: data } );
+							W.SellItemDialog._itemsFailNum++;
+							if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
+								W.SellItemDialog.OnFailure( { responseJSON: data } );
+							else {
+								return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
+							}
 						} );
 
 					}
@@ -414,8 +424,8 @@ function inventoryPageInit(){
 
 			} else
 				W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_old;
-			//$('#market_sell_dialog_ok').on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
-			W.$('market_sell_dialog_ok').observe( 'click', W.SellItemDialog.OnConfirmationAccept.bindAsEventListener(W.SellItemDialog) );
+			$('#market_sell_dialog_ok').on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
+			//W.$('market_sell_dialog_ok').observe( 'click', W.SellItemDialog.OnConfirmationAccept.bindAsEventListener(W.SellItemDialog) );
 
 			return res;
 		}

@@ -43,6 +43,8 @@
 'balance' : 'Balance',
 'acc' : 'Account',
 'acceptAllToInv' : 'Accept all to inventory',
+'listed' : 'Listed: ',
+'skipped' : 'Skipped: ',
 // settings page
 'set.ext' : 'extension',
 'set.settings' : 'Settings',
@@ -59,3 +61,5 @@
 'set.showSubid' : 'Show SubID',
 'set.showBtnGetPrices' : 'Show button "Get prices for other countries"',
 'set.def' : 'Restore the default',
+'set.market' : 'Community Market',
+'set.marketMainPageFuncs' : 'Enable functions in main page of Community Market',

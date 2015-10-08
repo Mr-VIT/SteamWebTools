@@ -1,6 +1,6 @@
 var $ = W.$J;
 
-$('#group_tab_content_overview').attr('id','swt_content1');
+$('#group_tab_content_overview').show().attr('id','swt_content1');
 
 $('head').append($('<link href="http://steamcommunity-a.akamaihd.net/public/css/skin_1/groupadmin.css" rel="stylesheet" type="text/css">'));
 
@@ -128,6 +128,16 @@ createForm([
 				title:t('set.showBtnGetPrices'),
 				name:'storeShowBtnGetPrices',
 			},
+		],
+	},
+	{
+		group:t('set.market'),
+		rows:[
+			{
+				type:'checkbox',
+				title:t('set.marketMainPageFuncs'),
+				name:'marketMainPageFuncs',
+			}
 		],
 	},
 ]);
