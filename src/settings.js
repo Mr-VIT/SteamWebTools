@@ -12,6 +12,8 @@ var settings = {
 		storeCartAjax : true,
 		storeShowSubid : true,
 		storeShowBtnGetPrices : true,
+		
+		marketMainPageFuncs: true,
 	},
 	cur : {},
 	storage : {
