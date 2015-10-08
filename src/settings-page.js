@@ -81,6 +81,10 @@ createForm([
 						text : 'Русский',
 						value : 'ru',
 					},
+					{
+						text : '简体中文',
+						value : 'zh-cn',
+					},
 				],
 			},
 			{
