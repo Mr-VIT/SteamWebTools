@@ -14,3 +14,6 @@ t.loadText({  //default text
 t.loadText({
 //!include lang/ru.js
 });
+t.loadText({
+//!include lang/zh-cn.js
+});
