@@ -89,6 +89,11 @@ createForm([
 			},
 			{
 				type:'checkbox',
+				title:t('set.FixNavbar'),
+				name:'globalFixNavbar',
+			},
+			{
+				type:'checkbox',
 				title:t('set.hideAccName'),
 				name:'globalHideAccName',
 			},

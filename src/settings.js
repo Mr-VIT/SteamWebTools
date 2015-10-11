@@ -3,6 +3,7 @@ var settings = {
 		version : 1,
 
 		globalLang : 'en',
+		globalFixNavbar : true,
 		globalHideAccName : true,
 		globalHideWalletBalance : true,
 
