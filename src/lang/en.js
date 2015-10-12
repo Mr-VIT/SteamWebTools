@@ -63,3 +63,4 @@
 'set.def' : 'Restore the default',
 'set.market' : 'Community Market',
 'set.marketMainPageFuncs' : 'Enable functions in main page of Community Market',
+'set.FixNavbar' : 'Fix Navbar',

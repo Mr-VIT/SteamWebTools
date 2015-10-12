@@ -110,7 +110,11 @@ function mainPage(){
 function itemPage(){
 	//// accept ssa checked
 	W.$('market_buynow_dialog_accept_ssa').checked=true;
-	addGotoBtn()
+	addGotoBtn();
+	//numerate listings
+	$J('#searchResultsRows .market_listing_item_name_block').each(function(i,e) {
+		$J(e).prepend('<div style="float:right">#'+(i+1)+'</div>')
+	});
 }
 
 function addGotoBtn(){

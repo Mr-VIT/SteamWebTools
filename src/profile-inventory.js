@@ -205,14 +205,31 @@ function inventoryPageInit(){
 	}
 
 	//// inv
-
+	
+	// hide dup witth filters
+	W.Filter.UpdateTagFiltering_old = W.Filter.UpdateTagFiltering;
+	W.Filter.UpdateTagFiltering = function(rgNewTags){
+		if (W.localStorage.hideDupItems) {
+			rgNewTags['SWT']=['notdup'];
+		}
+		return this.UpdateTagFiltering_old.apply(this, [rgNewTags]);
+	}
+	var ShowItemInventory_old = ShowItemInventory;
+	W.ShowItemInventory = function( appid, contextid, assetid, bLoadCompleted ){
+		console.log('ShowItemInventory', appid, contextid, assetid, bLoadCompleted);
+		return ShowItemInventory_old.apply(this, arguments);
+	}
 	var SelectInventoryFromUser_old = W.SelectInventoryFromUser;
-	W.SelectInventoryFromUser = function(){
-		var appid = arguments[1];
-		var contextid = arguments[2];
-
+	W.SelectInventoryFromUser = function( user, appid, contextid, bForceSelect ){
+		/*var appid = arguments[1];
+		var contextid = arguments[2];*/
+		if (!bForceSelect) {
+			return SelectInventoryFromUser_old.apply(this, arguments);
+		}
 		var inventory = W.UserYou.getInventory( appid, contextid );
 
+		console.log('SelectInventoryFromUser', appid,contextid, bForceSelect);
+		
 		if(!inventory.BuildItemElement_old){
 			inventory.BuildItemElement_old = inventory.BuildItemElement;
 			inventory.BuildItemElement = function(){
@@ -260,39 +277,43 @@ function inventoryPageInit(){
 			}
 		}
 
-		if (W.localStorage.hideDupItems && !inventory._hiddenDup) {
-			/* //show dup
-			if(!$('#swt_subItemsSpoiler').length) {
-				$('div.inventory_page_right').prepend('<div id="swt_subItemsSpoiler"><div>Показать еще <span id="swt_subItemsMore"></span></div><div class="swt_hidden"></div></div>');
-				$('#swt_subItemsSpoiler>div:first').click(function(){
-					$(this).next().slideToggle();
-				});
-			}
-			*/
+		if (!inventory._hiddenDup) {
 			// display amount
 			if(!inventory.BuildItemElement.fncs.itemcount) {
 				inventory.BuildItemElement.fncs.itemcount = true;
 				inventory.BuildItemElement.fncs.push(function(el){
+					if (el.rgItem._dup) {
+						$(el).addClass("swt_itemdup");
+					}
 					var a = el.rgItem._amount;
 					if (!a) return;
 					el.innerHTML+='<div class="itemcount">x'+a+'</div>';
-					//el.parentElement.innerHTML+='<a id="swt_dropmenubtn" class="slot_actionmenu_button" href="javascript:void(0)"></a>';
-					/*if (a>1) {
-						for(var i=0;i<el.rgItem._subItems.length;i++){
-							el.rgItem._subItems[i]=$(inventory.BuildItemElement(el.rgItem._subItems[i])).wrap("<div class='itemHolder'></div>");
-							inventory.LoadItemImage( el.rgItem._subItems[i] );
-						}
-						//$(el.rgItem._subItems).wrap("<div class='itemHolder'></div>");
-					}*/
-
 				});
 			}
+			
+			inventory.MakeActive_old = inventory.MakeActive;
+			inventory.MakeActive = function(){
+				var res = inventory.MakeActive_old.apply(this, arguments);
+				if(W.localStorage.hideDupItems){
+					W.Filter.rgCurrentTags['SWT']=['notdup'];
+					W.Filter.OnFilterChange();
+					$('.itemcount').show();
+				} else {
+					delete W.Filter.rgCurrentTags.SWT;
+					W.Filter.rgLastTags['SWT']=['notdup'];
+					W.Filter.OnFilterChange();
+					$('.itemcount').hide();
+				}
+				return res;
+			}
+			
 
 			var itemsA = [];
 
 			if(inventory.rgChildInventories) {
 				for(var x in inventory.rgChildInventories){
 					inventory.rgChildInventories[x].BuildItemElement = inventory.BuildItemElement; // display count
+					inventory.rgChildInventories[x].MakeActive = inventory.MakeActive; // display count
 					itemsA.push(inventory.rgChildInventories[x].rgInventory);
 				}
 			} else {
@@ -314,12 +335,17 @@ function inventoryPageInit(){
 							newItems[items[j].classid]._amount +=1;
 							newItems[items[j].classid]._ids.push(items[j].id);
 							newItems[items[j].classid]._subItems.push(items[j]);
-							delete items[j];
 						} else {
 							items[j]._is_stackable = true;
 							items[j]._amount = 1;
 							items[j]._ids = [items[j].id];
 							items[j]._subItems = [items[j]];
+
+							items[j].tags.push({category: "SWT",
+								category_name: "SteamWebTools",
+								internal_name: "notdup",
+								name: "HideDup"}
+							);
 							newItems[items[j].classid] = items[j];
 						}
 					}
@@ -337,100 +363,98 @@ function inventoryPageInit(){
 
 	W.onchangehidedup = function(e){
 		if(e.target.checked){
-			W.localStorage.hideDupItems = 1
+			W.localStorage.hideDupItems = 1;
 		} else {
-			W.localStorage.removeItem('hideDupItems')
+			W.localStorage.removeItem('hideDupItems');
 		}
-
-		W.location.reload();
+		g_ActiveInventory.MakeActive();
 	};
 
 	//// sell dialog accept ssa checked
 	$('#market_sell_dialog_accept_ssa').attr('checked',true);
 
 	//// multisell
-	if(W.localStorage.hideDupItems){
-		W.SellItemDialog.OnConfirmationAccept_old = W.SellItemDialog.OnConfirmationAccept;
-		var SellCurrentSelection_old = W.SellCurrentSelection;
-		W.SellCurrentSelection = function(){
-			var res = SellCurrentSelection_old.apply(this, arguments);
-			var count = W.g_ActiveInventory.selectedItem._amount;
+	W.SellItemDialog.OnConfirmationAccept_old = W.SellItemDialog.OnConfirmationAccept;
+	var SellCurrentSelection_old = W.SellCurrentSelection;
+	W.SellCurrentSelection = function(){
+		var res = SellCurrentSelection_old.apply(this, arguments);
+		var count = W.g_ActiveInventory.selectedItem._amount;
 
-			// unbind Sell btn
-			W.$('market_sell_dialog_ok').stopObserving();
-			$('#market_sell_dialog_ok').unbind();
+		// unbind Sell btn
+		W.$('market_sell_dialog_ok').stopObserving();
+		$('#market_sell_dialog_ok').unbind();
 
-			if(count>1) {
-				var amount =  parseInt(prompt(t('howmany')+count, count)) || 1;
-				if (amount>count)
-					amount=count;
+		if(count>1) {
+			var amount =  parseInt(prompt(t('howmany')+count, count)) || 1;
+			if (amount>count)
+				amount=count;
 
-				if(amount>1){
-					W.SellItemDialog._amount=amount;
-					W.SellItemDialog._itemNum=0;
-					W.SellItemDialog._itemsFailNum=0;
-					W.SellItemDialog.OnConfirmationAccept_new = function(event){
+			if(amount>1){
+				W.SellItemDialog._amount=amount;
+				W.SellItemDialog._itemNum=0;
+				W.SellItemDialog._itemsFailNum=0;
+				W.SellItemDialog.OnConfirmationAccept_new = function(event){
 
-						W.$('market_sell_dialog_error').hide();
-						W.$('market_sell_dialog_ok').fade({duration:0.25});
-						W.$('market_sell_dialog_back').fade({duration:0.25});
-						W.$('market_sell_dialog_throbber').show();
-						W.$('market_sell_dialog_throbber').fade({duration:0.25,from:0,to:1});
-						
-						var item;
-						do {
-							item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum];
-							W.SellItemDialog._itemNum++;
-						} while(!item.marketable);
-						W.SellItemDialog.m_item.id=item.id;
+					W.$('market_sell_dialog_error').hide();
+					W.$('market_sell_dialog_ok').fade({duration:0.25});
+					W.$('market_sell_dialog_back').fade({duration:0.25});
+					W.$('market_sell_dialog_throbber').show();
+					W.$('market_sell_dialog_throbber').fade({duration:0.25,from:0,to:1});
+					
+					var item;
+					do {
+						item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum];
+						W.SellItemDialog._itemNum++;
+					} while(!item.marketable);
+					W.SellItemDialog.m_item.id=item.id;
 
-						$.ajax( {
-							url: 'https://steamcommunity.com/market/sellitem/',
-							type: 'POST',
-							data: {
-								sessionid: W.g_sessionID,
-								appid: W.SellItemDialog.m_item.appid,
-								contextid: W.SellItemDialog.m_item.contextid,
-								assetid: W.SellItemDialog.m_item.id,
-								amount: W.SellItemDialog.m_nConfirmedQuantity,
-								price: W.SellItemDialog.m_nConfirmedPrice
-							},
-							crossDomain: true,
-							xhrFields: { withCredentials: true }
-						} ).done( function ( data ) {
-							$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text(t('listed')+W.SellItemDialog._itemNum+(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : ''));
-							if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
-								W.SellItemDialog.OnSuccess.apply(W.SellItemDialog, [{ responseJSON: data }])
-							else {
-								return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
-							}
-						} ).fail( function( jqxhr ) {
-							// jquery doesn't parse json on fail
-							var data = $.parseJSON( jqxhr.responseText );
-							W.SellItemDialog._itemsFailNum++;
-							if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
-								W.SellItemDialog.OnFailure( { responseJSON: data } );
-							else {
-								return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
-							}
-						} );
+					$.ajax( {
+						url: 'https://steamcommunity.com/market/sellitem/',
+						type: 'POST',
+						data: {
+							sessionid: W.g_sessionID,
+							appid: W.SellItemDialog.m_item.appid,
+							contextid: W.SellItemDialog.m_item.contextid,
+							assetid: W.SellItemDialog.m_item.id,
+							amount: W.SellItemDialog.m_nConfirmedQuantity,
+							price: W.SellItemDialog.m_nConfirmedPrice
+						},
+						crossDomain: true,
+						xhrFields: { withCredentials: true }
+					} ).done( function ( data ) {
+						$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text(t('listed')+W.SellItemDialog._itemNum+(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : ''));
+						if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
+							W.SellItemDialog.OnSuccess.apply(W.SellItemDialog, [{ responseJSON: data }])
+						else {
+							return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
+						}
+					} ).fail( function( jqxhr ) {
+						// jquery doesn't parse json on fail
+						var data = $.parseJSON( jqxhr.responseText );
+						W.SellItemDialog._itemsFailNum++;
+						if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
+							W.SellItemDialog.OnFailure( { responseJSON: data } );
+						else {
+							return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
+						}
+					} );
 
-					}
-					W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_new;
-				} else {
-					W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_old;
 				}
-
-
-			} else
+				W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_new;
+			} else {
 				W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_old;
-			$('#market_sell_dialog_ok').on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
-			//W.$('market_sell_dialog_ok').observe( 'click', W.SellItemDialog.OnConfirmationAccept.bindAsEventListener(W.SellItemDialog) );
+			}
 
-			return res;
-		}
 
+		} else
+			W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_old;
+		$('#market_sell_dialog_ok').on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
+		//W.$('market_sell_dialog_ok').observe( 'click', W.SellItemDialog.OnConfirmationAccept.bindAsEventListener(W.SellItemDialog) );
+
+		return res;
 	}
+
+
 
 }
 
