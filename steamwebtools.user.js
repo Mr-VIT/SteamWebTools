@@ -2,8 +2,8 @@
 // @name		Steam Web Tools
 // @namespace	http://v1t.su/projects/steam/webtools/
 // @description	Useful tools in Steam web sites
-// @version		0.5.2
-// @date		2015-10-12
+// @version		0.5.3
+// @date		2015-12-17
 // @author		Mr-VIT
 // @homepage	http://v1t.su/projects/steam/webtools/
 // @updateURL	https://mr-vit.github.io/SteamWebTools/version.js
@@ -32,7 +32,7 @@ var settings = {
 		storeCartAjax : true,
 		storeShowSubid : true,
 		storeShowBtnGetPrices : true,
-
+		
 		marketMainPageFuncs: true,
 	},
 	cur : {},
@@ -141,6 +141,7 @@ t.loadText({  //default text
 'acceptAllToInv' : 'Accept all to inventory',
 'listed' : 'Listed: ',
 'skipped' : 'Skipped: ',
+'skipSent' : 'Skip gifts sent before?',
 // settings page
 'set.ext' : 'extension',
 'set.settings' : 'Settings',
@@ -210,6 +211,7 @@ t.loadText({
 'acceptAllToInv' : 'Принять все в инвентарь',
 'listed' : 'Выставлено: ',
 'skipped' : 'Пропущено: ',
+'skipSent' : 'Пропустить отправленные ранее?',
 // settings page
 'set.ext' : 'расширение',
 'set.settings' : 'Настройки',
@@ -286,12 +288,12 @@ t.loadText({
 'set.hideAccName' : '隐藏帐号. 鼠标停留在[帐号]上时显示.',
 'set.hideBalance' : '隐藏余额. 鼠标停留在[余额]上时显示.',
 'set.store' : '商店',
-'set.showCCBtn' : '显示区域切换按钮',
+'set.showCCBtn' : '显示区域切换按钮(需要登出)',
 'set.CCList' : '区域列表. 将主区域放在第一位.',
 'set.showCartBtn' : '总是显示购物车按钮',
 'set.cartAjax' : '添加到购物车时不重新加载页面',
 'set.showSubid' : '显示 SubID',
-'set.showBtnGetPrices' : '显示 "获取其他地区的价格" 按钮',
+'set.showBtnGetPrices' : '显示 "获取其他地区的价格" 按钮(需要登出)',
 'set.def' : '恢复默认',
 
 });
@@ -328,7 +330,7 @@ function createBlock(title, links){
 	}
 
 	out+='<br/><h2>'+t('addSubidsToCart')+'</h2> <form id="addtocartsubids" method="post"><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subids" placeholder="1, 2, 3"/><input type="submit" value="'+t('add')+'" class="btn_small btnv6_blue_hoverfade"></form><br><form id="formcarthist" method="post"><input type="submit" value="'+t('addChecked')+'" style="float:right" class="btn_small btnv6_blue_hoverfade"><h2>'+t('cartHist')+'</h2><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart">';
-
+	
 	var cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
 	var chStr = '';
 	for(var i=0; i<cartHistory.length; i++) {
@@ -359,12 +361,12 @@ $('#addtocartsubids').bind('submit',function(){
 		subids = t.find('input[name="subids"]').val(),
 		s,
 		cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
-
+		
 	subids = subids.split(',');
 	for (var i=0; i < subids.length; i++) {
 		s = subids[i].trim();
 		t.append('<input type="hidden" name="subid[]" value="'+s+'"/>');
-
+		
 		cartHistory.push({subid: s});
 	}
 	while(cartHistory.length>20){
@@ -648,7 +650,7 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 		W.addToCart = function(subid){
 			var form = W.$J('[name="add_to_cart_'+subid+'"]');
 			var el=form.parent();
-
+			
 			var cartHistory = W.localStorage.swtcarthistory && JSON.parse(W.localStorage.swtcarthistory) || [];
 			if(cartHistory.length>=20) cartHistory.shift();
 			cartHistory.push({
@@ -658,7 +660,7 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 				link: itemType+'/'+itemId
 			});
 			W.localStorage.swtcarthistory = JSON.stringify(cartHistory);
-
+			
 			if(settings.cur.storeCartAjax){
 				el.find('.game_purchase_action_bg .btn_addtocart:last>a').after('<a id="swtcartdone" href="#">'+t('adding')+'</a>');
 				W.$J.ajax({
@@ -971,8 +973,23 @@ function inventoryPageInit(){
 					amount=item._amount;
 			}
 			if(amount>1){
-				for(var i=0;i<amount;i++){
+				if(!confirm(t('Skip sent?'))) for(var i=0;i<amount;i++){
 					W.checkedForSend[item._ids[i]]=item.name;
+					item._subItems[i].element.addClassName('checkedForSend');
+				}
+				else for(var i=0;i<amount;i++){
+					var sitem = item._subItems[i],
+						skipit = false;
+					if(sitem.owner_descriptions) for(var j=0;j<sitem.owner_descriptions.length;j++){
+						if(sitem.owner_descriptions[j].value.indexOf('<persona>')>=0){
+							skipit = true;
+							break;
+						}
+					}
+					if(!skipit) {
+						W.checkedForSend[item._subItems[i].id]=item.name;
+						item._subItems[i].element.addClassName('checkedForSend');
+					}
 				}
 			} else {
 				W.checkedForSend[giftId]=item.name;
@@ -980,7 +997,6 @@ function inventoryPageInit(){
 
 			item.checkedForSend=true;
 			item.element.addClassName('checkedForSend');
-
 
 		}
 	}
@@ -1000,6 +1016,7 @@ function inventoryPageInit(){
 
 
 	if(W.g_bViewingOwnProfile){
+
 		//// gifts notes
 		var giftsNotes = W.localStorage.giftsNotes;
 		if(giftsNotes)
@@ -1126,22 +1143,13 @@ function inventoryPageInit(){
 		}
 		return this.UpdateTagFiltering_old.apply(this, [rgNewTags]);
 	}
-	var ShowItemInventory_old = ShowItemInventory;
-	W.ShowItemInventory = function( appid, contextid, assetid, bLoadCompleted ){
-		console.log('ShowItemInventory', appid, contextid, assetid, bLoadCompleted);
-		return ShowItemInventory_old.apply(this, arguments);
-	}
+
 	var SelectInventoryFromUser_old = W.SelectInventoryFromUser;
 	W.SelectInventoryFromUser = function( user, appid, contextid, bForceSelect ){
-		/*var appid = arguments[1];
-		var contextid = arguments[2];*/
 		if (!bForceSelect) {
 			return SelectInventoryFromUser_old.apply(this, arguments);
 		}
 		var inventory = W.UserYou.getInventory( appid, contextid );
-
-		console.log('SelectInventoryFromUser', appid,contextid, bForceSelect);
-
 		if(!inventory.BuildItemElement_old){
 			inventory.BuildItemElement_old = inventory.BuildItemElement;
 			inventory.BuildItemElement = function(){
@@ -1374,6 +1382,7 @@ function inventoryPageInit(){
 if (W.g_strInventoryLoadURL) {
 	inventoryPageInit();
 }
+
 		}
 	},
 	{
@@ -1764,3 +1773,4 @@ for(var i = 0; i<scripts.length; i++) {
 		}
 	}
 }
+
