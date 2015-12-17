@@ -45,6 +45,7 @@
 'acceptAllToInv' : 'Accept all to inventory',
 'listed' : 'Listed: ',
 'skipped' : 'Skipped: ',
+'skipSent' : 'Skip gifts sent before?',
 // settings page
 'set.ext' : 'extension',
 'set.settings' : 'Settings',

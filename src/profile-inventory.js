@@ -59,8 +59,23 @@ function inventoryPageInit(){
 					amount=item._amount;
 			}
 			if(amount>1){
-				for(var i=0;i<amount;i++){
+				if(!confirm(t('Skip sent?'))) for(var i=0;i<amount;i++){
 					W.checkedForSend[item._ids[i]]=item.name;
+					item._subItems[i].element.addClassName('checkedForSend');
+				}
+				else for(var i=0;i<amount;i++){
+					var sitem = item._subItems[i],
+						skipit = false;
+					if(sitem.owner_descriptions) for(var j=0;j<sitem.owner_descriptions.length;j++){
+						if(sitem.owner_descriptions[j].value.indexOf('<persona>')>=0){
+							skipit = true;
+							break;
+						}
+					}
+					if(!skipit) {
+						W.checkedForSend[item._subItems[i].id]=item.name;
+						item._subItems[i].element.addClassName('checkedForSend');
+					}
 				}
 			} else {
 				W.checkedForSend[giftId]=item.name;
@@ -68,7 +83,6 @@ function inventoryPageInit(){
 
 			item.checkedForSend=true;
 			item.element.addClassName('checkedForSend');
-
 
 		}
 	}
@@ -88,6 +102,7 @@ function inventoryPageInit(){
 
 
 	if(W.g_bViewingOwnProfile){
+
 		//// gifts notes
 		var giftsNotes = W.localStorage.giftsNotes;
 		if(giftsNotes)
@@ -205,7 +220,7 @@ function inventoryPageInit(){
 	}
 
 	//// inv
-	
+
 	// hide dup witth filters
 	W.Filter.UpdateTagFiltering_old = W.Filter.UpdateTagFiltering;
 	W.Filter.UpdateTagFiltering = function(rgNewTags){
@@ -214,22 +229,13 @@ function inventoryPageInit(){
 		}
 		return this.UpdateTagFiltering_old.apply(this, [rgNewTags]);
 	}
-	var ShowItemInventory_old = ShowItemInventory;
-	W.ShowItemInventory = function( appid, contextid, assetid, bLoadCompleted ){
-		console.log('ShowItemInventory', appid, contextid, assetid, bLoadCompleted);
-		return ShowItemInventory_old.apply(this, arguments);
-	}
+
 	var SelectInventoryFromUser_old = W.SelectInventoryFromUser;
 	W.SelectInventoryFromUser = function( user, appid, contextid, bForceSelect ){
-		/*var appid = arguments[1];
-		var contextid = arguments[2];*/
 		if (!bForceSelect) {
 			return SelectInventoryFromUser_old.apply(this, arguments);
 		}
 		var inventory = W.UserYou.getInventory( appid, contextid );
-
-		console.log('SelectInventoryFromUser', appid,contextid, bForceSelect);
-		
 		if(!inventory.BuildItemElement_old){
 			inventory.BuildItemElement_old = inventory.BuildItemElement;
 			inventory.BuildItemElement = function(){
@@ -290,7 +296,7 @@ function inventoryPageInit(){
 					el.innerHTML+='<div class="itemcount">x'+a+'</div>';
 				});
 			}
-			
+
 			inventory.MakeActive_old = inventory.MakeActive;
 			inventory.MakeActive = function(){
 				var res = inventory.MakeActive_old.apply(this, arguments);
@@ -306,7 +312,7 @@ function inventoryPageInit(){
 				}
 				return res;
 			}
-			
+
 
 			var itemsA = [];
 
@@ -400,7 +406,7 @@ function inventoryPageInit(){
 					W.$('market_sell_dialog_back').fade({duration:0.25});
 					W.$('market_sell_dialog_throbber').show();
 					W.$('market_sell_dialog_throbber').fade({duration:0.25,from:0,to:1});
-					
+
 					var item;
 					do {
 						item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum];

@@ -45,6 +45,7 @@
 'acceptAllToInv' : 'Принять все в инвентарь',
 'listed' : 'Выставлено: ',
 'skipped' : 'Пропущено: ',
+'skipSent' : 'Пропустить отправленные ранее?',
 // settings page
 'set.ext' : 'расширение',
 'set.settings' : 'Настройки',
