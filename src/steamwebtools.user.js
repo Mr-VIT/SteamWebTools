@@ -2,7 +2,7 @@
 // @name		Steam Web Tools
 // @namespace	http://v1t.su/projects/steam/webtools/
 // @description	Useful tools in Steam web sites
-// @version		0.5.4
+// @version		0.5.5
 // @date		2015-12-23
 // @author		Mr-VIT
 // @homepage	http://v1t.su/projects/steam/webtools/
