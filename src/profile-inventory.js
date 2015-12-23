@@ -33,7 +33,7 @@ function inventoryPageInit(){
 
 	// styles
 	document.body.insertAdjacentHTML("afterBegin",
-		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}.swt_icon{position:absolute;top:0;left:0}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}#swt_subItemsSpoiler,.swt_hidden{display:none}</style>'
+		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}.swt_icon{position:absolute;top:0;left:0}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}.swt_hidden{display:none}</style>'
 	);
 
 	// multi gifts sending
@@ -67,7 +67,7 @@ function inventoryPageInit(){
 					var sitem = item._subItems[i],
 						skipit = false;
 					if(sitem.owner_descriptions) for(var j=0;j<sitem.owner_descriptions.length;j++){
-						if(sitem.owner_descriptions[j].value.indexOf('<persona>')>=0){
+						if(sitem.owner_descriptions[j].value.match(/<persona>|\S+@\S+/i)){
 							skipit = true;
 							break;
 						}
@@ -172,13 +172,7 @@ function inventoryPageInit(){
 				}
 			}
 		}
-		if(item._amount>1){
-			$('#swt_subItemsSpoiler .swt_hidden').hide().empty().append(item._subItems);
-			$('#swt_subItemsSpoiler #swt_subItemsMore').text(item._amount-1);
-			$('#swt_subItemsSpoiler').show();
-		} else{
-			$('#swt_subItemsSpoiler').hide();
-		}
+
 		return BuildHover_orig.apply(this, arguments);
 	}
 
@@ -310,6 +304,7 @@ function inventoryPageInit(){
 					W.Filter.OnFilterChange();
 					$('.itemcount').hide();
 				}
+				//var res = inventory.MakeActive_old.apply(this, arguments);
 				return res;
 			}
 
