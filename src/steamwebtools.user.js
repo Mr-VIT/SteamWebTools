@@ -6,7 +6,7 @@
 // @date		2015-12-23
 // @author		Mr-VIT
 // @homepage	http://v1t.su/projects/steam/webtools/
-// @updateURL	https://mr-vit.github.io/SteamWebTools/version.js
+// @updateURL	https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/version.js
 // @icon		http://mr-vit.github.io/SteamWebTools/icon-64.png
 // @run-at		document-end
 // @include		http://store.steampowered.com/*
