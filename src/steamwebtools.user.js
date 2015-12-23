@@ -103,7 +103,7 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://steamcommunity\\.com/app/\\d+/guides*'
+			'https?://steamcommunity\\.com/app/\\d+/guides.*'
 		],
 		run:function(){
 			//!include gamehub-guides.js

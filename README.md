@@ -1,5 +1,5 @@
 ## Install
-https://mr-vit.github.io/SteamWebTools/steamwebtools.user.js
+https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/steamwebtools.user.js
 
 ## Build
 Required Python 2.7

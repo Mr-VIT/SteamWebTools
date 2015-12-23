@@ -9,11 +9,12 @@ if(settings.cur.globalHideAccName){
 }
 
 if(settings.cur.globalFixNavbar){
-	W.$J('head').append('<style>#global_header.swtfixed{position:fixed;z-index:9999;width:100%}.responsive_page_template_content.swtfixed{padding-top:50px}#global_header.swtfixed>.content{height:50px !important}#global_header.swtfixed div.logo{display:none}#global_header.swtfixed .menuitem{padding-top:15px !important}#global_header.swtfixed .supernav_container{left:0 !important}#global_header.swtfixed .header_installsteam_btn{display:none}</style>');
+	W.$J('head').append('<style>#global_header.swtfixed{position:fixed;z-index:9999;width:100%}.responsive_page_template_content.swtfixed{padding-top:50px}#global_header.swtfixed>.content{height:50px !important}#global_header.swtfixed div.logo{display:none}#global_header.swtfixed .menuitem{padding-top:15px !important}#global_header.swtfixed .supernav_container{left:0 !important}#global_header.swtfixed .header_installsteam_btn{display:none}.swtup{display:none}#global_header.swtfixed .swtup{display:block;float:left}</style>');
 	
 	
 	var menu = W.$J('#global_header');
 	if(menu.length){
+		menu.prepend('<a class="swtup" href="#"><span class="btn_grey_white_innerfade btn_medium_wide"><span>'+t('totop')+'</span></span></a>');
 		var origOffsetY = menu.offset().top;
 
 		function scroll() {
