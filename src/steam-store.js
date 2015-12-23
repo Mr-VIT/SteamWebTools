@@ -26,11 +26,11 @@
 		var global_action_menu = document.getElementById('global_action_menu');
 		if(global_action_menu) {
 			var curCC = false;
-			if(curCC = document.cookie.match(/fakeCC=(\w+?);/i)){
+			if(curCC = document.cookie.match(/steamCountry=(\w{2})/i)){
 				curCC = curCC[1];
 			}
 			var changeCCmenuHTML = '\
-			<style>#cc_menu_btn{min-width:59px;z-index:999;position:fixed;right:0;top:0;background-color:#000;opacity:0.5;}#cc_menu_btn:hover{opacity:1}#cc_list .popup_menu_item{white-space:nowrap}</style>\
+			<style>#cc_menu_btn{min-width:59px;z-index:999}#cc_list .popup_menu_item{white-space:nowrap}</style>\
 			<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="http://cdn.steamcommunity.com/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
 	<div class="popup_block_new" id="cc_menu" style="display:none;">\
 	<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
@@ -44,7 +44,6 @@
 	// for app/sub page
 	var res = String(W.location.href).match(/\/(sub|app)\/(\d+)/i);
 	if(res){
-
 		var itemType = res[1], itemId = res[2];
 
 		var els = document.querySelectorAll('.game_area_purchase_game');
@@ -125,15 +124,11 @@
 				}
 				setTimeout(function(){getPrice(_cc.curCC)}, 3500); // set default CC
 
-
 				return false;
 			}
 
 		}
-		var gamenameEl = document.querySelector('.game_title_area .pageheader');
-		if (!gamenameEl){
-			gamenameEl = document.querySelector('.game_title_area .apphub_AppName');
-		}
+		var gamenameEl = document.querySelector('.game_title_area .pageheader') || document.querySelector('.game_title_area .apphub_AppName');
 		var gamename = encodeURIComponent(gamenameEl.textContent.trim());
 
 		var el = document.querySelector('.rightcol.game_meta_data');
@@ -198,14 +193,11 @@ _cc = {
 		}
 
 		document.getElementById('cc_list').innerHTML=s;
-		if (curCC)
-			_cc.curCC=curCC
-		else
-			_cc.curCC=_cc.ListA[0];
-	}
+		_cc.curCC = curCC || _cc.ListA[0];
+	},
+	url : String(W.location)
 };
 
-_cc.url = String(W.location);
 if (_cc.url.indexOf('?')==-1) {
 	_cc.url += '?';
 } else {
@@ -226,7 +218,6 @@ function createBlock(title, links){
 	for (var i=0; i < links.length; i++) {
 		link = links[i];
 		out+='<div class="game_area_details_specs"><div class="icon"><a href="'+link.href+'"><img style="height:16px" src="'+link.icon+'"></a></div><a class="name" href="'+link.href+'">'+link.text+'</a></div>';
-
 	}
 
 	out+='</div></div></div>';
