@@ -48,7 +48,15 @@ var settings = {
 		} else {
 			// first launch - open settings page
 			this.save();
-			W.location='http://steamcommunity.com/groups/SteamClientBeta#swt-settings';
+			//W.location='http://steamcommunity.com/groups/SteamClientBeta#swt-settings';
+			W.$J("#global_header .menuitem.supernav:nth(1)").css("outline", "#48DA48 3px solid");
+			setTimeout(function(){
+				W.$J("#global_header .menuitem.supernav:nth(1)").trigger('mouseover');
+			},1000);
+			setTimeout(function(){
+				W.$J("#global_header .submenu_community .submenuitem.swt").css("outline", "#48DA48 3px solid");
+			},2000);
+			
 		}
 	},
 	save : function(){

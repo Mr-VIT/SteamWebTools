@@ -1,4 +1,4 @@
-W.$J('.submenu_community').append('<a class="submenuitem" href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings">SWT - '+t('set.settings')+'</a>');
+W.$J('.submenu_community').append('<a class="submenuitem swt" href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings">SWT - '+t('set.settings')+'</a>');
 
 if(settings.cur.globalHideAccName){
 	var acBtnEl = W.$J('#account_pulldown')[0];
@@ -9,5 +9,22 @@ if(settings.cur.globalHideAccName){
 }
 
 if(settings.cur.globalFixNavbar){
-	W.$J('head').append('<style>#global_header{position:fixed;z-index:9999;width:100%}.responsive_page_template_content{padding-top:74px}#global_header>.content{height:74px !important}</style>');
+	W.$J('head').append('<style>#global_header.swtfixed{position:fixed;z-index:9999;width:100%}.responsive_page_template_content.swtfixed{padding-top:50px}#global_header.swtfixed>.content{height:50px !important}#global_header.swtfixed div.logo{display:none}#global_header.swtfixed .menuitem{padding-top:15px !important}#global_header.swtfixed .supernav_container{left:0 !important}#global_header.swtfixed .header_installsteam_btn{display:none}</style>');
+	
+	
+	var menu = W.$J('#global_header');
+    var origOffsetY = menu.offset().top;
+
+    function scroll() {
+        if (W.$J(window).scrollTop() > origOffsetY) {
+            W.$J('#global_header').addClass('swtfixed');
+            W.$J('.responsive_page_template_content').addClass('swtfixed');
+        } else {
+			W.$J('#global_header').removeClass('swtfixed');
+			W.$J('.responsive_page_template_content').removeClass('swtfixed');
+        }
+
+    }
+    W.document.onscroll = scroll;
+
 }
