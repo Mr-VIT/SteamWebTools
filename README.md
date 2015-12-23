@@ -1,4 +1,3 @@
-built file in "[gh-pages](https://github.com/Mr-VIT/SteamWebTools/tree/gh-pages)" branch
 ## Install
 https://mr-vit.github.io/SteamWebTools/steamwebtools.user.js
 
