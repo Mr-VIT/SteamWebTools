@@ -2,8 +2,8 @@
 // @name		Steam Web Tools
 // @namespace	http://v1t.su/projects/steam/webtools/
 // @description	Useful tools in Steam web sites
-// @version		0.5.3
-// @date		2015-12-17
+// @version		0.5.4
+// @date		2015-12-23
 // @author		Mr-VIT
 // @homepage	http://v1t.su/projects/steam/webtools/
 // @updateURL	https://mr-vit.github.io/SteamWebTools/version.js
@@ -67,7 +67,15 @@ var settings = {
 		} else {
 			// first launch - open settings page
 			this.save();
-			W.location='http://steamcommunity.com/groups/SteamClientBeta#swt-settings';
+			//W.location='http://steamcommunity.com/groups/SteamClientBeta#swt-settings';
+			W.$J("#global_header .menuitem.supernav:nth(1)").css("outline", "#48DA48 3px solid");
+			setTimeout(function(){
+				W.$J("#global_header .menuitem.supernav:nth(1)").trigger('mouseover');
+			},1000);
+			setTimeout(function(){
+				W.$J("#global_header .submenu_community .submenuitem.swt").css("outline", "#48DA48 3px solid");
+			},2000);
+			
 		}
 	},
 	save : function(){
@@ -230,7 +238,7 @@ t.loadText({
 'set.def' : 'Восстановить по умолчанию',
 'set.market' : 'Торговая Площадка',
 'set.marketMainPageFuncs' : 'Включить надстройку на главной странице торговой площадки',
-'set.FixMenuBar' : 'Зафиксировать Меню Навигации',
+'set.FixNavbar' : 'Зафиксировать Меню Навигации',
 
 });
 t.loadText({
@@ -299,7 +307,7 @@ t.loadText({
 });
 
 
-W.$J('.submenu_community').append('<a class="submenuitem" href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings">SWT - '+t('set.settings')+'</a>');
+W.$J('.submenu_community').append('<a class="submenuitem swt" href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings">SWT - '+t('set.settings')+'</a>');
 
 if(settings.cur.globalHideAccName){
 	var acBtnEl = W.$J('#account_pulldown')[0];
@@ -310,7 +318,24 @@ if(settings.cur.globalHideAccName){
 }
 
 if(settings.cur.globalFixNavbar){
-	W.$J('head').append('<style>#global_header{position:fixed;z-index:9999;width:100%}.responsive_page_template_content{padding-top:74px}#global_header>.content{height:74px !important}</style>');
+	W.$J('head').append('<style>#global_header.swtfixed{position:fixed;z-index:9999;width:100%}.responsive_page_template_content.swtfixed{padding-top:50px}#global_header.swtfixed>.content{height:50px !important}#global_header.swtfixed div.logo{display:none}#global_header.swtfixed .menuitem{padding-top:15px !important}#global_header.swtfixed .supernav_container{left:0 !important}#global_header.swtfixed .header_installsteam_btn{display:none}</style>');
+	
+	
+	var menu = W.$J('#global_header');
+    var origOffsetY = menu.offset().top;
+
+    function scroll() {
+        if (W.$J(window).scrollTop() > origOffsetY) {
+            W.$J('#global_header').addClass('swtfixed');
+            W.$J('.responsive_page_template_content').addClass('swtfixed');
+        } else {
+			W.$J('#global_header').removeClass('swtfixed');
+			W.$J('.responsive_page_template_content').removeClass('swtfixed');
+        }
+
+    }
+    W.document.onscroll = scroll;
+
 }
 
 var scripts = [
@@ -947,7 +972,7 @@ function inventoryPageInit(){
 
 	// styles
 	document.body.insertAdjacentHTML("afterBegin",
-		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}.swt_icon{position:absolute;top:0;left:0}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}#swt_subItemsSpoiler,.swt_hidden{display:none}</style>'
+		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#FFF;font-weight:700;position:absolute;right:0;bottom:0}.swt_icon{position:absolute;top:0;left:0}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}.swt_hidden{display:none}</style>'
 	);
 
 	// multi gifts sending
@@ -981,7 +1006,7 @@ function inventoryPageInit(){
 					var sitem = item._subItems[i],
 						skipit = false;
 					if(sitem.owner_descriptions) for(var j=0;j<sitem.owner_descriptions.length;j++){
-						if(sitem.owner_descriptions[j].value.indexOf('<persona>')>=0){
+						if(sitem.owner_descriptions[j].value.match(/<persona>|\S+@\S+/i)){
 							skipit = true;
 							break;
 						}
@@ -1086,13 +1111,7 @@ function inventoryPageInit(){
 				}
 			}
 		}
-		if(item._amount>1){
-			$('#swt_subItemsSpoiler .swt_hidden').hide().empty().append(item._subItems);
-			$('#swt_subItemsSpoiler #swt_subItemsMore').text(item._amount-1);
-			$('#swt_subItemsSpoiler').show();
-		} else{
-			$('#swt_subItemsSpoiler').hide();
-		}
+
 		return BuildHover_orig.apply(this, arguments);
 	}
 
@@ -1224,6 +1243,7 @@ function inventoryPageInit(){
 					W.Filter.OnFilterChange();
 					$('.itemcount').hide();
 				}
+				//var res = inventory.MakeActive_old.apply(this, arguments);
 				return res;
 			}
 
