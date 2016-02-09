@@ -31,7 +31,7 @@
 			}
 			var changeCCmenuHTML = '\
 			<style>#cc_menu_btn{min-width:59px;z-index:999}#cc_list .popup_menu_item{white-space:nowrap}</style>\
-			<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="http://cdn.steamcommunity.com/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
+			<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
 	<div class="popup_block_new" id="cc_menu" style="display:none;">\
 	<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
 
@@ -114,7 +114,7 @@
 				for(var k=0; k < subs.length; k++) {
 					var str = t('prices')+':';
 					for(var i=0; i < _cc.ListA.length; i++){
-						str += '<div class="swt_price_'+k+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
+						str += '<div class="swt_price_'+k+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
 
 					}
 					subs[k].el.innerHTML = str;
@@ -191,7 +191,7 @@ _cc = {
 		var s='';
 		_cc.ListA = settings.cur.storeCCList.split(' ');
 		for(var i=0; i < _cc.ListA.length; i++){
-			s += '<a class="popup_menu_item" href="'+_cc.url+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a>';
+			s += '<a class="popup_menu_item" href="'+_cc.url+_cc.ListA[i]+'"><img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a>';
 		}
 
 		document.getElementById('cc_list').innerHTML=s;
