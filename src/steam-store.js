@@ -26,12 +26,12 @@
 		var global_action_menu = document.getElementById('global_action_menu');
 		if(global_action_menu) {
 			var curCC = false;
-			if(curCC = document.cookie.match(/fakeCC=(\w+?);/i)){
+			if(curCC = document.cookie.match(/steamCountry=(\w{2})/i)){
 				curCC = curCC[1];
 			}
 			var changeCCmenuHTML = '\
-			<style>#cc_menu_btn{min-width:59px;z-index:999;position:fixed;right:0;top:0;background-color:#000;opacity:0.5;}#cc_menu_btn:hover{opacity:1}#cc_list .popup_menu_item{white-space:nowrap}</style>\
-			<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="http://cdn.steamcommunity.com/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
+			<style>#cc_menu_btn{min-width:59px;z-index:999}#cc_list .popup_menu_item{white-space:nowrap}</style>\
+			<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
 	<div class="popup_block_new" id="cc_menu" style="display:none;">\
 	<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
 
@@ -44,7 +44,6 @@
 	// for app/sub page
 	var res = String(W.location.href).match(/\/(sub|app)\/(\d+)/i);
 	if(res){
-
 		var itemType = res[1], itemId = res[2];
 
 		var els = document.querySelectorAll('.game_area_purchase_game');
@@ -115,7 +114,7 @@
 				for(var k=0; k < subs.length; k++) {
 					var str = t('prices')+':';
 					for(var i=0; i < _cc.ListA.length; i++){
-						str += '<div class="swt_price_'+k+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
+						str += '<div class="swt_price_'+k+'_'+_cc.ListA[i]+'"><a href="?cc='+_cc.ListA[i]+'"><img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a> <span>...</span></div>';
 
 					}
 					subs[k].el.innerHTML = str;
@@ -125,15 +124,11 @@
 				}
 				setTimeout(function(){getPrice(_cc.curCC)}, 3500); // set default CC
 
-
 				return false;
 			}
 
 		}
-		var gamenameEl = document.querySelector('.game_title_area .pageheader');
-		if (!gamenameEl){
-			gamenameEl = document.querySelector('.game_title_area .apphub_AppName');
-		}
+		var gamenameEl = document.querySelector('.game_title_area .pageheader') || document.querySelector('.game_title_area .apphub_AppName');
 		var gamename = encodeURIComponent(gamenameEl.textContent.trim());
 
 		var el = document.querySelector('.rightcol.game_meta_data');
@@ -141,8 +136,10 @@
 		links = [
 			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/favicon-16x16.png', text: t('viewin')+' SteamDB.info'},
 			{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png?v=a', text: t('viewin')+' SteamPrices.com'},
-			{href:'http://plati.ru/asp/find.asp?agent=111350&searchstr='+gamename, icon:'http://plati.ru/favicon.ico', text: t('searchin')+' Plati.ru'},
+			{href:'http://mr_vit.plati.com/asp/find.asp?searchstr='+gamename, icon:'http://plati.com/favicon.ico', text: t('searchin')+' Plati.com'},
 			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
+			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'http://www.steamgifts.com/favicon.ico', text: t('searchin')+' SteamGifts.com'},
+			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
 		];
 
 		if(itemType=='app'){
@@ -194,18 +191,15 @@ _cc = {
 		var s='';
 		_cc.ListA = settings.cur.storeCCList.split(' ');
 		for(var i=0; i < _cc.ListA.length; i++){
-			s += '<a class="popup_menu_item" href="'+_cc.url+_cc.ListA[i]+'"><img src="http://cdn.steamcommunity.com/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a>';
+			s += '<a class="popup_menu_item" href="'+_cc.url+_cc.ListA[i]+'"><img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+_cc.ListA[i]+'.gif" style="width:16px"/> '+_cc.ListA[i].toUpperCase()+'</a>';
 		}
 
 		document.getElementById('cc_list').innerHTML=s;
-		if (curCC)
-			_cc.curCC=curCC
-		else
-			_cc.curCC=_cc.ListA[0];
-	}
+		_cc.curCC = curCC || _cc.ListA[0];
+	},
+	url : String(W.location)
 };
 
-_cc.url = String(W.location);
 if (_cc.url.indexOf('?')==-1) {
 	_cc.url += '?';
 } else {
@@ -226,7 +220,6 @@ function createBlock(title, links){
 	for (var i=0; i < links.length; i++) {
 		link = links[i];
 		out+='<div class="game_area_details_specs"><div class="icon"><a href="'+link.href+'"><img style="height:16px" src="'+link.icon+'"></a></div><a class="name" href="'+link.href+'">'+link.text+'</a></div>';
-
 	}
 
 	out+='</div></div></div>';

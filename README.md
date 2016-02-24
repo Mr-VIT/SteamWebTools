@@ -1,14 +1,16 @@
 ## Install
-https://mr-vit.github.io/SteamWebTools/steamwebtools.user.js
+https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/steamwebtools.user.js
 
 ## Build
-Required Python 2.7
+Required Grunt with plugins:
+- grunt-contrib-clean
+- grunt-contrib-uglify
+- grunt-includes
 
-Using:
+## Built files
+- steamwebtools.full.js -- full built file
+- steamwebtools.user.js -- minimized
+- version.js -- use to check the version.
 
-    build.py <file> [<output dir>]
-
-example: 
-
-	build.py src\steamwebtools.user.js outputdir
-	build.py src\steamwebtools.user.js
+## License
+licensed under GPLv2.

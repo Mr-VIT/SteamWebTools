@@ -309,13 +309,14 @@ function inventoryPageInit(){
 			}
 
 
-			var itemsA = [];
+			var itemsA = [],
+				chinv;
 
-			if(inventory.rgChildInventories) {
-				for(var x in inventory.rgChildInventories){
-					inventory.rgChildInventories[x].BuildItemElement = inventory.BuildItemElement; // display count
-					inventory.rgChildInventories[x].MakeActive = inventory.MakeActive; // display count
-					itemsA.push(inventory.rgChildInventories[x].rgInventory);
+			if(chinv=inventory.rgChildInventories) {
+				for(var x in chinv){
+					chinv[x].BuildItemElement = inventory.BuildItemElement; // display count
+					chinv[x].MakeActive = inventory.MakeActive; // display count
+					itemsA.push(chinv[x].rgInventory);
 				}
 			} else {
 				if(inventory.rgInventory)
@@ -328,26 +329,28 @@ function inventoryPageInit(){
 				for(var i=0; i<itemsA.length; i++){
 					items = itemsA[i];
 					newItems=[];
-
+					
+					var itm,nitm;
 					for ( var j in items ){
-						if(items[j]._is_stackable || items[j].is_stackable)
+						itm = items[j];
+						if(itm._is_stackable || itm.is_stackable)
 							continue;
-						if(newItems[items[j].classid]){
-							newItems[items[j].classid]._amount +=1;
-							newItems[items[j].classid]._ids.push(items[j].id);
-							newItems[items[j].classid]._subItems.push(items[j]);
+						if(nitm = newItems[itm.classid]){
+							nitm._amount +=1;
+							nitm._ids.push(itm.id);
+							nitm._subItems.push(itm);
 						} else {
-							items[j]._is_stackable = true;
-							items[j]._amount = 1;
-							items[j]._ids = [items[j].id];
-							items[j]._subItems = [items[j]];
+							itm._is_stackable = true;
+							itm._amount = 1;
+							itm._ids = [itm.id];
+							itm._subItems = [itm];
 
-							items[j].tags.push({category: "SWT",
+							itm.tags.push({category: "SWT",
 								category_name: "SteamWebTools",
 								internal_name: "notdup",
 								name: "HideDup"}
 							);
-							newItems[items[j].classid] = items[j];
+							newItems[itm.classid] = itm;
 						}
 					}
 				}

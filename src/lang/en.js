@@ -46,6 +46,7 @@
 'listed' : 'Listed: ',
 'skipped' : 'Skipped: ',
 'skipSent' : 'Skip gifts sent before?',
+'totop' : 'To top',
 // settings page
 'set.ext' : 'extension',
 'set.settings' : 'Settings',
