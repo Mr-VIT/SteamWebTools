@@ -133,9 +133,6 @@ function profilePageInit(){
 		pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">'+t('chat')+': Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
 	} catch(e) {};
 
-	// Games link - tab all games
-	var el = document.querySelector('.profile_count_link a[href$="games/"]');
-	if(el) el.href+='?tab=all';
 	// inventory links
 	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)

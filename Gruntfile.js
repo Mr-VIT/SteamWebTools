@@ -23,10 +23,9 @@ module.exports = function(grunt) {
 			options: {
 				preserveComments: /^\s(?:==\/?UserScript|@)/
 			},
-			my_target: {
-				files: {
-					'release/steamwebtools.user.js': ['release/steamwebtools.full.js']
-				}
+			build: {
+				src: 'release/steamwebtools.full.js',
+				dest: 'release/steamwebtools.user.js'
 			},
 		}
 

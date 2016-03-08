@@ -215,7 +215,7 @@ function inventoryPageInit(){
 
 	//// inv
 
-	// hide dup witth filters
+	// == hide dup work with another filters
 	W.Filter.UpdateTagFiltering_old = W.Filter.UpdateTagFiltering;
 	W.Filter.UpdateTagFiltering = function(rgNewTags){
 		if (W.localStorage.hideDupItems) {
@@ -223,6 +223,7 @@ function inventoryPageInit(){
 		}
 		return this.UpdateTagFiltering_old.apply(this, [rgNewTags]);
 	}
+	// == /hide dup
 
 	var SelectInventoryFromUser_old = W.SelectInventoryFromUser;
 	W.SelectInventoryFromUser = function( user, appid, contextid, bForceSelect ){
@@ -230,6 +231,46 @@ function inventoryPageInit(){
 			return SelectInventoryFromUser_old.apply(this, arguments);
 		}
 		var inventory = W.UserYou.getInventory( appid, contextid );
+		
+		// == Fix Bug : The old page is shown below after use filter
+		/* 
+		if(!inventory.SetActivePage_old){
+			inventory.SetActivePage_old = inventory.SetActivePage;
+			inventory.SetActivePage = function(){
+				$('.inventory_page').hide();
+				return inventory.SetActivePage_old.apply(this, arguments);
+			}
+		}
+		*/
+		if(!inventory.SetActivePage_old){
+			inventory.SetActivePage_old = inventory.SetActivePage;
+			inventory.SetActivePage = function( iPage )
+			{
+				if ( this.BIsPendingInventory() )
+				{
+					// just hold on to the value
+					this.pageCurrent = iPage;
+					return;
+				}
+
+				if ( iPage >= this.pageTotal )
+					return;
+
+				// we may have removed pages
+				//if ( this.pageCurrent >= 0 && this.pageCurrent < this.pageTotal ) // FIX
+					this.pageList[this.pageCurrent].hide();
+
+				this.pageList[iPage].show();
+				this.pageCurrent = iPage;
+				this.UpdatePageCounts();
+
+
+				this.PreloadPageImages( this.pageCurrent );
+			}
+		}
+		// == / Fix Bug
+		
+		
 		if(!inventory.BuildItemElement_old){
 			inventory.BuildItemElement_old = inventory.BuildItemElement;
 			inventory.BuildItemElement = function(){
@@ -294,17 +335,7 @@ function inventoryPageInit(){
 			inventory.MakeActive_old = inventory.MakeActive;
 			inventory.MakeActive = function(){
 				var res = inventory.MakeActive_old.apply(this, arguments);
-				if(W.localStorage.hideDupItems){
-					W.Filter.rgCurrentTags['SWT']=['notdup'];
-					W.Filter.OnFilterChange();
-					$('.itemcount').show();
-				} else {
-					delete W.Filter.rgCurrentTags.SWT;
-					W.Filter.rgLastTags['SWT']=['notdup'];
-					W.Filter.OnFilterChange();
-					$('.itemcount').hide();
-				}
-				//var res = inventory.MakeActive_old.apply(this, arguments);
+				hideDupFilter();
 				return res;
 			}
 
@@ -365,13 +396,32 @@ function inventoryPageInit(){
 	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup');
 	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
 
+	var hideDupFilter = function (){
+		if(W.localStorage.hideDupItems){
+			W.Filter.rgCurrentTags['SWT']=['notdup'];
+			W.Filter.OnFilterChange();
+			$('.itemcount').show();
+		} else {
+			delete W.Filter.rgCurrentTags.SWT;
+			W.Filter.rgLastTags['SWT']=['notdup'];
+			W.Filter.OnFilterChange();
+			$('.itemcount').hide();
+		}
+		// return to page selectedItem
+		if(g_ActiveInventory.selectedItem)
+			g_ActiveInventory.EnsurePageActiveForItem( g_ActiveInventory.selectedItem.element );
+	}
+	
 	W.onchangehidedup = function(e){
 		if(e.target.checked){
 			W.localStorage.hideDupItems = 1;
 		} else {
 			W.localStorage.removeItem('hideDupItems');
 		}
-		g_ActiveInventory.MakeActive();
+		hideDupFilter();
+
+		
+
 	};
 
 	//// sell dialog accept ssa checked

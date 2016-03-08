@@ -109,19 +109,21 @@ function mainPage(){
 
 function itemPage(){
 	//// accept ssa checked
-	W.$('market_buynow_dialog_accept_ssa').checked=true;
+	W.$J('#market_buynow_dialog_accept_ssa, #market_buyorder_dialog_accept_ssa').prop('checked',true);
+
 	addGotoBtn();
+
 	//numerate listings
-	$J('#searchResultsRows .market_listing_item_name_block').each(function(i,e) {
+	W.$J('#searchResultsRows .market_listing_item_name_block').each(function(i,e) {
 		$J(e).prepend('<div style="float:right">#'+(i+1)+'</div>')
 	});
 }
 
 function addGotoBtn(){
 	W.$J("#searchResults_btn_next").after(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">'+t('go')+'</span>');
-	W.$('swt_gotopagebtn').onclick=function(){
+	W.$J('#swt_gotopagebtn').click(function(){
 		W.g_oSearchResults.GoToPage(W.$('swt_gotopagevl').value-1);
-	}
+	})
 }
 
 init();
