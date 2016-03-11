@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
 
 	grunt.initConfig({
-
+		pkg: grunt.file.readJSON('package.json'),
 		clean: {
 			build: ['release/']
 		},
@@ -23,10 +23,9 @@ module.exports = function(grunt) {
 			options: {
 				preserveComments: /^\s(?:==\/?UserScript|@)/
 			},
-			my_target: {
-				files: {
-					'release/steamwebtools.user.js': ['release/steamwebtools.full.js']
-				}
+			build: {
+				src: 'release/steamwebtools.full.js',
+				dest: 'release/steamwebtools.user.js'
 			},
 		}
 
@@ -36,6 +35,15 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 
-	grunt.registerTask('build', ['clean', 'includes', 'uglify']);
+	grunt.registerTask( "genverfile", "Generate _version.js", function() {
+		var v = grunt.config('pkg').version,
+			d = grunt.template.today("yyyy-mm-dd");
+		grunt.file.write('src/_version.js', '// @version		'+v+'\n// @date		'+d);
+		
+		grunt.log.writeln('Generated _version.js : '+d+' '+v);
+	});
+	
+	
+	grunt.registerTask('build', ['genverfile', 'clean', 'includes', 'uglify']);
 	grunt.registerTask('default', ['build']);
 };

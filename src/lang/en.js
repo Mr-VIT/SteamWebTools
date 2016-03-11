@@ -66,3 +66,9 @@
 'set.market' : 'Community Market',
 'set.marketMainPageFuncs' : 'Enable functions in main page of Community Market',
 'set.FixNavbar' : 'Fix Navbar',
+// rep bages
+'rep.unk' : 'unknown',
+'rep.mdlman' : 'middleman',
+'rep.white' : 'whitelisted',
+'rep.black' : 'blacklisted',
+'rep.orange' : 'suspicious',

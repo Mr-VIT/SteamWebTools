@@ -1,6 +1,7 @@
 {
   "name": "steamwebtools",
   "main": "Gruntfile.js",
+  "version": "0.5.7",
   "dependencies": {
     "grunt": "^0.4.5"
   },
@@ -8,9 +9,6 @@
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-uglify": "^0.11.1",
     "grunt-includes": "^0.5.3"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",

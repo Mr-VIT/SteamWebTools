@@ -8,6 +8,7 @@
 // @updateURL	https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/version.js
 // @icon		http://mr-vit.github.io/SteamWebTools/icon-64.png
 // @run-at		document-end
+// @connect		check.csmania.ru
 // @include		http://store.steampowered.com/*
 // @include		https://store.steampowered.com/*
 // @include		http://steamcommunity.com/*

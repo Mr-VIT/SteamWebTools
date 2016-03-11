@@ -2,13 +2,14 @@
 // @name		Steam Web Tools
 // @namespace	http://v1t.su/projects/steam/webtools/
 // @description	Useful tools in Steam web sites
-// @version		0.5.6
-// @date		2016-02-24
+// @version		0.5.7
+// @date		2016-03-11
 // @author		Mr-VIT
 // @homepage	http://v1t.su/projects/steam/webtools/
 // @updateURL	https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/version.js
 // @icon		http://mr-vit.github.io/SteamWebTools/icon-64.png
 // @run-at		document-end
+// @connect		check.csmania.ru
 // @include		http://store.steampowered.com/*
 // @include		https://store.steampowered.com/*
 // @include		http://steamcommunity.com/*
@@ -170,6 +171,12 @@ t.loadText({  //default text
 'set.market' : 'Community Market',
 'set.marketMainPageFuncs' : 'Enable functions in main page of Community Market',
 'set.FixNavbar' : 'Fix Navbar',
+// rep bages
+'rep.unk' : 'unknown',
+'rep.mdlman' : 'middleman',
+'rep.white' : 'whitelisted',
+'rep.black' : 'blacklisted',
+'rep.orange' : 'suspicious',
 
 });
 t.loadText({
@@ -241,6 +248,12 @@ t.loadText({
 'set.market' : 'Торговая Площадка',
 'set.marketMainPageFuncs' : 'Включить надстройку на главной странице торговой площадки',
 'set.FixNavbar' : 'Зафиксировать Меню Навигации',
+// rep bages
+'rep.unk' : 'неизвестен',
+'rep.mdlman' : 'гарант',
+'rep.white' : 'в белом списке',
+'rep.black' : 'в черном списке',
+'rep.orange' : 'подозрительный',
 
 });
 t.loadText({
@@ -761,6 +774,87 @@ var scripts = [
 		run:function(){
 			var $ = W.$J, steamid;
 
+			function SetRepBadges(selector){
+				document.querySelector(selector).insertAdjacentHTML('afterBegin',
+					'<div id="swt_badges"><a id="csmbadge" class="badge" href="http://check.csmania.ru/#steam:'+steamid+'">CSm: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a></div>'
+				);
+				
+				var badges = {
+					0:{
+						text : 'rep.unk',
+						color : '606060'
+					},
+					1:{
+						text : 'rep.mdlman',
+						color : '5E931B'
+					},
+					2:{
+						text : 'rep.white',
+						color : '247E9E'
+					},
+					3:{
+						text : 'rep.black',
+						color : '9E2424'
+					},
+					4:{
+						text : 'rep.orange',
+						color : 'B47200'
+					},
+					error:{
+						text : 'Error',
+						color : '606060'
+					}
+				};
+				
+
+				var setRepStatus = function(res) {
+					if(!(res.csm >= 0)){
+						res.csm = error;
+					}
+					$('#csmbadge')[0].style.background = '#'+badges[res.csm].color;
+					$('#csmbadge span').text(t(badges[res.csm].text));
+					
+					var srbcolor;
+					if(!res.srcom){
+						res.srcom = t(badges[0].text);
+						srbcolor = badges[0].color;
+					} else {
+						if(res.srcom.indexOf('SCAMMER')>-1){
+							srbcolor = badges[3].color;
+						} else
+						if(res.srcom.indexOf('CAUTION')>-1){
+							srbcolor = badges[4].color;
+						} else
+						if(res.srcom.indexOf('MIDDLEMAN')>-1){
+							srbcolor = badges[1].color;
+						} else
+						if((res.srcom.indexOf('TRUSTED SELLER')>-1)||(res.srcom.indexOf('ADMIN')>-1)){
+							srbcolor = badges[2].color;
+						} else {
+							srbcolor = badges[0].color;
+						}
+					}
+					
+					$('#srbadge')[0].style.background = '#'+srbcolor;
+					$('#srbadge span').text(res.srcom);
+					$('#swt_badges').show();
+				}
+
+				// get rep status
+				try{
+					GM_xmlhttpRequest({
+						method : 'GET',
+						url  : 'http://check.csmania.ru/api/swt9Hk02yFhf/0/repforext2/'+steamid,
+						onload: function(response) {
+							setRepStatus(JSON.parse(response.responseText));
+						}
+					});
+				} catch(e) {
+					console.log(e)
+				}
+				
+			}
+
 			function profilePageInit(){
 
 				steamid = W.g_rgProfileData.steamid;
@@ -843,12 +937,14 @@ var scripts = [
 
 				// Styles
 				document.body.insertAdjacentHTML("afterBegin",
-					'<style>#swt_info{position:absolute;top:201px}</style>'
+					'<style>#swt_badges{display:none;position:absolute;top:7px}.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;padding:3px}#swt_info{position:absolute;top:201px}</style>'
 				);
 
 
 				$('.profile_header').append('<div id="swt_info">SteamID64: <a href="http://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> | <a href="#getMoreInfo" onclick="getMoreInfo();return false">'+t('getMoreInfo')+'</a></div>');
 
+				SetRepBadges('.profile_header');
+				
 				W.getMoreInfo = function() {
 					var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
 					W.setTimeout(function(){Modal.AdjustSizing();},1);
@@ -894,11 +990,8 @@ var scripts = [
 					pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">'+t('chat')+': Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
 				} catch(e) {};
 
-				// Games link - tab all games
-				var el = document.querySelector('.profile_count_link a[href$="games/"]');
-				if(el) el.href+='?tab=all';
 				// inventory links
-				el = document.querySelector('.profile_count_link a[href$="inventory/"]');
+				var el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 				if(el)
 					el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="http://store.akamai.steamstatic.com/public/images/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
 
@@ -1058,7 +1151,8 @@ var scripts = [
 					var el = $('div.pending_gift:first');
 					if(el.length){
 						el.before('<a id="swt_acceptAllGifts" class="btn_darkblue_white_innerfade btn_medium new_trade_offer_btn" href="#"><span>'+t('acceptAllToInv')+'</span></a>');
-						$('#swt_acceptAllGifts').click(function(){
+						$('#swt_acceptAllGifts').click(function(e){
+							e.preventDefault();
 							var pg = $('div.pending_gift');
 							if(pg.length){
 								var gid;
@@ -1151,7 +1245,7 @@ var scripts = [
 
 				//// inv
 
-				// hide dup witth filters
+				// == hide dup work with another filters
 				W.Filter.UpdateTagFiltering_old = W.Filter.UpdateTagFiltering;
 				W.Filter.UpdateTagFiltering = function(rgNewTags){
 					if (W.localStorage.hideDupItems) {
@@ -1159,6 +1253,7 @@ var scripts = [
 					}
 					return this.UpdateTagFiltering_old.apply(this, [rgNewTags]);
 				}
+				// == /hide dup
 
 				var SelectInventoryFromUser_old = W.SelectInventoryFromUser;
 				W.SelectInventoryFromUser = function( user, appid, contextid, bForceSelect ){
@@ -1166,6 +1261,46 @@ var scripts = [
 						return SelectInventoryFromUser_old.apply(this, arguments);
 					}
 					var inventory = W.UserYou.getInventory( appid, contextid );
+					
+					// == Fix Bug : The old page is shown below after use filter
+					/* 
+					if(!inventory.SetActivePage_old){
+						inventory.SetActivePage_old = inventory.SetActivePage;
+						inventory.SetActivePage = function(){
+							$('.inventory_page').hide();
+							return inventory.SetActivePage_old.apply(this, arguments);
+						}
+					}
+					*/
+					if(!inventory.SetActivePage_old){
+						inventory.SetActivePage_old = inventory.SetActivePage;
+						inventory.SetActivePage = function( iPage )
+						{
+							if ( this.BIsPendingInventory() )
+							{
+								// just hold on to the value
+								this.pageCurrent = iPage;
+								return;
+							}
+
+							if ( iPage >= this.pageTotal )
+								return;
+
+							// we may have removed pages
+							//if ( this.pageCurrent >= 0 && this.pageCurrent < this.pageTotal ) // FIX
+								this.pageList[this.pageCurrent].hide();
+
+							this.pageList[iPage].show();
+							this.pageCurrent = iPage;
+							this.UpdatePageCounts();
+
+
+							this.PreloadPageImages( this.pageCurrent );
+						}
+					}
+					// == / Fix Bug
+					
+					
 					if(!inventory.BuildItemElement_old){
 						inventory.BuildItemElement_old = inventory.BuildItemElement;
 						inventory.BuildItemElement = function(){
@@ -1230,17 +1365,7 @@ var scripts = [
 						inventory.MakeActive_old = inventory.MakeActive;
 						inventory.MakeActive = function(){
 							var res = inventory.MakeActive_old.apply(this, arguments);
-							if(W.localStorage.hideDupItems){
-								W.Filter.rgCurrentTags['SWT']=['notdup'];
-								W.Filter.OnFilterChange();
-								$('.itemcount').show();
-							} else {
-								delete W.Filter.rgCurrentTags.SWT;
-								W.Filter.rgLastTags['SWT']=['notdup'];
-								W.Filter.OnFilterChange();
-								$('.itemcount').hide();
-							}
-							//var res = inventory.MakeActive_old.apply(this, arguments);
+							hideDupFilter();
 							return res;
 						}
 
@@ -1301,13 +1426,32 @@ var scripts = [
 				var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup');
 				document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
 
+				var hideDupFilter = function (){
+					if(W.localStorage.hideDupItems){
+						W.Filter.rgCurrentTags['SWT']=['notdup'];
+						W.Filter.OnFilterChange();
+						$('.itemcount').show();
+					} else {
+						delete W.Filter.rgCurrentTags.SWT;
+						W.Filter.rgLastTags['SWT']=['notdup'];
+						W.Filter.OnFilterChange();
+						$('.itemcount').hide();
+					}
+					// return to page selectedItem
+					if(g_ActiveInventory.selectedItem)
+						g_ActiveInventory.EnsurePageActiveForItem( g_ActiveInventory.selectedItem.element );
+				}
+				
 				W.onchangehidedup = function(e){
 					if(e.target.checked){
 						W.localStorage.hideDupItems = 1;
 					} else {
 						W.localStorage.removeItem('hideDupItems');
 					}
-					g_ActiveInventory.MakeActive();
+					hideDupFilter();
+
+					
+
 				};
 
 				//// sell dialog accept ssa checked
@@ -1550,7 +1694,7 @@ var scripts = [
 
 							total += price;
 						}
-						W.$J('#'+resultId).append(' / '+W.v_currencyformat(total, W.GetCurrencyCode(W.g_rgWalletInfo.wallet_currency)));
+						W.$J('#'+resultId).append(' / '+W.v_currencyformat(total, W.GetCurrencyCode(W.g_rgWalletInfo.wallet_currency))+'('+W.v_currencyformat(total/1.15, W.GetCurrencyCode(W.g_rgWalletInfo.wallet_currency))+')');
 					}
 				}
 				countSumListings('tablesell', 'my_market_selllistings_number');
@@ -1560,19 +1704,21 @@ var scripts = [
 
 			function itemPage(){
 				//// accept ssa checked
-				W.$('market_buynow_dialog_accept_ssa').checked=true;
+				W.$J('#market_buynow_dialog_accept_ssa, #market_buyorder_dialog_accept_ssa').prop('checked',true);
+
 				addGotoBtn();
+
 				//numerate listings
-				$J('#searchResultsRows .market_listing_item_name_block').each(function(i,e) {
+				W.$J('#searchResultsRows .market_listing_item_name_block').each(function(i,e) {
 					$J(e).prepend('<div style="float:right">#'+(i+1)+'</div>')
 				});
 			}
 
 			function addGotoBtn(){
 				W.$J("#searchResults_btn_next").after(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">'+t('go')+'</span>');
-				W.$('swt_gotopagebtn').onclick=function(){
+				W.$J('#swt_gotopagebtn').click(function(){
 					W.g_oSearchResults.GoToPage(W.$('swt_gotopagevl').value-1);
-				}
+				})
 			}
 
 			init();
