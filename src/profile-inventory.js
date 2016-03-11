@@ -122,7 +122,8 @@ function inventoryPageInit(){
 		var el = $('div.pending_gift:first');
 		if(el.length){
 			el.before('<a id="swt_acceptAllGifts" class="btn_darkblue_white_innerfade btn_medium new_trade_offer_btn" href="#"><span>'+t('acceptAllToInv')+'</span></a>');
-			$('#swt_acceptAllGifts').click(function(){
+			$('#swt_acceptAllGifts').click(function(e){
+				e.preventDefault();
 				var pg = $('div.pending_gift');
 				if(pg.length){
 					var gid;

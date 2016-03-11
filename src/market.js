@@ -99,7 +99,7 @@ function mainPage(){
 
 				total += price;
 			}
-			W.$J('#'+resultId).append(' / '+W.v_currencyformat(total, W.GetCurrencyCode(W.g_rgWalletInfo.wallet_currency)));
+			W.$J('#'+resultId).append(' / '+W.v_currencyformat(total, W.GetCurrencyCode(W.g_rgWalletInfo.wallet_currency))+'('+W.v_currencyformat(total/1.15, W.GetCurrencyCode(W.g_rgWalletInfo.wallet_currency))+')');
 		}
 	}
 	countSumListings('tablesell', 'my_market_selllistings_number');

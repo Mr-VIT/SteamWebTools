@@ -1,5 +1,86 @@
 ﻿var $ = W.$J, steamid;
 
+function SetRepBadges(selector){
+	document.querySelector(selector).insertAdjacentHTML('afterBegin',
+		'<div id="swt_badges"><a id="csmbadge" class="badge" href="http://check.csmania.ru/#steam:'+steamid+'">CSm: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a></div>'
+	);
+	
+	var badges = {
+		0:{
+			text : 'rep.unk',
+			color : '606060'
+		},
+		1:{
+			text : 'rep.mdlman',
+			color : '5E931B'
+		},
+		2:{
+			text : 'rep.white',
+			color : '247E9E'
+		},
+		3:{
+			text : 'rep.black',
+			color : '9E2424'
+		},
+		4:{
+			text : 'rep.orange',
+			color : 'B47200'
+		},
+		error:{
+			text : 'Error',
+			color : '606060'
+		}
+	};
+	
+
+	var setRepStatus = function(res) {
+		if(!(res.csm >= 0)){
+			res.csm = error;
+		}
+		$('#csmbadge')[0].style.background = '#'+badges[res.csm].color;
+		$('#csmbadge span').text(t(badges[res.csm].text));
+		
+		var srbcolor;
+		if(!res.srcom){
+			res.srcom = t(badges[0].text);
+			srbcolor = badges[0].color;
+		} else {
+			if(res.srcom.indexOf('SCAMMER')>-1){
+				srbcolor = badges[3].color;
+			} else
+			if(res.srcom.indexOf('CAUTION')>-1){
+				srbcolor = badges[4].color;
+			} else
+			if(res.srcom.indexOf('MIDDLEMAN')>-1){
+				srbcolor = badges[1].color;
+			} else
+			if((res.srcom.indexOf('TRUSTED SELLER')>-1)||(res.srcom.indexOf('ADMIN')>-1)){
+				srbcolor = badges[2].color;
+			} else {
+				srbcolor = badges[0].color;
+			}
+		}
+		
+		$('#srbadge')[0].style.background = '#'+srbcolor;
+		$('#srbadge span').text(res.srcom);
+		$('#swt_badges').show();
+	}
+
+	// get rep status
+	try{
+		GM_xmlhttpRequest({
+			method : 'GET',
+			url  : 'http://check.csmania.ru/api/swt9Hk02yFhf/0/repforext2/'+steamid,
+			onload: function(response) {
+				setRepStatus(JSON.parse(response.responseText));
+			}
+		});
+	} catch(e) {
+		console.log(e)
+	}
+	
+}
+
 function profilePageInit(){
 
 	steamid = W.g_rgProfileData.steamid;
@@ -82,12 +163,14 @@ function profilePageInit(){
 
 	// Styles
 	document.body.insertAdjacentHTML("afterBegin",
-		'<style>#swt_info{position:absolute;top:201px}</style>'
+		'<style>#swt_badges{display:none;position:absolute;top:7px}.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;padding:3px}#swt_info{position:absolute;top:201px}</style>'
 	);
 
 
 	$('.profile_header').append('<div id="swt_info">SteamID64: <a href="http://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> | <a href="#getMoreInfo" onclick="getMoreInfo();return false">'+t('getMoreInfo')+'</a></div>');
 
+	SetRepBadges('.profile_header');
+	
 	W.getMoreInfo = function() {
 		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
 		W.setTimeout(function(){Modal.AdjustSizing();},1);
@@ -134,7 +217,7 @@ function profilePageInit(){
 	} catch(e) {};
 
 	// inventory links
-	el = document.querySelector('.profile_count_link a[href$="inventory/"]');
+	var el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
 		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="http://store.akamai.steamstatic.com/public/images/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
 
