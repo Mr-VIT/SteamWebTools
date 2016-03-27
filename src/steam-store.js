@@ -22,24 +22,26 @@
 	}
 
 	// cc switcher
-	if(settings.cur.storeShowCCbtn) {
-		var global_action_menu = document.getElementById('global_action_menu');
-		if(global_action_menu) {
-			var curCC = false;
-			if(curCC = document.cookie.match(/steamCountry=(\w{2})/i)){
-				curCC = curCC[1];
-			}
-			var changeCCmenuHTML = '\
-			<style>#cc_menu_btn{min-width:59px;z-index:999}#cc_list .popup_menu_item{white-space:nowrap}</style>\
-			<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
-	<div class="popup_block_new" id="cc_menu" style="display:none;">\
-	<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
-
-			global_action_menu.insertAdjacentHTML('afterBegin', changeCCmenuHTML);
-
-			_cc.updHTMLccList(curCC);
+	var global_action_menu = document.getElementById('global_action_menu');
+	if(global_action_menu) {
+		var curCC = false;
+		if(curCC = document.cookie.match(/steamCountry=(\w{2})/i)){
+			curCC = curCC[1];
 		}
+		var changeCCmenuHTML = '\
+		<style>#cc_menu_btn{display:none;min-width:59px;z-index:999}#cc_list .popup_menu_item{white-space:nowrap}</style>\
+		<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
+<div class="popup_block_new" id="cc_menu" style="display:none;">\
+<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
+
+		global_action_menu.insertAdjacentHTML('afterBegin', changeCCmenuHTML);
+
+		_cc.updHTMLccList(curCC);
 	}
+	if(settings.cur.storeShowCCbtn) {
+		W.$J('#cc_menu_btn').show()
+	}
+
 
 	// for app/sub page
 	var res = String(W.location.href).match(/\/(sub|app)\/(\d+)/i);
@@ -136,7 +138,7 @@
 		links = [
 			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/favicon-16x16.png', text: t('viewin')+' SteamDB.info'},
 			{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png?v=a', text: t('viewin')+' SteamPrices.com'},
-			{href:'http://mr_vit.plati.com/asp/find.asp?searchstr='+gamename, icon:'http://plati.com/favicon.ico', text: t('searchin')+' Plati.com'},
+			{href:'http://plati.com/asp/find.asp?ai=111350&searchstr='+gamename, icon:'http://plati.com/favicon.ico', text: t('searchin')+' Plati.com'},
 			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
 			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'http://www.steamgifts.com/favicon.ico', text: t('searchin')+' SteamGifts.com'},
 			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
