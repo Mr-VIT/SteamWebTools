@@ -2,8 +2,8 @@
 // @name		Steam Web Tools
 // @namespace	http://v1t.su/projects/steam/webtools/
 // @description	Useful tools in Steam web sites
-// @version		0.5.7
-// @date		2016-03-11
+// @version		0.5.8
+// @date		2016-03-27
 // @author		Mr-VIT
 // @homepage	http://v1t.su/projects/steam/webtools/
 // @updateURL	https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/version.js
@@ -320,6 +320,87 @@ t.loadText({
 'set.def' : '恢复默认',
 
 });
+t.loadText({
+/**
+ * Author: nagi.s.0330@gmail.com
+ */
+
+'lang.current' : '日本語',
+'lang.code' : 'jp',
+'getMoreInfo' : '詳細',
+'extInfo' : '拡張機能について',
+'reqErr' : 'リクエストエラー',
+'checkin' : 'チェックイン',
+'searchinforums' : 'フォーラムで探す',
+'inventory' : 'インベントリ',
+'profile' : 'プロフィール',
+'trades' : 'トレード',
+'chat' : 'チャット',
+'more' : '詳細',
+'showDropsCard' : 'Show only with cards drops remaining',
+'howmany' : 'How many? of ',
+'save' : 'セーブ',
+'get' : 'Get',
+'checkForSend' : '選択して送信',
+'sendChecked' : '選択したものを送信する',
+'showNote' : 'メモを見る',
+'minMarketPrice' : 'Min. Market price',
+'hideDup' : 'Hide duplicates, show amount',
+'go' : 'Go',
+'checkAll' : 'すべて選択',
+'deleteChecked' : '選択を解除',
+'addSubidsToCart' : 'Add SubIDs to cart',
+'add' : 'Add',
+'addChecked' : 'Add checked',
+'cartHist' : 'Cart history',
+'clearCart' : 'カートをリセットする',
+'quickPurchase' : 'One-Click Buy to inventory (SteamWallet only)',
+'giftForSend' : 'Gifts for send',
+'giftForSendNote' : 'If you want to send Gifts to different Emails enter them below one per line. Gifts will be sent on the order. If quantity of gifts greater than address the remaining Gifts will be sent to the last address',
+'sent' : '送信完了',
+'def' : 'Default',
+'getPrices' : '国ごとの価格を表示',
+'prices' : '国ごとの価格',
+'viewin' : 'View in',
+'searchin' : 'Search in',
+'viewMyCardsGame' : 'View my cards/badge this game',
+'adding' : 'adding',
+'added' : 'Added | View in cart',
+'allSpecials' : 'All Specials',
+'balance' : 'Balance',
+'acc' : 'Account',
+'acceptAllToInv' : 'Accept all to inventory',
+'listed' : 'Listed: ',
+'skipped' : 'Skipped: ',
+'skipSent' : 'Skip gifts sent before?',
+'totop' : 'To top',
+// settings page
+'set.ext' : '拡張機能',
+'set.settings' : '設定',
+'set.homePage' : 'ホームページ',
+'set.global' : 'グローバル',
+'set.lang' : '言語',
+'set.hideAccName' : 'アカウント名を非表示にする',
+'set.hideBalance' : '残高を非表示にする',
+'set.store' : 'ストア',
+'set.showCCBtn' : 'Show button change country',
+'set.CCList' : 'Your list of countries. Enter your country first',
+'set.showCartBtn' : 'Always show Cart button',
+'set.cartAjax' : 'Adding to cart without reloading the page',
+'set.showSubid' : 'SubIDを表示',
+'set.showBtnGetPrices' : '"国ごとの価格を表示"ボタンを表示する',
+'set.def' : 'Restore the default',
+'set.market' : 'マーケット',
+'set.marketMainPageFuncs' : 'Enable functions in main page of Community Market',
+'set.FixNavbar' : 'Fix Navbar',
+// rep bages
+'rep.unk' : 'unknown',
+'rep.mdlman' : 'middleman',
+'rep.white' : 'whitelisted',
+'rep.black' : 'blacklisted',
+'rep.orange' : 'suspicious',
+
+});
 
 
 W.$J('.submenu_community').append('<a class="submenuitem swt" href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings">SWT - '+t('set.settings')+'</a>');
@@ -502,10 +583,20 @@ var scripts = [
 					emails = W.$('emails').value.split(/\r?\n/);
 
 					if(emails.length){
-						W.$('email_input').value = emails[0];
+						W.$('email_input').value = 'noreply@steampowered.com'; //for login+text@gmail.com validation success
 					}
 
 					return SubmitGiftDeliveryForm_old.apply(this, arguments);
+
+				}
+				
+				var SubmitGiftNoteForm_old = W.SubmitGiftNoteForm;
+				W.SubmitGiftNoteForm = function(){
+					if(emails.length){
+						W.$('email_input').value = emails[0];
+					}
+
+					return SubmitGiftNoteForm_old.apply(this, arguments);
 
 				}
 
@@ -558,24 +649,26 @@ var scripts = [
 				}
 
 				// cc switcher
-				if(settings.cur.storeShowCCbtn) {
-					var global_action_menu = document.getElementById('global_action_menu');
-					if(global_action_menu) {
-						var curCC = false;
-						if(curCC = document.cookie.match(/steamCountry=(\w{2})/i)){
-							curCC = curCC[1];
-						}
-						var changeCCmenuHTML = '\
-						<style>#cc_menu_btn{min-width:59px;z-index:999}#cc_list .popup_menu_item{white-space:nowrap}</style>\
-						<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
-				<div class="popup_block_new" id="cc_menu" style="display:none;">\
-				<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
-
-						global_action_menu.insertAdjacentHTML('afterBegin', changeCCmenuHTML);
-
-						_cc.updHTMLccList(curCC);
+				var global_action_menu = document.getElementById('global_action_menu');
+				if(global_action_menu) {
+					var curCC = false;
+					if(curCC = document.cookie.match(/steamCountry=(\w{2})/i)){
+						curCC = curCC[1];
 					}
+					var changeCCmenuHTML = '\
+					<style>#cc_menu_btn{display:none;min-width:59px;z-index:999}#cc_list .popup_menu_item{white-space:nowrap}</style>\
+					<span class="pulldown" id="cc_menu_btn" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+(curCC ?': <img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+curCC.toLowerCase()+'.gif" /> '+curCC:'')+' </span>\
+			<div class="popup_block_new" id="cc_menu" style="display:none;">\
+			<div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
+
+					global_action_menu.insertAdjacentHTML('afterBegin', changeCCmenuHTML);
+
+					_cc.updHTMLccList(curCC);
 				}
+				if(settings.cur.storeShowCCbtn) {
+					W.$J('#cc_menu_btn').show()
+				}
+
 
 				// for app/sub page
 				var res = String(W.location.href).match(/\/(sub|app)\/(\d+)/i);
@@ -672,7 +765,7 @@ var scripts = [
 					links = [
 						{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/favicon-16x16.png', text: t('viewin')+' SteamDB.info'},
 						{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png?v=a', text: t('viewin')+' SteamPrices.com'},
-						{href:'http://mr_vit.plati.com/asp/find.asp?searchstr='+gamename, icon:'http://plati.com/favicon.ico', text: t('searchin')+' Plati.com'},
+						{href:'http://plati.com/asp/find.asp?ai=111350&searchstr='+gamename, icon:'http://plati.com/favicon.ico', text: t('searchin')+' Plati.com'},
 						{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
 						{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'http://www.steamgifts.com/favicon.ico', text: t('searchin')+' SteamGifts.com'},
 						{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
@@ -1815,6 +1908,10 @@ var scripts = [
 								{
 									text : '简体中文',
 									value : 'zh-cn',
+								},
+								{
+									text : '日本語',
+									value : 'jp',
 								},
 							],
 						},

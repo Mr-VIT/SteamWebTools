@@ -17,3 +17,6 @@ t.loadText({
 t.loadText({
 //!include lang/zh-cn.js
 });
+t.loadText({
+//!include lang/jp.js
+});
