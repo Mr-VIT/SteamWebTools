@@ -85,6 +85,10 @@ createForm([
 						text : '简体中文',
 						value : 'zh-cn',
 					},
+					{
+						text : '日本語',
+						value : 'jp',
+					},
 				],
 			},
 			{
