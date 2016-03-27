@@ -37,10 +37,20 @@ if(W.location.hash && W.location.hash.substr(1,9)=='multisend'){
 		emails = W.$('emails').value.split(/\r?\n/);
 
 		if(emails.length){
-			W.$('email_input').value = emails[0];
+			W.$('email_input').value = 'noreply@steampowered.com'; //for login+text@gmail.com validation success
 		}
 
 		return SubmitGiftDeliveryForm_old.apply(this, arguments);
+
+	}
+	
+	var SubmitGiftNoteForm_old = W.SubmitGiftNoteForm;
+	W.SubmitGiftNoteForm = function(){
+		if(emails.length){
+			W.$('email_input').value = emails[0];
+		}
+
+		return SubmitGiftNoteForm_old.apply(this, arguments);
 
 	}
 
