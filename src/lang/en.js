@@ -32,7 +32,7 @@
 'giftForSendNote' : 'If you want to send Gifts to different Emails enter them below one per line. Gifts will be sent on the order. If quantity of gifts greater than address the remaining Gifts will be sent to the last address',
 'sent' : 'Sent',
 'def' : 'Default',
-'getPrices' : 'Get prices for other countries (Need logout)',
+'getPrices' : 'Get prices for other countries',
 'prices' : 'Prices for other countries',
 'viewin' : 'View in',
 'searchin' : 'Search in',

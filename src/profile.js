@@ -2,7 +2,7 @@
 
 function SetRepBadges(selector){
 	document.querySelector(selector).insertAdjacentHTML('afterBegin',
-		'<div id="swt_badges"><a id="csmbadge" class="badge" href="http://check.csmania.ru/#steam:'+steamid+'">CSm: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a></div>'
+		'<div id="swt_badges"><a id="csmbadge" class="badge" href="http://checkrep.ru/#steam:'+steamid+'">CRep: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a></div>'
 	);
 	
 	var badges = {
@@ -68,9 +68,10 @@ function SetRepBadges(selector){
 
 	// get rep status
 	try{
-		GM_xmlhttpRequest({
+		var xhr = window.GM_xmlhttpRequest || window.GM_xhr;
+		xhr({
 			method : 'GET',
-			url  : 'http://check.csmania.ru/api/swt9Hk02yFhf/0/repforext2/'+steamid,
+			url  : 'http://checkrep.ru/api/swt9Hk02yFhf/0/repforext2/'+steamid,
 			onload: function(response) {
 				setRepStatus(JSON.parse(response.responseText));
 			}
@@ -87,9 +88,9 @@ function profilePageInit(){
 
 	var profilesLinks = [
 		{
-			href: 'http://check.csmania.ru/#steam:'+steamid,
-			icon: 'http://check.csmania.ru/favicon.ico',
-			text: t('checkin')+' Check.CSMania.RU',
+			href: 'http://checkrep.ru/#steam:'+steamid,
+			icon: 'http://checkrep.ru/favicon.ico',
+			text: t('checkin')+' CheckRep.ru',
 		},
 		{
 			href: 'http://steamrep.com/profiles/'+steamid,
@@ -125,13 +126,13 @@ function profilePageInit(){
 		},
 		{
 			href: 'http://tf2outpost.com/backpack/'+steamid,
-			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
+			icon: 'http://cdn.tf2outpost.com/img/favicon-440.ico',
 			text: t('inventory')+' TF2OutPost.com',
 		},
 		{hr:true},
 		{
 			href: 'http://tf2outpost.com/user/'+steamid,
-			icon: 'http://cdn.tf2outpost.com/img/favicon_440.ico',
+			icon: 'http://cdn.tf2outpost.com/img/favicon-440.ico',
 			text: t('trades')+' TF2OutPost.com',
 		},
 		{
@@ -143,6 +144,11 @@ function profilePageInit(){
 			href: 'http://csgolounge.com/profile?id='+steamid,
 			icon: 'http://csgolounge.com/favicon.ico',
 			text: t('trades')+' CSGOLounge.com',
+		},
+		{
+			href: 'http://steam.tools/itemvalue/#/'+steamid+'-730',
+			icon: 'http://steam.tools/favicon.ico',
+			text: t('inventory')+' Steam.tools/itemvalue/',
 		},
 		{hr:true},
 		{

@@ -32,7 +32,7 @@
 'giftForSendNote' : '如果想给不同的 Email 地址发送礼物,请在下框中每行填写一个 Email. 礼物将按顺序发送. 如果礼物数量大于 Email 地址数, 余下的礼物将被全部发送到最后一个地址.',
 'sent' : '已发送',
 'def' : '默认',
-'getPrices' : '获取其他地区的价格 (需要登出)',
+'getPrices' : '获取其他地区的价格',
 'prices' : '其他地区价格',
 'viewin' : '查询',
 'searchin' : '搜索',

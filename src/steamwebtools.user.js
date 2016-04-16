@@ -8,24 +8,33 @@
 // @updateURL	https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/version.js
 // @icon		http://mr-vit.github.io/SteamWebTools/icon-64.png
 // @run-at		document-end
-// @connect		check.csmania.ru
+// @connect		checkrep.ru
+// @connect		store.steampowered.com
+// @grant		GM_xmlhttpRequest
+// @grant		GM_xhr
+// @grant		GM_getValue
+// @grant		GM_setValue
+// @grant		GM_deleteValue
 // @include		http://store.steampowered.com/*
 // @include		https://store.steampowered.com/*
 // @include		http://steamcommunity.com/*
 // @include		https://steamcommunity.com/*
 // ==/UserScript==
 
-W = unsafeWindow;
+!function(){
+W = window.unsafeWindow || window;
 
 //!include settings.js
 //!include lang.js
 
 //!include global.js
 
+var rURL_STORE = 'https?://store\\.steampowered\\.com/';
+var rURL_COMMUNITY = 'https?://steamcommunity\\.com/';
 var scripts = [
 	{
 		match:[
-			'https?://store\\.steampowered\\.com/cart.*',
+			rURL_STORE+'cart.*',
 		],
 		run:function(){
 			//!include cart-page.js
@@ -33,7 +42,7 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://store\\.steampowered\\.com/checkout/\\?purchasetype=.+',
+			rURL_STORE+'checkout/\\?purchasetype=.+',
 		],
 		run:function(){
 			//!include purchase.js
@@ -41,7 +50,7 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://store\\.steampowered\\.com/checkout/\\?purchasetype=gift.*',
+			rURL_STORE+'checkout/\\?purchasetype=gift.*',
 		],
 		run:function(){
 			//!include checkout-quickpurchase.js
@@ -49,8 +58,8 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://store\\.steampowered\\.com/checkout/sendgift/.*',
-			'https?://store\\.steampowered\\.com/checkout/\\?purchasetype=gift.*'
+			rURL_STORE+'checkout/sendgift/.*',
+			rURL_STORE+'checkout/\\?purchasetype=gift.*'
 
 		],
 		run:function(){
@@ -59,7 +68,7 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://store\\.steampowered\\.com/.*',
+			rURL_STORE+'.*',
 		],
 		run:function(){
 			//!include steam-store.js
@@ -67,8 +76,8 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://steamcommunity\\.com/id/[^/]+/?',
-			'https?://steamcommunity\\.com/profiles/\\d+/?',
+			rURL_COMMUNITY+'id/[^/]+/?',
+			rURL_COMMUNITY+'profiles/\\d+/?',
 		],
 		run:function(){
 			//!include profile.js
@@ -76,8 +85,8 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://steamcommunity\\.com/id/.+?/inventory.*',
-			'https?://steamcommunity\\.com/profiles/\\d+/inventory.*',
+			rURL_COMMUNITY+'id/.+?/inventory.*',
+			rURL_COMMUNITY+'profiles/\\d+/inventory.*',
 		],
 		run:function(){
 			//!include profile-inventory.js
@@ -85,8 +94,8 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://steamcommunity\\.com/id/.+?/gamecards/\\d+.*',
-			'https?://steamcommunity\\.com/profiles/\\d+/gamecards/\\d+.*',
+			rURL_COMMUNITY+'id/.+?/gamecards/\\d+.*',
+			rURL_COMMUNITY+'profiles/\\d+/gamecards/\\d+.*',
 		],
 		run:function(){
 			//!include profile-badge.js
@@ -94,8 +103,8 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://steamcommunity\\.com/id/.+?/badges.*',
-			'https?://steamcommunity\\.com/profiles/\\d+/badges.*',
+			rURL_COMMUNITY+'id/.+?/badges.*',
+			rURL_COMMUNITY+'profiles/\\d+/badges.*',
 		],
 		run:function(){
 			//!include profile-badges.js
@@ -103,7 +112,7 @@ var scripts = [
 	},
 	{
 		match:[
-			'https?://steamcommunity\\.com/app/\\d+/guides.*'
+			rURL_COMMUNITY+'app/\\d+/guides.*'
 		],
 		run:function(){
 			//!include gamehub-guides.js
@@ -111,7 +120,7 @@ var scripts = [
 	},
 	{
 		match:[
-			'http://steamcommunity\\.com/market.*'
+			rURL_COMMUNITY+'market.*'
 		],
 		run:function(){
 			//!include market.js
@@ -119,7 +128,7 @@ var scripts = [
 	},
 	{
 		match:[
-			'http://steamcommunity\\.com/groups/SteamClientBeta#swt-settings'
+			rURL_COMMUNITY+'groups/SteamClientBeta#swt-settings'
 		],
 		run:function(){
 			//!include settings-page.js
@@ -127,7 +136,7 @@ var scripts = [
 	},
 	{
 		match:[
-			'http://store\\.steampowered\\.com/about/#swt-settings.*',
+			rURL_STORE+'about/#swt-settings.*',
 		],
 		run:function(){
 			//!include settings-store-save.js
@@ -145,3 +154,5 @@ for(var i = 0; i<scripts.length; i++) {
 		}
 	}
 }
+
+}()
