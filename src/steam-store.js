@@ -76,46 +76,57 @@
 					)
 
 					reqUrl += itemId+'&cc='+cc;
+					var done = function(data){
+						var s='';
 
+						if(data[itemId].success){
+							var data = data[itemId].data;
+							var price = data.price_overview || data.price;
+
+							if(price.discount_percent>0){
+								s += '<s>'+(price.initial/100)+'</s> <span class="discount_pct">-'+price.discount_percent+'%</span> ';
+							}
+
+							s += '<b>'+(price.final/100)+'</b> '+price.currency;
+
+							if(data.packages)
+								s += ' (subID:<a href="http://steamdb.info/sub/'+data.packages[0]+'">'+data.packages[0]+'</a>)';
+							// for non-main subs
+							try{
+								var pg = data.package_groups[0].subs;
+								if(pg.length>1){
+									for(var i=1;i<pg.length;i++){
+										var tmp = pg[i].option_text.match(/- \D*(\d+(?:[.,]\d{2})?)/i);
+										document.querySelector('.swt_price_'+i+'_'+cc+'>span').innerHTML = '<b>'+tmp[tmp.length-1]+'</b> '+price.currency+' (subID:<a href="http://steamdb.info/sub/'+pg[i].packageid+'">'+pg[i].packageid+'</a>)';
+									}
+								}
+							}catch(e){};
+						} else {
+							s+='N/A';
+						}
+						document.querySelector('.swt_price_0_'+cc+'>span').innerHTML = s;
+					};
 					try{
 						var xhr = window.GM_xmlhttpRequest || window.GM_xhr;
 						console.log(xhr);
-						xhr({
-							url: reqUrl,
-							method: 'GET',
-							anonymous : true,
-							onload: function( data ) {
-								data=JSON.parse(data.responseText);
-								var s='';
-
-								if(data[itemId].success){
-									var data = data[itemId].data;
-									var price = data.price_overview || data.price;
-
-									if(price.discount_percent>0){
-										s += '<s>'+(price.initial/100)+'</s> <span class="discount_pct">-'+price.discount_percent+'%</span> ';
-									}
-
-									s += '<b>'+(price.final/100)+'</b> '+price.currency;
-
-									if(data.packages)
-										s += ' (subID:<a href="http://steamdb.info/sub/'+data.packages[0]+'">'+data.packages[0]+'</a>)';
-									// for non-main subs
-									try{
-										var pg = data.package_groups[0].subs;
-										if(pg.length>1){
-											for(var i=1;i<pg.length;i++){
-												var tmp = pg[i].option_text.match(/- \D*(\d+(?:[.,]\d{2})?)/i);
-												document.querySelector('.swt_price_'+i+'_'+cc+'>span').innerHTML = '<b>'+tmp[tmp.length-1]+'</b> '+price.currency+' (subID:<a href="http://steamdb.info/sub/'+pg[i].packageid+'">'+pg[i].packageid+'</a>)';
-											}
-										}
-									}catch(e){};
-								} else {
-									s+='N/A';
+						if(xhr){
+							xhr({
+								url: reqUrl,
+								method: 'GET',
+								anonymous : true,
+								onload: function( data ) {
+									data=JSON.parse(data.responseText);
+									done(data);
 								}
-								document.querySelector('.swt_price_0_'+cc+'>span').innerHTML = s;
-							}
-						});
+							});
+						} else {
+							W.$J.ajax({
+								url: reqUrl,
+								method: 'GET',
+							}).done(done);
+						}
+						
+
 					} catch(e) {
 						console.log(e)
 					}
