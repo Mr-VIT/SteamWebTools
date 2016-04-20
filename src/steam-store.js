@@ -76,11 +76,7 @@
 					)
 
 					reqUrl += itemId+'&cc='+cc;
-
-					W.$J.ajax( {
-						url: reqUrl,
-						method: 'get'
-					}).done(function( data ) {
+					var done = function(data){
 						var s='';
 
 						if(data[itemId].success){
@@ -109,7 +105,31 @@
 							s+='N/A';
 						}
 						document.querySelector('.swt_price_0_'+cc+'>span').innerHTML = s;
-					});
+					};
+					try{
+						var xhr = window.GM_xmlhttpRequest || window.GM_xhr;
+						console.log(xhr);
+						if(xhr){
+							xhr({
+								url: reqUrl,
+								method: 'GET',
+								anonymous : true,
+								onload: function( data ) {
+									data=JSON.parse(data.responseText);
+									done(data);
+								}
+							});
+						} else {
+							W.$J.ajax({
+								url: reqUrl,
+								method: 'GET',
+							}).done(done);
+						}
+						
+
+					} catch(e) {
+						console.log(e)
+					}
 				}
 
 
@@ -124,7 +144,7 @@
 				for(var i=0; i < _cc.ListA.length; i++){
 					getPrice(_cc.ListA[i]);
 				}
-				setTimeout(function(){getPrice(_cc.curCC)}, 3500); // set default CC
+				//setTimeout(function(){getPrice(_cc.curCC)}, 3500); // set default CC
 
 				return false;
 			}
@@ -143,7 +163,7 @@
 			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'http://www.steamgifts.com/favicon.ico', text: t('searchin')+' SteamGifts.com'},
 			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
 		];
-
+		
 		if(itemType=='app'){
 			links.push({href:'http://steamcommunity.com/my/gamecards/'+itemId, icon:'http://store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')})
 		}
