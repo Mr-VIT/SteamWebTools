@@ -1,28 +1,5 @@
-// ==UserScript==
-// @name		Steam Web Tools
-// @namespace	http://v1t.su/projects/steam/webtools/
-// @description	Useful tools in Steam web sites
-//!include _version.js
-// @author		Mr-VIT
-// @homepage	http://v1t.su/projects/steam/webtools/
-// @updateURL	https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/version.js
-// @icon		http://mr-vit.github.io/SteamWebTools/icon-64.png
-// @run-at		document-end
-// @connect		checkrep.ru
-// @connect		store.steampowered.com
-// @grant		GM_xmlhttpRequest
-// @grant		GM_xhr
-// @grant		GM_getValue
-// @grant		GM_setValue
-// @grant		GM_deleteValue
-// @include		http://store.steampowered.com/*
-// @include		https://store.steampowered.com/*
-// @include		http://steamcommunity.com/*
-// @include		https://steamcommunity.com/*
-// ==/UserScript==
-
 !function(){
-W = window.unsafeWindow || window;
+var W = window.unsafeWindow || window;
 
 //!include settings.js
 //!include lang.js
