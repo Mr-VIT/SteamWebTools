@@ -200,6 +200,31 @@
 			}
 		};
 
+		//add btn : view logos
+		var el = $J({
+			app : '.game_header_image_full',
+			sub : '.package_header'
+		}[itemType]).wrap(
+			$J('<a href="#viewlogos" title="View Logos"></a>').click(function(){
+				var urls = [
+					'capsule_616x353',
+					'header',
+					'header_586x192',
+					'header_292x136',
+					'capsule_231x87',
+					'capsule_184x69',
+					'capsule_sm_120',
+				];
+	
+				var res='';
+				for(var i=0;i<urls.length;i++){
+					res+='<img src="http://cdn.akamai.steamstatic.com/steam/'+itemType+'s/'+itemId+'/'+urls[i]+'.jpg"><br>';
+				}
+	
+				W.ShowDialog(t('Logos'), $J(res));
+				return false;
+			})
+		)
 	} else {
 		W.$J('a.btn_small_tall[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="btnv6_blue_hoverfade btn_small_tall" href="http://steamdb.info/sales/"><span>'+t('allSpecials')+' - SteamDB.Info</span></a>');
 	}
