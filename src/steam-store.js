@@ -3,6 +3,7 @@ function init() {
 
 	// for age check
 	if(W.location.pathname.indexOf('/agecheck')===0){
+		document.cookie = 'mature_content=1; path=/;';
 		document.cookie='birthtime=-1704124799; expires=21-Dec-2025 00:00:00 GMT; path=/';
 		W.location.reload();
 	}
@@ -159,7 +160,7 @@ function init() {
 			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
 			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'http://www.steamgifts.com/favicon.ico', text: t('searchin')+' SteamGifts.com'},
 			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
-			{href:'http://steam-trader.com/games/?r=45962&text='+gamename, icon:'http://steam-trader.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
+			{href:'http://steam-trader.com/games/?r=45962&text='+gamename, icon:'http://steam-trader.com/favicon.ico', text: t('searchin')+' Steam-Trader.com'},
 		];
 		
 		if(itemType=='app'){
