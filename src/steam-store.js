@@ -1,13 +1,15 @@
-﻿function init() {
+﻿var $ = W.$J;
+function init() {
 
 	// for age check
 	if(W.location.pathname.indexOf('/agecheck')===0){
+		document.cookie = 'mature_content=1; path=/;';
 		document.cookie='birthtime=-1704124799; expires=21-Dec-2025 00:00:00 GMT; path=/';
 		W.location.reload();
 	}
 
 	if(settings.cur.globalHideWalletBalance){
-		var el = W.$J('#header_wallet_balance')[0];
+		var el = $('#header_wallet_balance')[0];
 		if(el){
 			el.title = el.innerHTML;
 			el.innerHTML = '['+t('balance')+']';
@@ -15,10 +17,7 @@
 	}
 
 	if(settings.cur.storeShowCartBtn){
-		var el = W.$J('#store_header_cart_btn');
-		if(el.length){
-			el.css('display','block');
-		}
+		$('#store_header_cart_btn').css('display','block');
 	}
 
 	// cc switcher
@@ -39,7 +38,7 @@
 		_cc.updHTMLccList(curCC);
 	}
 	if(settings.cur.storeShowCCbtn) {
-		W.$J('#cc_menu_btn').show()
+		$('#cc_menu_btn').show()
 	}
 
 
@@ -60,20 +59,20 @@
 					el.insertAdjacentHTML('beforeEnd', '<div>Subscription id = <a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a></div>');
 				}
 				if(settings.cur.storeShowBtnGetPrices) {
-					tmp = W.$J('<div><a onclick="getPrices(event, \''+itemType+'\', '+itemId+');return false" href="#getPrices">'+t('getPrices')+'</a></div>');
-					el = W.$J(el).append(tmp);
+					tmp = $('<div><a onclick="getPrices(event, \''+itemType+'\', '+itemId+');return false" href="#getPrices">'+t('getPrices')+'</a></div>');
+					el = $(el).append(tmp);
 					subs.push({subid:subid,el:tmp[0]});
 				}
 			}
 			if(settings.cur.storeShowBtnGetPrices) W.getPrices = function(e, itemType, itemId){
 
 				function getPrice(cc){
-					var reqUrl = 'http://store.steampowered.com/api/';
-
-					reqUrl += ((itemType=='app')
-						? 'appdetails/?filters=basic,price_overview,packages&v=1&appids='
-						: 'packagedetails/?filters=basic,price_overview,packages&v=1&packageids='
-					)
+					var type = ((itemType=='app')
+						? 'app'
+						: 'package'
+					);
+					var reqUrl = 'http://store.steampowered.com/api/'+type+'details/?filters=basic,price_overview,packages&v=1&'+type+'ids=';
+					
 
 					reqUrl += itemId+'&cc='+cc;
 					var done = function(data){
@@ -108,7 +107,6 @@
 					};
 					try{
 						var xhr = window.GM_xmlhttpRequest || window.GM_xhr;
-						console.log(xhr);
 						if(xhr){
 							xhr({
 								url: reqUrl,
@@ -120,7 +118,7 @@
 								}
 							});
 						} else {
-							W.$J.ajax({
+							$.ajax({
 								url: reqUrl,
 								method: 'GET',
 							}).done(done);
@@ -162,6 +160,7 @@
 			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
 			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'http://www.steamgifts.com/favicon.ico', text: t('searchin')+' SteamGifts.com'},
 			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
+			{href:'http://steam-trader.com/games/?r=45962&text='+gamename, icon:'http://steam-trader.com/favicon.ico', text: t('searchin')+' Steam-Trader.com'},
 		];
 		
 		if(itemType=='app'){
@@ -173,7 +172,7 @@
 		// ajax add to cart | cart history
 		var addToCart_old = W.addToCart;
 		W.addToCart = function(subid){
-			var form = W.$J('[name="add_to_cart_'+subid+'"]');
+			var form = $('[name="add_to_cart_'+subid+'"]');
 			var el=form.parent();
 			
 			var cartHistory = W.localStorage.swtcarthistory && JSON.parse(W.localStorage.swtcarthistory) || [];
@@ -188,7 +187,7 @@
 			
 			if(settings.cur.storeCartAjax){
 				el.find('.game_purchase_action_bg .btn_addtocart:last>a').after('<a id="swtcartdone" href="#">'+t('adding')+'</a>');
-				W.$J.ajax({
+				$.ajax({
 					url: form.attr('action'),
 					type: 'POST',
 					data: {subid:subid, action:'add_to_cart', sessionid:W.g_sessionID}
@@ -200,8 +199,33 @@
 			}
 		};
 
+		//add btn : view logos
+		var el = $({
+			app : '.game_header_image_full',
+			sub : '.package_header'
+		}[itemType]).wrap(
+			$('<a href="#viewlogos" title="View Logos"></a>').click(function(){
+				var urls = [
+					'capsule_616x353',
+					'header',
+					'header_586x192',
+					'header_292x136',
+					'capsule_231x87',
+					'capsule_184x69',
+					'capsule_sm_120',
+				];
+	
+				var res='';
+				for(var i=0;i<urls.length;i++){
+					res+='<img src="http://cdn.akamai.steamstatic.com/steam/'+itemType+'s/'+itemId+'/'+urls[i]+'.jpg"><br>';
+				}
+	
+				W.ShowDialog(t('Logos'), $(res));
+				return false;
+			})
+		)
 	} else {
-		W.$J('a.btn_small_tall[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="btnv6_blue_hoverfade btn_small_tall" href="http://steamdb.info/sales/"><span>'+t('allSpecials')+' - SteamDB.Info</span></a>');
+		$('a.btn_small_tall[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="btnv6_blue_hoverfade btn_small_tall" href="http://steamdb.info/sales/"><span>'+t('allSpecials')+' - SteamDB.Info</span></a>');
 	}
 
 

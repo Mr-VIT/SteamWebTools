@@ -67,7 +67,7 @@ function inventoryPageInit(){
 					var sitem = item._subItems[i],
 						skipit = false;
 					if(sitem.owner_descriptions) for(var j=0;j<sitem.owner_descriptions.length;j++){
-						if(sitem.owner_descriptions[j].value.match(/<persona>|\S+@\S+/i)){
+						if(sitem.owner_descriptions[j].value.match(/data-miniprofile=|\S+@\S+/i)){
 							skipit = true;
 							break;
 						}
@@ -79,11 +79,9 @@ function inventoryPageInit(){
 				}
 			} else {
 				W.checkedForSend[giftId]=item.name;
+				item.checkedForSend=true;
+				item.element.addClassName('checkedForSend');
 			}
-
-			item.checkedForSend=true;
-			item.element.addClassName('checkedForSend');
-
 		}
 	}
 	W.sendChecked = function(){
