@@ -46,7 +46,7 @@ function mainPage(){
 
 		function run(i){
 			if(i<data.length)
-				new W.Ajax.Request('http://steamcommunity.com/market/removelisting/'+W.$J(data[i]).data('listingid'), {
+				new W.Ajax.Request('https://steamcommunity.com/market/removelisting/'+W.$J(data[i]).data('listingid'), {
 					method: 'post',
 					parameters: {
 						sessionid: W.g_sessionID,
