@@ -10,7 +10,9 @@
 'trades' : 'Трэйды',
 'chat' : 'Чат',
 'more' : 'Ещё',
+//cards badges
 'showDropsCard' : 'Показать с невыпавшими картами',
+'craftAllAvailable' : 'Крафт всех доступных',
 'howmany' : 'Сколько выбрать? из ',
 'save' : 'Сохранить',
 'get' : 'Получить',

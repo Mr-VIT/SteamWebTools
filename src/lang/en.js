@@ -10,7 +10,9 @@
 'trades' : 'Trades',
 'chat' : 'Chat',
 'more' : 'More',
+//cards badges
 'showDropsCard' : 'Show only with cards drops remaining',
+'craftAllAvailable' : 'Craft all available',
 'howmany' : 'How many? of ',
 'save' : 'Save',
 'get' : 'Get',
