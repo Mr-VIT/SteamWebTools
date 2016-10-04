@@ -9,7 +9,7 @@ function createBlock(title, links){
 	}
 
 	out+='<br/><h2>'+t('addSubidsToCart')+'</h2> <form id="addtocartsubids" method="post"><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subids" placeholder="1, 2, 3"/><input type="submit" value="'+t('add')+'" class="btn_small btnv6_blue_hoverfade"></form><br><form id="formcarthist" method="post"><input type="submit" value="'+t('addChecked')+'" style="float:right" class="btn_small btnv6_blue_hoverfade"><h2>'+t('cartHist')+'</h2><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart">';
-	
+
 	var cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
 	var chStr = '';
 	for(var i=0; i<cartHistory.length; i++) {
@@ -40,12 +40,12 @@ $('#addtocartsubids').bind('submit',function(){
 		subids = t.find('input[name="subids"]').val(),
 		s,
 		cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
-		
+
 	subids = subids.split(',');
 	for (var i=0; i < subids.length; i++) {
 		s = subids[i].trim();
 		t.append('<input type="hidden" name="subid[]" value="'+s+'"/>');
-		
+
 		cartHistory.push({subid: s});
 	}
 	while(cartHistory.length>20){

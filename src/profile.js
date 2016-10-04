@@ -4,7 +4,7 @@ function SetRepBadges(selector){
 	document.querySelector(selector).insertAdjacentHTML('afterBegin',
 		'<div id="swt_badges"><a id="csmbadge" class="badge" href="http://checkrep.ru/#steam:'+steamid+'">CRep: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a></div>'
 	);
-	
+
 	var badges = {
 		0:{
 			text : 'rep.unk',
@@ -31,7 +31,7 @@ function SetRepBadges(selector){
 			color : '606060'
 		}
 	};
-	
+
 
 	var setRepStatus = function(res) {
 		if(!(res.csm >= 0)){
@@ -39,7 +39,7 @@ function SetRepBadges(selector){
 		}
 		$('#csmbadge')[0].style.background = '#'+badges[res.csm].color;
 		$('#csmbadge span').text(t(badges[res.csm].text));
-		
+
 		var srbcolor;
 		if(!res.srcom){
 			res.srcom = t(badges[0].text);
@@ -60,7 +60,7 @@ function SetRepBadges(selector){
 				srbcolor = badges[0].color;
 			}
 		}
-		
+
 		$('#srbadge')[0].style.background = '#'+srbcolor;
 		$('#srbadge span').text(res.srcom);
 		$('#swt_badges').show();
@@ -79,7 +79,7 @@ function SetRepBadges(selector){
 	} catch(e) {
 		console.log(e)
 	}
-	
+
 }
 
 function profilePageInit(){
@@ -176,7 +176,7 @@ function profilePageInit(){
 	$('.profile_header').append('<div id="swt_info">SteamID64: <a href="http://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> | <a href="#getMoreInfo" onclick="getMoreInfo();return false">'+t('getMoreInfo')+'</a></div>');
 
 	SetRepBadges('.profile_header');
-	
+
 	W.getMoreInfo = function() {
 		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
 		W.setTimeout(function(){Modal.AdjustSizing();},1);
@@ -197,16 +197,18 @@ function profilePageInit(){
 			var accountid = steamid2 - 7960265728;
 			steamid2 = "STEAM_0:" + srv + ":" + ((accountid-srv)/2);
 
-
+			var tmpl1='<tr><td><b>',
+				tmpl2='</b></td><td>';
+				tmpl3='</td>';
 			$('#swtexinfo').html(
 				'<table>'+
-				'<tr><td><b>CommunityID</b></td><td>'+steamid+'</td>'+
-				'<tr><td><b>SteamID</b></td><td>'+steamid2+'</td>'+
-				'<tr><td><b>AccountID</b></td><td>'+accountid+'</td>'+
-				'<tr><td><b>Registration date</b></td><td>'+accCrDate+'</td>'+
-				'<tr><td><b>VAC</b></td><td>'+(vacBanned=='0'?'Clear':'Banned')+'</td>'+
-				'<tr><td><b>Trade Ban</b></td><td>'+tradeBanState+'</td>'+
-				'<tr><td><b>Is Limited Account</b></td><td>'+(isLimitedAccount=='0'?'No':'Yes')+'</td>'+
+				tmpl1+'CommunityID'+tmpl2+ steamid +tmpl3+
+				tmpl1+'SteamID'+tmpl2+ steamid2 +tmpl3+
+				tmpl1+'AccountID'+tmpl2+ accountid +tmpl3+
+				tmpl1+'Registration date'+tmpl2+ accCrDate +tmpl3+
+				tmpl1+'VAC'+tmpl2+ (vacBanned=='0'?'Clear':'Banned') +tmpl3+
+				tmpl1+'Trade Ban'+tmpl2+ tradeBanState +tmpl3+
+				tmpl1+'Is Limited Account'+tmpl2+ (isLimitedAccount=='0'?'No':'Yes') +tmpl3+
 				'</table>'
 			);
 			W.setTimeout(function(){Modal.AdjustSizing();},1);

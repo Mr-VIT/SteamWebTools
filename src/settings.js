@@ -42,19 +42,21 @@ var settings = {
 	load : function(){
 		this.cur = W.$J.extend({}, this.defaults);
 
-		var data = this.storage.get(this.storage.key);
+		var data = this.storage.get();
 		if(data) {
-			W.$J.extend(this.cur, JSON.parse(data));
+			if(typeof data === 'string') data=JSON.parse(data)
+			W.$J.extend(this.cur, data);
 		} else {
-			// first launch - open settings page
+			// first launch - show settings page button
 			this.save();
-			//W.location='http://steamcommunity.com/groups/SteamClientBeta#swt-settings';
-			W.$J("#global_header .menuitem.supernav:nth(1)").css("outline", "#48DA48 3px solid");
+			var style = {outline:"#48DA48 3px solid"},
+				item = W.$J("#global_header .menuitem.supernav:nth(1)");
+			item.css(style);
 			setTimeout(function(){
-				W.$J("#global_header .menuitem.supernav:nth(1)").trigger('mouseover');
+				item.trigger('mouseover');
 			},1000);
 			setTimeout(function(){
-				W.$J("#global_header .submenu_community .submenuitem.swt").css("outline", "#48DA48 3px solid");
+				W.$J("#global_header .submenu_community .submenuitem.swt").css(style);
 			},2000);
 			
 		}
