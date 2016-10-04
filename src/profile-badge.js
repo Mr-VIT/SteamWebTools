@@ -8,10 +8,20 @@ if($('.badge_craft_button').length){
 	W.craftAllAvailable=function(){
 		var totalCrafts = $('.badge_card_set_text_qty').text().match(/\d+/g).min(),
 			curCraft = 0,
-			stop = false,
+			done = 0,
 			droppedItems = [];
 		W.FinishCraft_old = W.FinishCraft;
 		W.FinishCraft = function(){
+			if(done){ // onece only call orig. FinishCraft
+				if(done==1){  // Preventing re-adding items after the end of the last animation
+					if ( g_rgBadgeCraftData && g_bBadgeCraftAnimationReady ){
+						done++;
+					}
+					W.FinishCraft_old();
+				}
+				return;
+			}
+
 			if (!W.g_rgBadgeCraftData)
 				return;
 
@@ -19,15 +29,14 @@ if($('.badge_craft_button').length){
 
 			droppedItems=droppedItems.concat(W.g_rgBadgeCraftData.rgDroppedItems); //save all items
 
-
 			if(curCraft>=totalCrafts){
+				done = 1;
 				if(multiCraft){
 					W.parent.swt_craftBadgeDone();
 					//return;
 				}
 				W.g_rgBadgeCraftData.rgDroppedItems = droppedItems; //restore items
-				W.FinishCraft_old(); // done
-				W.FinishCraft=W.FinishCraft_old; // Preventing re-adding items after the end of the last animation
+				W.FinishCraft(); // done
 			} else {
 				$('.badge_craft_button').click(); //craft one more
 			}
