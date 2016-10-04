@@ -6,6 +6,7 @@
 'checkin' : 'Проверить на',
 'searchinforums' : 'Искать на форумах',
 'inventory' : 'Инвентарь',
+'toInventory' : 'В Инвентарь',
 'profile' : 'Профиль',
 'trades' : 'Трэйды',
 'chat' : 'Чат',

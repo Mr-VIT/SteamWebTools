@@ -6,6 +6,7 @@
 'checkin' : 'Check in',
 'searchinforums' : 'Search in forums',
 'inventory' : 'Inventory',
+'toInventory' : 'To Inventory',
 'profile' : 'Profile',
 'trades' : 'Trades',
 'chat' : 'Chat',
