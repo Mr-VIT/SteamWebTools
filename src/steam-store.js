@@ -71,7 +71,7 @@ function init() {
 						? 'app'
 						: 'package'
 					);
-					var reqUrl = 'http://store.steampowered.com/api/'+type+'details/?filters=basic,price_overview,packages&v=1&'+type+'ids=';
+					var reqUrl = 'http://store.steampowered.com/api/'+type+'details/?filters=price_overview,packages&v=1&'+type+'ids=';
 					
 
 					reqUrl += itemId+'&cc='+cc;
@@ -118,9 +118,14 @@ function init() {
 								}
 							});
 						} else {
+							jQuery.ajaxSettings.xhr = function() {
+								try {
+									return new W.XMLHttpRequest({mozAnon:true}); // anon req for FF
+								} catch ( e ) {}
+							};
 							$.ajax({
 								url: reqUrl,
-								method: 'GET',
+								method: 'GET'
 							}).done(done);
 						}
 						
