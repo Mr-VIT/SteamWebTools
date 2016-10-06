@@ -1,4 +1,5 @@
 var settings = {
+	locales : ['en', 'ru', 'jp', 'zh-cn'],
 	defaults : {
 		version : 1,
 
@@ -47,6 +48,20 @@ var settings = {
 			if(typeof data === 'string') data=JSON.parse(data)
 			W.$J.extend(this.cur, data);
 		} else {
+			// detect browser locale and set for extension
+			var locale = W.navigator.language.toLowerCase();
+			var li = this.locales.indexOf( locale );
+			if(li>-1){
+				this.cur.globalLang = this.locales[li]
+			} else {
+				locale = locale.split('-');
+				if(locale.length>1){
+					var li = this.locales.indexOf( locale[0] );
+					if(li>-1){
+						this.cur.globalLang = this.locales[li]
+					}
+				}
+			}
 			// first launch - show settings page button
 			this.save();
 			var style = {outline:"#48DA48 3px solid"},
