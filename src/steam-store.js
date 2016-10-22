@@ -2,7 +2,7 @@
 function init() {
 
 	// for age check
-	if(W.location.pathname.indexOf('/agecheck')===0){
+	if(W.location.pathname.indexOf('/agecheck')>-1){
 		document.cookie = 'mature_content=1; path=/;';
 		document.cookie='birthtime=-1704124799; expires=21-Dec-2025 00:00:00 GMT; path=/';
 		W.location.reload();
