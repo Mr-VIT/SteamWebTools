@@ -230,7 +230,7 @@ function init() {
 			})
 		)
 	} else {
-		$('a.btn_small_tall[href^="http://store.steampowered.com/search/?specials=1"]').after('<a class="btnv6_blue_hoverfade btn_small_tall" href="http://steamdb.info/sales/"><span>'+t('allSpecials')+' - SteamDB.Info</span></a>');
+		$('.icon.discounts').parent().after('<a class="gutter_item" href="http://steamdb.info/sales/"><span class="icon discounts"></span><span> SteamDB.Info/Sales</span></a>');
 	}
 
 
