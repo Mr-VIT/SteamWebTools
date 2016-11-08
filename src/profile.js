@@ -105,13 +105,13 @@ function profilePageInit(){
 		},
 		{
 			href: 'http://www.google.com/#q='+steamid+' inurl:sourceop.com',
-			icon: 'http://forums.sourceop.com/favicon.ico',
+			icon: 'http://www.sourceop.com/themes/hl2/images/favicon.ico',
 			text: t('searchinforums')+' SourceOP.com',
 		},
 		{
-			href: 'http://www.steamtrades.com/user/id/'+steamid,
-			icon: 'http://www.steamgifts.com/favicon.ico',
-			text: t('profile')+' SteamGifts.com',
+			href: 'http://www.steamtrades.com/user/'+steamid,
+			icon: 'https://cdn.steamtrades.com/img/favicon.ico',
+			text: t('profile')+' SteamTrades.com',
 		},
 		{hr:true},
 		{
