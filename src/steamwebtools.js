@@ -118,6 +118,14 @@ var scripts = [
 		run:function(){
 			//!include settings-store-save.js
 		}
+	},
+	{
+		match:[
+			rURL_COMMUNITY+'linkfilter.*',
+		],
+		run:function(){
+			//!include linkfilter.js
+		}
 	}
 ];
 

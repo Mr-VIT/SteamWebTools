@@ -42,7 +42,6 @@
 'viewMyCardsGame' : 'View my cards/badge this game',
 'adding' : 'adding',
 'added' : 'Added | View in cart',
-'allSpecials' : 'All Specials',
 'balance' : 'Balance',
 'acc' : 'Account',
 'acceptAllToInv' : 'Accept all to inventory',
@@ -69,6 +68,7 @@
 'set.market' : 'Community Market',
 'set.marketMainPageFuncs' : 'Enable functions in main page of Community Market',
 'set.FixNavbar' : 'Fix Navbar',
+'set.linkfilter' : 'Disable link filter alert',
 // rep bages
 'rep.unk' : 'unknown',
 'rep.mdlman' : 'middleman',

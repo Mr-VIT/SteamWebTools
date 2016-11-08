@@ -7,6 +7,7 @@ var settings = {
 		globalFixNavbar : true,
 		globalHideAccName : true,
 		globalHideWalletBalance : true,
+		globalDisableLinkFilted : false,
 
 		storeShowCCbtn : true,
 		storeCCList : 'ru ua us ar fr no gb au br de jp',

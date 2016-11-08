@@ -106,6 +106,11 @@ createForm([
 				title:t('set.hideBalance'),
 				name:'globalHideWalletBalance',
 			},
+			{
+				type:'checkbox',
+				title:t('set.linkfilter'),
+				name:'globalDisableLinkFilted',
+			},
 		],
 	},
 	{
