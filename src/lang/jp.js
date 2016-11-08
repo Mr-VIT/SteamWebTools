@@ -43,7 +43,6 @@
 'viewMyCardsGame' : 'View my cards/badge this game',
 'adding' : 'adding',
 'added' : 'Added | View in cart',
-'allSpecials' : 'All Specials',
 'balance' : 'Balance',
 'acc' : 'Account',
 'acceptAllToInv' : 'Accept all to inventory',

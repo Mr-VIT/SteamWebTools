@@ -35,7 +35,7 @@ function SetRepBadges(selector){
 
 	var setRepStatus = function(res) {
 		if(!(res.csm >= 0)){
-			res.csm = error;
+			res.csm = 'error';
 		}
 		$('#csmbadge')[0].style.background = '#'+badges[res.csm].color;
 		$('#csmbadge span').text(t(badges[res.csm].text));
@@ -179,7 +179,7 @@ function profilePageInit(){
 
 	W.getMoreInfo = function() {
 		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
-		W.setTimeout(function(){Modal.AdjustSizing();},1);
+		W.setTimeout(function(){Modal.AdjustSizing()},1);
 		$.ajax({
 			url: W.location.href+'?xml=1',
 			context: document.body,
@@ -196,22 +196,23 @@ function profilePageInit(){
 			var srv = steamid2 % 2;
 			var accountid = steamid2 - 7960265728;
 			steamid2 = "STEAM_0:" + srv + ":" + ((accountid-srv)/2);
-
-			var tmpl1='<tr><td><b>',
-				tmpl2='</b></td><td>';
-				tmpl3='</td>';
+			
+			function template(a, b){
+				return '<tr><td><b>'+ a +'</b></td><td>'+ b +'</td>';
+			}
+			
 			$('#swtexinfo').html(
 				'<table>'+
-				tmpl1+'CommunityID'+tmpl2+ steamid +tmpl3+
-				tmpl1+'SteamID'+tmpl2+ steamid2 +tmpl3+
-				tmpl1+'AccountID'+tmpl2+ accountid +tmpl3+
-				tmpl1+'Registration date'+tmpl2+ accCrDate +tmpl3+
-				tmpl1+'VAC'+tmpl2+ (vacBanned=='0'?'Clear':'Banned') +tmpl3+
-				tmpl1+'Trade Ban'+tmpl2+ tradeBanState +tmpl3+
-				tmpl1+'Is Limited Account'+tmpl2+ (isLimitedAccount=='0'?'No':'Yes') +tmpl3+
+				template('CommunityID', steamid)+
+				template('SteamID', steamid2)+
+				template('AccountID', accountid)+
+				template('Registration date', accCrDate)+
+				template('VAC', (vacBanned=='0'?'Clear':'Banned'))+
+				template('Trade Ban', tradeBanState)+
+				template('Is Limited Account', (isLimitedAccount=='0'?'No':'Yes'))+
 				'</table>'
 			);
-			W.setTimeout(function(){Modal.AdjustSizing();},1);
+			W.setTimeout(function(){Modal.AdjustSizing()},1);
 		}).fail(function(){
 			$('#swtexinfo').html(t('reqErr'));
 		});

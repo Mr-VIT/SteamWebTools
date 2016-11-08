@@ -39,7 +39,6 @@
 'viewMyCardsGame' : '查看该游戏的卡片/徽章',
 'adding' : '正在添加',
 'added' : '已添加 | 在购物车中查看',
-'allSpecials' : '所有促销',
 'balance' : '余额',
 'acc' : '账户',
 'acceptAllToInv' : '接受全部并加入库存',
