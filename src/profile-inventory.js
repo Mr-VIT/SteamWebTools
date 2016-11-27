@@ -220,7 +220,7 @@ function inventoryPageInit(){
 		if (W.localStorage.hideDupItems) {
 			rgNewTags['SWT']=['notdup'];
 		}
-		return this.UpdateTagFiltering_old.apply(this, [rgNewTags]);
+		return this.UpdateTagFiltering_old.call(this, rgNewTags);
 	}
 	// == /hide dup
 
@@ -230,9 +230,9 @@ function inventoryPageInit(){
 			return SelectInventoryFromUser_old.apply(this, arguments);
 		}
 		var inventory = W.UserYou.getInventory( appid, contextid );
-		
+
 		// == Fix Bug : The old page is shown below after use filter
-		/* 
+		/*
 		if(!inventory.SetActivePage_old){
 			inventory.SetActivePage_old = inventory.SetActivePage;
 			inventory.SetActivePage = function(){
@@ -268,8 +268,8 @@ function inventoryPageInit(){
 			}
 		}
 		// == / Fix Bug
-		
-		
+
+
 		if(!inventory.BuildItemElement_old){
 			inventory.BuildItemElement_old = inventory.BuildItemElement;
 			inventory.BuildItemElement = function(){
@@ -359,7 +359,7 @@ function inventoryPageInit(){
 				for(var i=0; i<itemsA.length; i++){
 					items = itemsA[i];
 					newItems=[];
-					
+
 					var itm,nitm;
 					for ( var j in items ){
 						itm = items[j];
@@ -395,6 +395,19 @@ function inventoryPageInit(){
 	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup');
 	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
 
+	/**
+	 * SIH v1.10.1 fix sort items
+	 **/
+	setTimeout(function(){
+		if (!SortItem) return;
+		var SortItem_old = SortItem;
+		W.SortItem = function () {
+			if(!W.$J('#Lnk_SortItems').data('asc')) return;
+			SortItem_old.apply(W, arguments);
+		}
+	}, 1500);
+	// END fix
+
 	var hideDupFilter = function (){
 		if(W.localStorage.hideDupItems){
 			W.Filter.rgCurrentTags['SWT']=['notdup'];
@@ -407,10 +420,10 @@ function inventoryPageInit(){
 			$('.itemcount').hide();
 		}
 		// return to page selectedItem
-		if(g_ActiveInventory.selectedItem)
-			g_ActiveInventory.EnsurePageActiveForItem( g_ActiveInventory.selectedItem.element );
+		if(W.g_ActiveInventory.selectedItem)
+			W.g_ActiveInventory.EnsurePageActiveForItem( W.g_ActiveInventory.selectedItem.element );
 	}
-	
+
 	W.onchangehidedup = function(e){
 		if(e.target.checked){
 			W.localStorage.hideDupItems = 1;
@@ -419,7 +432,7 @@ function inventoryPageInit(){
 		}
 		hideDupFilter();
 
-		
+
 
 	};
 
