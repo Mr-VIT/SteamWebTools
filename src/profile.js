@@ -83,6 +83,8 @@ function SetRepBadges(selector){
 }
 
 function profilePageInit(){
+	W.$J('.profile_header_badgeinfo_badge_area .persona_level').unwrap(); // remove link from level label
+
 
 	steamid = W.g_rgProfileData.steamid;
 
@@ -178,6 +180,11 @@ function profilePageInit(){
 	SetRepBadges('.profile_header');
 
 	W.getMoreInfo = function() {
+		if (location.protocol=="https:") {
+			// redirect to http, profile?xml=1 don't work over https
+			location.protocol="http:";
+		}
+
 		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
 		W.setTimeout(function(){Modal.AdjustSizing()},1);
 		$.ajax({
@@ -196,11 +203,11 @@ function profilePageInit(){
 			var srv = steamid2 % 2;
 			var accountid = steamid2 - 7960265728;
 			steamid2 = "STEAM_0:" + srv + ":" + ((accountid-srv)/2);
-			
+
 			function template(a, b){
 				return '<tr><td><b>'+ a +'</b></td><td>'+ b +'</td>';
 			}
-			
+
 			$('#swtexinfo').html(
 				'<table>'+
 				template('CommunityID', steamid)+
