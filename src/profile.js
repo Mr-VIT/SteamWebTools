@@ -183,6 +183,7 @@ function profilePageInit(){
 		if (location.protocol=="https:") {
 			// redirect to http, profile?xml=1 don't work over https
 			location.protocol="http:";
+			return;
 		}
 
 		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
