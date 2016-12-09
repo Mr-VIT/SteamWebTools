@@ -1,17 +1,18 @@
 var $ = W.$J;
 
 function inventoryPageInit(){
+	var SWT_NOT_DUP_KEY = 'swt_notdup';
 	// for subid detect
 	var ajaxTarget = {descriptions:[]};
 
-	W.getSubid = function(target, itemid){
+	W.getSubid = function(target){
 		ajaxTarget.element = target;
 
-		var item = W.UserYou.rgContexts[753][1].inventory.rgInventory[itemid];
+		var item = W.g_ActiveInventory.selectedItem;
 
 		ajaxTarget.classid = item.classid;
-		ajaxTarget.giftId = itemid;
-		ajaxTarget.giftName = encodeURIComponent(item.name);
+		ajaxTarget.giftId = item.assetid;
+		ajaxTarget.giftName = encodeURIComponent(item.description.name);
 
 		new W.Ajax.Request( 'http://steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
 			method: 'post',
@@ -26,7 +27,7 @@ function inventoryPageInit(){
 		var str = 'SubscriptionID = <a href="http://steamdb.info/sub/'+subid+'">'+subid+'</a>';
 		ajaxTarget.element.outerHTML=str;
 		var ds = ajaxTarget.descriptions[ajaxTarget.classid];
-		ds[ds.length-1]={value:str};
+		ds[ds.length-1]={value:str, type:'html'};
 		ds.withSubid=true;
 	}
 
@@ -66,8 +67,8 @@ function inventoryPageInit(){
 				else for(var i=0;i<amount;i++){
 					var sitem = item._subItems[i],
 						skipit = false;
-					if(sitem.owner_descriptions) for(var j=0;j<sitem.owner_descriptions.length;j++){
-						if(sitem.owner_descriptions[j].value.match(/data-miniprofile=|\S+@\S+/i)){
+					if(sitem.description.owner_descriptions) for(var j=0;j<sitem.description.owner_descriptions.length;j++){
+						if(sitem.description.owner_descriptions[j].value.match(/data-miniprofile=|\S+@\S+/i)){
 							skipit = true;
 							break;
 						}
@@ -137,22 +138,21 @@ function inventoryPageInit(){
 
 	//// action for gifts and items
 	var BuildHover_orig = W.BuildHover;
-	W.BuildHover = function(){
-		var item = arguments[1];
+	W.BuildHover = function( sNewInfo, item, UserYou ){
 		// gifts
 		if(W.g_ActiveInventory && (W.g_ActiveInventory.appid == 753)){
-			if ((item.contextid==1) && !item.descriptions.withClassid) {
-				item.descriptions.withClassid=true;
+			if ((item.contextid==1) && !item.description.descriptions.withClassid) {
+				item.description.descriptions.withClassid=true;
 
-				if(!item.descriptions)
-					item.descriptions = [];
+				if(!item.description.descriptions)
+					item.description.descriptions = [];
 
-				item.descriptions.push({value:'ClassID = '+item.classid});
+				item.description.descriptions.push({value:'ClassID = '+item.classid});
 				if(W.g_bViewingOwnProfile)
-					item.descriptions.push({value:'<a href="#" onclick="getSubid(event.target,\''+item.id+'\');return false">'+t('get')+' SubscriptionID</a>',type:'html'});
+					item.description.descriptions.push({value:'<a href="#" onclick="getSubid(event.target);return false">'+t('get')+' SubscriptionID</a>',type:'html'});
 
 				if(!ajaxTarget.descriptions[item.classid])
-					ajaxTarget.descriptions[item.classid] = item.descriptions;
+					ajaxTarget.descriptions[item.classid] = item.description.descriptions;
 
 
 				if(item.owner_actions) {
@@ -214,208 +214,59 @@ function inventoryPageInit(){
 
 	//// inv
 
+	/* *
+	 * Hide dup items functions
+	 * */
+
 	// == hide dup work with another filters
 	W.Filter.UpdateTagFiltering_old = W.Filter.UpdateTagFiltering;
 	W.Filter.UpdateTagFiltering = function(rgNewTags){
 		if (W.localStorage.hideDupItems) {
-			rgNewTags['SWT']=['notdup'];
+			rgNewTags['SWT']=[SWT_NOT_DUP_KEY];
 		}
-		return this.UpdateTagFiltering_old.call(this, rgNewTags);
+		return this.UpdateTagFiltering_old.apply(this, arguments);
 	}
-	// == /hide dup
-
-	var SelectInventoryFromUser_old = W.SelectInventoryFromUser;
-	W.SelectInventoryFromUser = function( user, appid, contextid, bForceSelect ){
-		if (!bForceSelect) {
-			return SelectInventoryFromUser_old.apply(this, arguments);
-		}
-		var inventory = W.UserYou.getInventory( appid, contextid );
-
-		// == Fix Bug : The old page is shown below after use filter
-		/*
-		if(!inventory.SetActivePage_old){
-			inventory.SetActivePage_old = inventory.SetActivePage;
-			inventory.SetActivePage = function(){
-				$('.inventory_page').hide();
-				return inventory.SetActivePage_old.apply(this, arguments);
-			}
-		}
-		*/
-		if(!inventory.SetActivePage_old){
-			inventory.SetActivePage_old = inventory.SetActivePage;
-			inventory.SetActivePage = function( iPage )
-			{
-				if ( this.BIsPendingInventory() )
-				{
-					// just hold on to the value
-					this.pageCurrent = iPage;
-					return;
-				}
-
-				if ( iPage >= this.pageTotal )
-					return;
-
-				// we may have removed pages
-				//if ( this.pageCurrent >= 0 && this.pageCurrent < this.pageTotal ) // FIX
-					this.pageList[this.pageCurrent].hide();
-
-				this.pageList[iPage].show();
-				this.pageCurrent = iPage;
-				this.UpdatePageCounts();
-
-
-				this.PreloadPageImages( this.pageCurrent );
-			}
-		}
-		// == / Fix Bug
-
-
-		if(!inventory.BuildItemElement_old){
-			inventory.BuildItemElement_old = inventory.BuildItemElement;
-			inventory.BuildItemElement = function(){
-				var el = inventory.BuildItemElement_old.apply(this, arguments);
-				var fncs = this.BuildItemElement.fncs;
-				for (var i=0;i<fncs.length;i++) {
-					fncs[i].apply(this, [el]);
-				}
-				return el;
-			};
-			inventory.BuildItemElement.fncs=[];
-		}
-
-		if (appid==730) { //CSGO
-			// Item color by Rarity
-			if(!inventory.BuildItemElement.fncs.csgoItemColor) {
-				inventory.BuildItemElement.fncs.csgoItemColor = true;
-				inventory.BuildItemElement.fncs.push(function(el){
-					var icons='<div class="swt_icon">',
-						tags = el.rgItem.tags;
-					for (var i=0;i<tags.length;i++) {
-						switch (tags[i].category) {
-							case "Quality":
-								switch (tags[i].internal_name) {
-									case "strange":
-										icons+='<span class="swt_icon-st">ST</span>';
-										break;
-									case "unusual":
-										el.style.borderColor='#'+tags[i].color;
-										tags.colored=true;
-										break;
-									case "tournament":
-										icons+='<span class="swt_icon-t">S</span>';
-										break;
-								}
-								break;
-							case "Rarity":
-								if (!tags.colored)
-									el.style.borderColor='#'+tags[i].color;
-								break;
-						}
-					};
-					el.innerHTML+=icons+'</div>';
-				});
-			}
-		}
-
-		if (!inventory._hiddenDup) {
-			// display amount
-			if(!inventory.BuildItemElement.fncs.itemcount) {
-				inventory.BuildItemElement.fncs.itemcount = true;
-				inventory.BuildItemElement.fncs.push(function(el){
-					if (el.rgItem._dup) {
-						$(el).addClass("swt_itemdup");
-					}
-					var a = el.rgItem._amount;
-					if (!a) return;
-					el.innerHTML+='<div class="itemcount">x'+a+'</div>';
-				});
-			}
-
-			inventory.MakeActive_old = inventory.MakeActive;
-			inventory.MakeActive = function(){
-				var res = inventory.MakeActive_old.apply(this, arguments);
-				hideDupFilter();
-				return res;
-			}
-
-
-			var itemsA = [],
-				chinv;
-
-			if(chinv=inventory.rgChildInventories) {
-				for(var x in chinv){
-					chinv[x].BuildItemElement = inventory.BuildItemElement; // display count
-					chinv[x].MakeActive = inventory.MakeActive; // display count
-					itemsA.push(chinv[x].rgInventory);
-				}
-			} else {
-				if(inventory.rgInventory)
-					itemsA.push(inventory.rgInventory);
-			}
-
-			if(itemsA.length){
-				inventory._hiddenDup = true;
-				var items, newItems;
-				for(var i=0; i<itemsA.length; i++){
-					items = itemsA[i];
-					newItems=[];
-
-					var itm,nitm;
-					for ( var j in items ){
-						itm = items[j];
-						if(itm._is_stackable || itm.is_stackable)
-							continue;
-						if(nitm = newItems[itm.classid]){
-							nitm._amount +=1;
-							nitm._ids.push(itm.id);
-							nitm._subItems.push(itm);
-						} else {
-							itm._is_stackable = true;
-							itm._amount = 1;
-							itm._ids = [itm.id];
-							itm._subItems = [itm];
-
-							itm.tags.push({category: "SWT",
-								category_name: "SteamWebTools",
-								internal_name: "notdup",
-								name: "HideDup"}
-							);
-							newItems[itm.classid] = itm;
-						}
-					}
-				}
-			}
-
-		}
-
-		return SelectInventoryFromUser_old.apply(this, arguments);
+	// check dup in original item data
+	W.Filter.MatchItemTags_old = W.Filter.MatchItemTags;
+	W.Filter.MatchItemTags = function( elItem, rgTags ){
+		if (rgTags && rgTags[0]==SWT_NOT_DUP_KEY) {
+			return elItem.rgItem._amount > 0
+		} else
+			return this.MatchItemTags_old.apply(this, arguments);
 	}
 
-
-	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup');
-	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
-
-	/**
-	 * SIH v1.10.1 fix sort items
-	 **/
-	setTimeout(function(){
-		if (!SortItem) return;
-		var SortItem_old = SortItem;
-		W.SortItem = function () {
-			if(!W.$J('#Lnk_SortItems').data('asc')) return;
-			SortItem_old.apply(W, arguments);
-		}
-	}, 1500);
-	// END fix
-
+	// on change inv
+	W.CInventory.prototype.show_old = W.CInventory.prototype.show;
+	W.CInventory.prototype.show = function(){
+		var res = W.CInventory.prototype.show_old.apply(this, arguments);
+		hideDupFilter();
+		return res;
+	}
 	var hideDupFilter = function (){
 		if(W.localStorage.hideDupItems){
-			W.Filter.rgCurrentTags['SWT']=['notdup'];
-			W.Filter.OnFilterChange();
-			$('.itemcount').show();
+
+			W.Filter.rgCurrentTags['SWT']=[SWT_NOT_DUP_KEY];
+
+			var applyDupFilter = function(){
+				W.Filter.OnFilterChange();
+
+				if (W.g_ActiveInventory._hideDupCounters) {
+					$('.itemcount', W.g_ActiveInventory.m_$Inventory).show();
+				} else {
+					$('.itemcount', W.g_ActiveInventory.m_$Inventory).each(function(i, el){
+						var $el = $(el);
+						$el .text('x'+W.g_ActiveInventory._firstItems[$el.data('classid')]._amount)
+							.show();
+					});
+					g_ActiveInventory._hideDupCounters = true;
+				};
+			}
+
+			W.g_ActiveInventory.LoadCompleteInventory().done(applyDupFilter);
+
 		} else {
 			delete W.Filter.rgCurrentTags.SWT;
-			W.Filter.rgLastTags['SWT']=['notdup'];
+			W.Filter.rgLastTags['SWT']=[SWT_NOT_DUP_KEY];
 			W.Filter.OnFilterChange();
 			$('.itemcount').hide();
 		}
@@ -424,6 +275,7 @@ function inventoryPageInit(){
 			W.g_ActiveInventory.EnsurePageActiveForItem( W.g_ActiveInventory.selectedItem.element );
 	}
 
+	// check box click
 	W.onchangehidedup = function(e){
 		if(e.target.checked){
 			W.localStorage.hideDupItems = 1;
@@ -431,10 +283,127 @@ function inventoryPageInit(){
 			W.localStorage.removeItem('hideDupItems');
 		}
 		hideDupFilter();
-
-
-
 	};
+
+	// activate filter onload page
+	var checkHideDupFilter = function(){
+		if (W.g_ActiveInventory.m_bActive) {
+			hideDupFilter()
+		} else {
+			setTimeout(checkHideDupFilter, 1000);
+		}
+	}
+	checkHideDupFilter();
+	// == END hide dup functions
+
+
+	W.CInventory.prototype.BuildItemElement_old = W.CInventory.prototype.BuildItemElement;
+	W.CInventory.prototype.BuildItemElement = function(asset){
+		var $el = W.CInventory.prototype.BuildItemElement_old.apply(this, arguments);
+
+		if (asset.appid==730) { //CSGO
+			// Item color by Rarity
+			var icons='<div class="swt_icon">',
+				tags = asset.description.tags;
+			for (var i=0;i<tags.length;i++) {
+				switch (tags[i].category) {
+					case "Quality":
+						switch (tags[i].internal_name) {
+							case "strange":
+								icons+='<span class="swt_icon-st">ST</span>';
+								break;
+							case "unusual":
+								$el.css('border-color', '#'+tags[i].color);
+								tags.colored=true;
+								break;
+							case "tournament":
+								icons+='<span class="swt_icon-t">S</span>';
+								break;
+						}
+						break;
+					case "Rarity":
+						if (!tags.colored)
+							$el.css('border-color', '#'+tags[i].color);
+						break;
+				}
+			};
+			$el.append(icons+'</div>');
+
+
+		}
+
+		// below hide dup fn only
+		if (asset.is_stackable) {
+			return;
+		}
+
+		if (!this._firstItems) {
+			this._firstItems={};
+		}
+		var fi; // first items with same classId
+		if (fi = this._firstItems[asset.classid]) {
+			fi._amount++;
+
+			fi._ids.push(asset.assetid);
+			fi._subItems.push(asset);
+
+		} else {
+			asset._amount=1;
+			asset._is_stackable = true;
+			asset._subItems = [asset];
+			asset._ids = [asset.assetid];
+
+			this._firstItems[asset.classid]=asset;
+
+			$el.append('<div class="itemcount" data-classid="'+asset.classid+'"></div>');
+			asset.description.tags.push({
+				category: "SWT",
+				internal_name: "swt_notdup",
+				localized_category_name: "Steam Web Tools",
+				localized_tag_name: "Hide Dup"
+			});
+		}
+
+		return $el;
+	}
+
+	// == Fix Steam Bug : The old page is shown below after use filter
+	W.CInventory.prototype.SetActivePage_old = W.CInventory.prototype.SetActivePage;
+	W.CInventory.prototype.SetActivePage = function( iPage ) {
+		if ( iPage >= this.m_cPages )
+			return;
+
+		//if ( this.m_iCurrentPage >= 0 && this.m_iCurrentPage < this.m_cPages ) // FIX
+			this.m_rgPages[ this.m_iCurrentPage ].hide();
+
+		this.m_rgPages[iPage].show();
+		this.m_iCurrentPage = iPage;
+		this.UpdatePageCounts();
+
+		this.PreloadPageImages( this.m_iCurrentPage );
+	}
+	// == / Fix Steam Bug
+
+
+	// insert check box - hide dup items
+	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup');
+	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
+
+	/**
+	 * SIH v1.10.1 fix sort items
+	 **/
+	setTimeout(function(){
+		if (!W.SortItem) return;
+		var SortItem_old = W.SortItem;
+		W.SortItem = function () {
+			if(!W.$J('#Lnk_SortItems').data('asc')) return;
+			SortItem_old.apply(W, arguments);
+		}
+	}, 1500);
+	// END fix
+
+
+
 
 	//// sell dialog accept ssa checked
 	$('#market_sell_dialog_accept_ssa').attr('checked',true);
@@ -471,8 +440,8 @@ function inventoryPageInit(){
 					do {
 						item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum];
 						W.SellItemDialog._itemNum++;
-					} while(!item.marketable);
-					W.SellItemDialog.m_item.id=item.id;
+					} while(!item.description.marketable);
+					W.SellItemDialog.m_item.assetid=item.assetid;
 
 					$.ajax( {
 						url: 'https://steamcommunity.com/market/sellitem/',
@@ -481,7 +450,7 @@ function inventoryPageInit(){
 							sessionid: W.g_sessionID,
 							appid: W.SellItemDialog.m_item.appid,
 							contextid: W.SellItemDialog.m_item.contextid,
-							assetid: W.SellItemDialog.m_item.id,
+							assetid: W.SellItemDialog.m_item.assetid,
 							amount: W.SellItemDialog.m_nConfirmedQuantity,
 							price: W.SellItemDialog.m_nConfirmedPrice
 						},
