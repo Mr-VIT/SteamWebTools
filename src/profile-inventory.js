@@ -61,7 +61,7 @@ function inventoryPageInit(){
 			}
 			if(amount>1){
 				if(!confirm(t('Skip sent?'))) for(var i=0;i<amount;i++){
-					W.checkedForSend[item._ids[i]]=item.name;
+					W.checkedForSend[item._ids[i]]=item.description.name;
 					item._subItems[i].element.addClassName('checkedForSend');
 				}
 				else for(var i=0;i<amount;i++){
@@ -74,12 +74,12 @@ function inventoryPageInit(){
 						}
 					}
 					if(!skipit) {
-						W.checkedForSend[item._subItems[i].id]=item.name;
+						W.checkedForSend[item._subItems[i].assetid]=item.description.name;
 						item._subItems[i].element.addClassName('checkedForSend');
 					}
 				}
 			} else {
-				W.checkedForSend[giftId]=item.name;
+				W.checkedForSend[giftId]=item.description.name;
 				item.checkedForSend=true;
 				item.element.addClassName('checkedForSend');
 			}
@@ -108,7 +108,7 @@ function inventoryPageInit(){
 			giftsNotes = JSON.parse(giftsNotes);
 		else giftsNotes={};
 		W.loadGiftNote = function(){
-			var gid = W.g_ActiveInventory.selectedItem.id;
+			var gid = W.g_ActiveInventory.selectedItem.assetid;
 			if(!$('#iteminfo'+W.iActiveSelectView+'_item_tags_content textarea.giftnote').length)
 				$('#iteminfo'+W.iActiveSelectView+'_item_tags_content').append('<br/><textarea class="giftnote" style="width:100%">'+(giftsNotes[gid]||'')+'</textarea><button onclick="saveGiftNote(\''+gid+'\')">'+t('save')+'</button>');
 		}
@@ -141,11 +141,12 @@ function inventoryPageInit(){
 	W.BuildHover = function( sNewInfo, item, UserYou ){
 		// gifts
 		if(W.g_ActiveInventory && (W.g_ActiveInventory.appid == 753)){
-			if ((item.contextid==1) && !item.description.descriptions.withClassid) {
-				item.description.descriptions.withClassid=true;
+			if ((item.contextid==1) && !(item.description && item.description.descriptions && item.description.descriptions.withClassid)) {
 
 				if(!item.description.descriptions)
 					item.description.descriptions = [];
+
+				item.description.descriptions.withClassid=true;
 
 				item.description.descriptions.push({value:'ClassID = '+item.classid});
 				if(W.g_bViewingOwnProfile)
@@ -155,16 +156,16 @@ function inventoryPageInit(){
 					ajaxTarget.descriptions[item.classid] = item.description.descriptions;
 
 
-				if(item.owner_actions) {
-					item.owner_actions.push({
+				if(item.description.owner_actions) {
+					item.description.owner_actions.push({
 						link:'javascript:checkForSend("%assetid%")',
 						name:t('checkForSend')
 					});
-					item.owner_actions.push({
+					item.description.owner_actions.push({
 						link:'javascript:sendChecked()',
 						name:t('sendChecked')
 					});
-					item.owner_actions.push({
+					item.description.owner_actions.push({
 						link:'javascript:loadGiftNote()',
 						name:t('showNote')
 					});
