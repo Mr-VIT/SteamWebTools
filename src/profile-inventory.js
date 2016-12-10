@@ -183,14 +183,15 @@ function inventoryPageInit(){
 		var PopulateMarketActions_orig = W.PopulateMarketActions;
 		W.PopulateMarketActions = function (elActions, item) {
 			var res = PopulateMarketActions_orig.apply(this, arguments);
-			if (!item.marketable) {
+			var itmdescr = item.description;
+			if (!itmdescr.marketable) {
 				return res;
 			}
-			var market_hash_name = item.market_hash_name ? item.market_hash_name : item.market_name;
+			var market_hash_name = itmdescr.market_hash_name || itmdescr.market_name;
 			elActions.appendChild(W.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, t('minMarketPrice')+': <span id="swt_lowestItemPrice_'+item.classid+'">?</span>'));
 			$(elActions).css('display', 'block');
 			$.ajax( {
-				url: 'http://steamcommunity.com/market/priceoverview/',
+				url: '//steamcommunity.com/market/priceoverview/',
 				type: 'GET',
 				data: {
 					country: W.g_strCountryCode,
@@ -259,7 +260,7 @@ function inventoryPageInit(){
 						$el .text('x'+W.g_ActiveInventory._firstItems[$el.data('classid')]._amount)
 							.show();
 					});
-					g_ActiveInventory._hideDupCounters = true;
+					W.g_ActiveInventory._hideDupCounters = true;
 				};
 			}
 
@@ -288,7 +289,7 @@ function inventoryPageInit(){
 
 	// activate filter onload page
 	var checkHideDupFilter = function(){
-		if (W.g_ActiveInventory.m_bActive) {
+		if (W.g_ActiveInventory && W.g_ActiveInventory.m_bActive) {
 			hideDupFilter()
 		} else {
 			setTimeout(checkHideDupFilter, 1000);
@@ -387,8 +388,7 @@ function inventoryPageInit(){
 
 
 	// insert check box - hide dup items
-	var HTMLHideDup = '<input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup');
-	document.getElementById('inventory_pagecontrols').insertAdjacentHTML("beforeBegin", HTMLHideDup);
+	$('#inventory_pagecontrols').before('<label><input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup')+'</label>');
 
 	/**
 	 * SIH v1.10.1 fix sort items

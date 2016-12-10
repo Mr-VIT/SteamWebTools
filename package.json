@@ -1,7 +1,7 @@
 {
   "name": "steamwebtools",
   "main": "Gruntfile.js",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "devDependencies": {
     "grunt": "latest",
     "grunt-contrib-clean": "latest",
