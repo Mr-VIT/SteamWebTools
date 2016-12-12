@@ -47,6 +47,7 @@
 'acceptAllToInv' : 'Accept all to inventory',
 'listed' : 'Listed: ',
 'skipped' : 'Skipped: ',
+'setlowestprice' : 'set lowest price',
 'skipSent' : 'Skip gifts sent before?',
 'totop' : 'To top',
 // settings page

@@ -404,15 +404,50 @@ function inventoryPageInit(){
 	// END fix
 
 
-
-
 	//// sell dialog accept ssa checked
-	$('#market_sell_dialog_accept_ssa').attr('checked',true);
+	$('#market_sell_dialog_accept_ssa').prop('checked',true);
 
-	//// multisell
+
+
+	/*
+	 * Multisell
+	 */
+
+	//// set lowest price btn
+	$('#market_sell_dialog_input_area').before('<div style="text-align:right;margin-bottom:0.5em;"><a href="#" id="swt_setpricebtn">[установить минимальную цену -0,01]</a></div>');
+	$('#swt_setpricebtn').click(function(e){
+		e.preventDefault();
+		var item = W.SellItemDialog.m_item;
+		var strMarketName = GetMarketHashName( item.description );
+		new W.Ajax.Request( 'http://steamcommunity.com/market/priceoverview/', {
+			method: 'get',
+			parameters: {
+				country: W.g_strCountryCode,
+				currency: typeof( W.g_rgWalletInfo ) != 'undefined' ? W.g_rgWalletInfo['wallet_currency'] : 1,
+				appid: item.appid,
+				market_hash_name: strMarketName
+			},
+			onSuccess: function( transport ) {
+				if ( transport.responseJSON && transport.responseJSON.success ){
+					var price = W.GetPriceValueAsInt(transport.responseJSON.lowest_price);
+					price--;
+
+					$('#market_sell_buyercurrency_input').val(W.v_currencyformat(price, W.GetCurrencyCode(W.g_rgWalletInfo['wallet_currency'])));
+					W.SellItemDialog.OnBuyerPriceInputKeyUp();
+				}
+			}
+		});
+
+	});
+
+	var sellWarningBlock = {};
+	sellWarningBlock.el = $('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning');
+	sellWarningBlock.orgnText = sellWarningBlock.el.text();
+
 	W.SellItemDialog.OnConfirmationAccept_old = W.SellItemDialog.OnConfirmationAccept;
 	var SellCurrentSelection_old = W.SellCurrentSelection;
 	W.SellCurrentSelection = function(){
+		sellWarningBlock.el.text(sellWarningBlock.orgnText);
 		var res = SellCurrentSelection_old.apply(this, arguments);
 		var count = W.g_ActiveInventory.selectedItem._amount;
 
@@ -422,14 +457,14 @@ function inventoryPageInit(){
 
 		if(count>1) {
 			var amount =  parseInt(prompt(t('howmany')+count, count)) || 1;
-			if (amount>count)
-				amount=count;
+			amount = Math.min(amount, count);
 
 			if(amount>1){
 				W.SellItemDialog._amount=amount;
 				W.SellItemDialog._itemNum=0;
 				W.SellItemDialog._itemsFailNum=0;
 				W.SellItemDialog.OnConfirmationAccept_new = function(event){
+
 
 					W.$('market_sell_dialog_error').hide();
 					W.$('market_sell_dialog_ok').fade({duration:0.25});
@@ -458,7 +493,11 @@ function inventoryPageInit(){
 						crossDomain: true,
 						xhrFields: { withCredentials: true }
 					} ).done( function ( data ) {
-						$('#market_sell_dialog_item_availability_hint>.market_dialog_topwarning').text(t('listed')+W.SellItemDialog._itemNum+(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : ''));
+						sellWarningBlock.el.text(
+							t('listed')+ W.SellItemDialog._itemNum +
+							(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : '')+
+							' / '+amount
+						);
 						if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
 							W.SellItemDialog.OnSuccess.apply(W.SellItemDialog, [{ responseJSON: data }])
 						else {
