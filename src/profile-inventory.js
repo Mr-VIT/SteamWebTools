@@ -257,7 +257,17 @@ function inventoryPageInit(){
 				} else {
 					$('.itemcount', W.g_ActiveInventory.m_$Inventory).each(function(i, el){
 						var $el = $(el);
-						$el .text('x'+W.g_ActiveInventory._firstItems[$el.data('classid')]._amount)
+						var firstItems;
+						if (W.g_ActiveInventory.m_rgChildInventories) {
+							firstItems = {};
+							for(var context in W.g_ActiveInventory.m_rgChildInventories){
+								$.extend(firstItems, W.g_ActiveInventory.m_rgChildInventories[context]._firstItems);
+							}
+						} else {
+							firstItems = W.g_ActiveInventory._firstItems;
+						}
+
+						$el .text('x'+firstItems[$el.data('classid')]._amount)
 							.show();
 					});
 					W.g_ActiveInventory._hideDupCounters = true;
