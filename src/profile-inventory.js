@@ -414,12 +414,12 @@ function inventoryPageInit(){
 	 */
 
 	//// set lowest price btn
-	$('#market_sell_dialog_input_area').before('<div style="text-align:right;margin-bottom:0.5em;"><a href="#" id="swt_setpricebtn">[установить минимальную цену -0,01]</a></div>');
+	$('#market_sell_dialog_input_area').before('<div style="text-align:right;margin-bottom:0.5em;"><a href="#" id="swt_setpricebtn">['+t('setlowestprice')+' -0,01]</a></div>');
 	$('#swt_setpricebtn').click(function(e){
 		e.preventDefault();
 		var item = W.SellItemDialog.m_item;
 		var strMarketName = GetMarketHashName( item.description );
-		new W.Ajax.Request( 'http://steamcommunity.com/market/priceoverview/', {
+		new W.Ajax.Request( '//steamcommunity.com/market/priceoverview/', {
 			method: 'get',
 			parameters: {
 				country: W.g_strCountryCode,
@@ -494,9 +494,8 @@ function inventoryPageInit(){
 						xhrFields: { withCredentials: true }
 					} ).done( function ( data ) {
 						sellWarningBlock.el.text(
-							t('listed')+ W.SellItemDialog._itemNum +
-							(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : '')+
-							' / '+amount
+							t('listed')+ W.SellItemDialog._itemNum +' / '+amount+
+							(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : '')
 						);
 						if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
 							W.SellItemDialog.OnSuccess.apply(W.SellItemDialog, [{ responseJSON: data }])
@@ -535,5 +534,6 @@ function inventoryPageInit(){
 
 
 if (W.g_strInventoryLoadURL) {
+	if (!W.CInventory.prototype.LoadCompleteInventory) return; // fix for old scripts in ?modal=1&market=1
 	inventoryPageInit();
 }
