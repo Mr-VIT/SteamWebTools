@@ -72,7 +72,7 @@ function init() {
 						: 'package'
 					);
 					var reqUrl = 'http://store.steampowered.com/api/'+type+'details/?filters=price_overview,packages&v=1&'+type+'ids=';
-					
+
 
 					reqUrl += itemId+'&cc='+cc;
 					var done = function(data){
@@ -128,7 +128,7 @@ function init() {
 								method: 'GET'
 							}).done(done);
 						}
-						
+
 
 					} catch(e) {
 						console.log(e)
@@ -167,9 +167,10 @@ function init() {
 			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
 			{href:'http://steam-trader.com/games/?r=45962&text='+gamename, icon:'http://steam-trader.com/favicon.ico', text: t('searchin')+' Steam-Trader.com'},
 		];
-		
+
 		if(itemType=='app'){
-			links.push({href:'http://steamcommunity.com/my/gamecards/'+itemId, icon:'http://store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')})
+			links.push({href:'http://steamcommunity.com/my/gamecards/'+itemId, icon:'http://store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')});
+			links.push({href:'http://steamcommunity.com/market/search?q=&category_753_Game%5B%5D=tag_app_'+itemId+'&category_753_item_class%5B%5D=tag_item_class_2&appid=753', icon:'http://store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text: t('SearchCardsOnMarket')})
 		}
 
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
@@ -179,7 +180,7 @@ function init() {
 		W.addToCart = function(subid){
 			var form = $('[name="add_to_cart_'+subid+'"]');
 			var el=form.parent();
-			
+
 			var cartHistory = W.localStorage.swtcarthistory && JSON.parse(W.localStorage.swtcarthistory) || [];
 			if(cartHistory.length>=20) cartHistory.shift();
 			cartHistory.push({
@@ -189,7 +190,7 @@ function init() {
 				link: itemType+'/'+itemId
 			});
 			W.localStorage.swtcarthistory = JSON.stringify(cartHistory);
-			
+
 			if(settings.cur.storeCartAjax){
 				el.find('.game_purchase_action_bg .btn_addtocart:last>a').after('<a id="swtcartdone" href="#">'+t('adding')+'</a>');
 				$.ajax({
@@ -219,12 +220,12 @@ function init() {
 					'capsule_184x69',
 					'capsule_sm_120',
 				];
-	
+
 				var res='';
 				for(var i=0;i<urls.length;i++){
 					res+='<img src="http://cdn.akamai.steamstatic.com/steam/'+itemType+'s/'+itemId+'/'+urls[i]+'.jpg"><br>';
 				}
-	
+
 				W.ShowDialog(t('Logos'), $(res));
 				return false;
 			})

@@ -40,6 +40,7 @@
 'viewin' : 'View in',
 'searchin' : 'Search in',
 'viewMyCardsGame' : 'View my cards/badge this game',
+'SearchCardsOnMarket' : 'Search cards on Market',
 'adding' : 'adding',
 'added' : 'Added | View in cart',
 'balance' : 'Balance',
