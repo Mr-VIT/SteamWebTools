@@ -7,16 +7,13 @@
 		}
 	}
 	var el = W.$J('.pick_and_sell_button').length;
-	if(el)
-	{
+	if(el){
 		if(settings.cur.marketMainPageFuncs) mainPage();
 	} else
-	if(document.getElementById('searchResults'))
-	{
+	if(document.getElementById('searchResults')){
 		addGotoBtn();
 	} else
-	if(document.getElementById('largeiteminfo_item_name'))
-	{
+	if(document.getElementById('largeiteminfo_item_name')){
 		itemPage();
 	}
 }
@@ -65,7 +62,7 @@ function mainPage(){
 		return false;
 	});
 
-
+	/*
 	// scroll table:sell
 	var rows = W.$J('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_row').detach();
 	W.$J('.market_content_block.my_listing_section.market_home_listing_table:nth-child(1)').append('<div class="scrollbl tablesell"></div>').click;
@@ -74,16 +71,22 @@ function mainPage(){
 	var rows = W.$J('#tabContentsMyListings .market_home_listing_table:nth-child(2) .market_listing_row').detach();
 	W.$J('.market_content_block.my_listing_section.market_home_listing_table:nth-child(2)').append('<div class="scrollbl tablebuy"></div>').click;
 	rows.prependTo("#tabContentsMyListings .scrollbl.tablebuy");
-
-	W.$J('.market_listing_cancel_button a').each(function(i, el){
-		var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i);
-		if(res){
-			W.$J(el).before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
-			W.$J(el).remove();
-		}
+	*/
+	var checkboxify = function(){
+		W.$J('.market_listing_cancel_button a').each(function(i, el){
+			var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i);
+			if(res){
+				W.$J(el).before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
+				W.$J(el).remove();
+			}
+		});
+	};
+	checkboxify();
+	W.g_oMyListings.SetResponseHandler(function(){
+		setTimeout(checkboxify);
 	});
 
-	/////
+	///// //need fix
 	function countSumListings(tableClass, resultId, useCount){
 		var myListings = W.$J('#tabContentsMyListings .'+tableClass+' span.market_listing_price');
 		if(myListings){
@@ -93,8 +96,8 @@ function mainPage(){
 				price = parseFloat(myListings[i].innerHTML.match(/(\d+(?:[.,]\d{1,2})?)/)[1].replace(',','.'))*100;
 
 				if(useCount) {
-					i++
-					price *= myListings[i].innerHTML
+					i++;
+					price *= myListings[i].innerHTML;
 				}
 
 				total += price;
