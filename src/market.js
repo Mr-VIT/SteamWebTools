@@ -18,16 +18,19 @@
 	}
 }
 
-function mainPage(){
-	// styles
-	document.body.insertAdjacentHTML("afterBegin",
-		'<style>.scrollbl{max-height:500px;overflow-y:scroll;} .lfremove{display:inline-block}</style>'
-	);
+function checkboxifyMyListings(){
+	W.$J('.market_listing_cancel_button a').each(function(i, el){
+		var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i);
+		if(res){
+			W.$J(el).before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
+			W.$J(el).remove();
+		}
+	});
+};
 
-	//// Remove button
-	// add
-	var el = document.querySelector('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_edit_buttons').innerHTML='<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('checkAll')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('deleteChecked')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>';
-
+function addButtonsMyListings(){
+	W.$J('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_table_header>.market_listing_edit_buttons').html('<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('checkAll')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('deleteChecked')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>');
+	
 	// set function
 	W.$J('#btnCheckAllListings').click(function(){
 		W.$J('.lfremove').attr('checked',!W.$J('.lfremove:first')[0].checked)
@@ -61,6 +64,15 @@ function mainPage(){
 
 		return false;
 	});
+	
+	checkboxifyMyListings();
+};
+
+function mainPage(){
+	// styles
+	document.body.insertAdjacentHTML("afterBegin",
+		'<style>.scrollbl{max-height:500px;overflow-y:scroll;} .lfremove{display:inline-block}</style>'
+	);
 
 	/*
 	// scroll table:sell
@@ -72,21 +84,13 @@ function mainPage(){
 	W.$J('.market_content_block.my_listing_section.market_home_listing_table:nth-child(2)').append('<div class="scrollbl tablebuy"></div>').click;
 	rows.prependTo("#tabContentsMyListings .scrollbl.tablebuy");
 	*/
-	var checkboxify = function(){
-		W.$J('.market_listing_cancel_button a').each(function(i, el){
-			var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i);
-			if(res){
-				W.$J(el).before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
-				W.$J(el).remove();
-			}
-		});
-	};
-	checkboxify();
+	
+	addButtonsMyListings();
 	W.g_oMyListings.SetResponseHandler(function(){
-		setTimeout(checkboxify);
+		setTimeout(checkboxifyMyListings, 300);
 	});
 
-	///// //need fix
+	/* //need fix
 	function countSumListings(tableClass, resultId, useCount){
 		var myListings = W.$J('#tabContentsMyListings .'+tableClass+' span.market_listing_price');
 		if(myListings){
@@ -107,6 +111,7 @@ function mainPage(){
 	}
 	countSumListings('tablesell', 'my_market_selllistings_number');
 	countSumListings('tablebuy', 'my_market_buylistings_number', true);
+	*/
 
 }
 
@@ -115,6 +120,8 @@ function itemPage(){
 	W.$J('#market_buynow_dialog_accept_ssa, #market_buyorder_dialog_accept_ssa').prop('checked',true);
 
 	addGotoBtn();
+	
+	addButtonsMyListings(); // for comodity items only
 
 	//numerate listings
 	W.$J('#searchResultsRows .market_listing_item_name_block').each(function(i,e) {
