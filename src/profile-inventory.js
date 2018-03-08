@@ -232,7 +232,7 @@ function inventoryPageInit(){
 	W.Filter.MatchItemTags_old = W.Filter.MatchItemTags;
 	W.Filter.MatchItemTags = function( elItem, rgTags ){
 		if (rgTags && rgTags[0]==SWT_NOT_DUP_KEY) {
-			return elItem.rgItem._amount > 0
+			return (elItem.rgItem._amount > 0) || (elItem.rgItem.amount > 1) ;
 		} else
 			return this.MatchItemTags_old.apply(this, arguments);
 	}
