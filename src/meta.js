@@ -11,4 +11,6 @@
 // @include		http://steamcommunity.com/*
 // @include		https://steamcommunity.com/*
 // @connect		checkrep.ru
+// @domain		checkrep.ru
 // @connect		store.steampowered.com
+// @domain		store.steampowered.com
