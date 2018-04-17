@@ -180,12 +180,6 @@ function profilePageInit(){
 	SetRepBadges('.profile_header');
 
 	W.getMoreInfo = function() {
-		if (location.protocol=="https:") {
-			// redirect to http, profile?xml=1 don't work over https
-			location.protocol="http:";
-			return;
-		}
-
 		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
 		W.setTimeout(function(){Modal.AdjustSizing()},1);
 		$.ajax({
@@ -229,7 +223,7 @@ function profilePageInit(){
 
 	// chat button
 	try {
-		var pm_btn = $('.profile_header_actions>a.btn_profile_action[href^="javascript:LaunchWebChat"]')[0];
+		var pm_btn = $('.profile_header_actions>a.btn_profile_action[href^="javascript:OpenFriendChat"]')[0];
 		pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">'+t('chat')+': Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
 	} catch(e) {};
 
