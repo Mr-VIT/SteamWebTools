@@ -14,7 +14,7 @@ function inventoryPageInit(){
 		ajaxTarget.giftId = item.assetid;
 		ajaxTarget.giftName = encodeURIComponent(item.description.name);
 
-		new W.Ajax.Request( 'http://steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
+		new W.Ajax.Request( '//steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
 			method: 'post',
 			parameters: { sessionid: W.g_sessionID },
 			onSuccess: function( transport ) {
