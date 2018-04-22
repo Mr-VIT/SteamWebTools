@@ -160,17 +160,17 @@ function init() {
 
 		links = [
 			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/favicon-16x16.png', text: t('viewin')+' SteamDB.info'},
-			{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png?v=a', text: t('viewin')+' SteamPrices.com'},
-			{href:'http://plati.com/asp/find.asp?ai=111350&searchstr='+gamename, icon:'http://plati.com/favicon.ico', text: t('searchin')+' Plati.com'},
+			{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png', text: t('viewin')+' SteamPrices.com'},
+			{href:'http://plati.com/asp/find.asp?ai=111350&searchstr='+gamename, icon:'https://plati.com/favicon.ico', text: t('searchin')+' Plati.com'},
 			{href:'http://steampub.ru/search/'+gamename, icon:'http://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
-			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'http://www.steamgifts.com/favicon.ico', text: t('searchin')+' SteamGifts.com'},
+			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'https://cdn.steamgifts.com/img/favicon.ico', text: t('searchin')+' SteamGifts.com'},
 			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
-			{href:'http://steam-trader.com/games/?r=45962&text='+gamename, icon:'http://steam-trader.com/favicon.ico', text: t('searchin')+' Steam-Trader.com'},
+			{href:'http://steam-trader.com/games/?r=45962&text='+gamename, icon:'https://steam-trader.com/favicon.ico', text: t('searchin')+' Steam-Trader.com'},
 		];
 
 		if(itemType=='app'){
-			links.push({href:'http://steamcommunity.com/my/gamecards/'+itemId, icon:'http://store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')});
-			links.push({href:'http://steamcommunity.com/market/search?q=&category_753_Game%5B%5D=tag_app_'+itemId+'&category_753_item_class%5B%5D=tag_item_class_2&appid=753', icon:'http://store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text: t('SearchCardsOnMarket')})
+			links.push({href:'//steamcommunity.com/my/gamecards/'+itemId, icon:'//steamstore-a.akamaihd.net/public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')});
+			links.push({href:'//steamcommunity.com/market/search?q=&category_753_Game%5B%5D=tag_app_'+itemId+'&category_753_item_class%5B%5D=tag_item_class_2&appid=753', icon:'//store.akamai.steamstatic.com/public/images/v6/ico/ico_cards.png', text: t('SearchCardsOnMarket')})
 		}
 
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
@@ -223,7 +223,7 @@ function init() {
 
 				var res='';
 				for(var i=0;i<urls.length;i++){
-					res+='<img src="http://cdn.akamai.steamstatic.com/steam/'+itemType+'s/'+itemId+'/'+urls[i]+'.jpg"><br>';
+					res+='<img src="//steamcdn-a.akamaihd.net/steam/'+itemType+'s/'+itemId+'/'+urls[i]+'.jpg"><br>';
 				}
 
 				W.ShowDialog(t('Logos'), $(res));
