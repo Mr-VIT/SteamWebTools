@@ -2,15 +2,21 @@ var $ = W.$J;
 
 $('#group_tab_content_overview').show().attr('id','swt_content1');
 
-$('head').append($('<link href="http://steamcommunity-a.akamaihd.net/public/css/skin_1/groupadmin.css" rel="stylesheet" type="text/css">'));
+$('head').append($('<link href="//steamcommunity-a.akamaihd.net/public/css/skin_1/groupadmin.css" rel="stylesheet" type="text/css">'));
 
 $('.grouppage_logo').css('background-image','none');
-$('.grouppage_logo>img')[0].src='http://v1t.su/projects/steam/webtools/imgs/steam-big-icon.png';
+$('.grouppage_logo>img')[0].src='//v1t.su/projects/steam/webtools/imgs/steam-big-icon.png';
 
 $('.grouppage_header_label').text('Steam '+t('set.ext'));
-$('.grouppage_header_name').html('Steam Web Tools <span class="grouppage_header_abbrev" style="font-size:21px">'+t('set.settings')+'</span>');
-$('.grouppage_join_area a')[0].href='http://v1t.su/projects/steam/webtools/';
-$('.grouppage_join_area a span').text(t('set.homePage'));
+var header = $('.grouppage_header_name').html('Steam Web Tools <span class="grouppage_header_abbrev" style="font-size:21px">'+t('set.settings')+'</span>');
+var homePageUrl='https://v1t.su/projects/steam/webtools/';
+var tmp = $('.grouppage_join_area a');
+if(tmp.lenght){
+	tmp[0].href=homePageUrl;
+	tmp.find('span').text(t('set.homePage'));
+}else{
+	header.after('<div class="grouppage_join_area"><a href="'+homePageUrl+'" class="btn_green_white_innerfade btn_medium"><span>'+t('set.homePage')+'</span></a></div>')
+}
 $('.grouppage_friendsingroup').remove();
 $('.grouppage_member_tiles').remove();
 $('.group_tabs').remove();
