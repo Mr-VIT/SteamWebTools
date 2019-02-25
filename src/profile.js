@@ -1,4 +1,4 @@
-﻿var $ = W.$J, steamid;
+var $ = W.$J, steamid;
 
 function SetRepBadges(selector){
 	document.querySelector(selector).insertAdjacentHTML('afterBegin',
@@ -91,23 +91,23 @@ function profilePageInit(){
 	var profilesLinks = [
 		{
 			href: 'http://checkrep.ru/#steam:'+steamid,
-			icon: 'http://checkrep.ru/favicon.ico',
+			icon: '//checkrep.ru/favicon.ico',
 			text: t('checkin')+' CheckRep.ru',
 		},
 		{
 			href: 'http://steamrep.com/profiles/'+steamid,
-			icon: 'http://steamrep.com/favicon.ico',
+			icon: '//steamrep.com/favicon.ico',
 			text: t('checkin')+' SteamRep.com',
 		},
 		{hr:true},
 		{
 			href: 'http://forums.steamrep.com/search/search?keywords='+steamid,
-			icon: 'http://steamrep.com/favicon.ico',
+			icon: '//steamrep.com/favicon.ico',
 			text: t('searchinforums')+' SteamRep.com',
 		},
 		{
 			href: 'http://www.google.com/#q='+steamid+' inurl:sourceop.com',
-			icon: 'http://www.sourceop.com/themes/hl2/images/favicon.ico',
+			icon: '//www.sourceop.com/themes/hl2/images/favicon.ico',
 			text: t('searchinforums')+' SourceOP.com',
 		},
 		{
@@ -118,50 +118,35 @@ function profilePageInit(){
 		{hr:true},
 		{
 			href: 'http://backpack.tf/profiles/'+steamid,
-			icon: 'http://backpack.tf/favicon_440.ico',
+			icon: '//backpack.tf/favicon_440.ico',
 			text: t('inventory')+' Backpack.tf',
 		},
 		{
 			href: 'http://tf2b.com/tf2/'+steamid,
-			icon: 'http://tf2b.com/favicon.ico',
+			icon: '//tf2b.com/favicon.ico',
 			text: t('inventory')+' TF2B.com',
-		},
-		{
-			href: 'http://tf2outpost.com/backpack/'+steamid,
-			icon: 'http://cdn.tf2outpost.com/img/favicon-440.ico',
-			text: t('inventory')+' TF2OutPost.com',
 		},
 		{hr:true},
 		{
-			href: 'http://tf2outpost.com/user/'+steamid,
-			icon: 'http://cdn.tf2outpost.com/img/favicon-440.ico',
-			text: t('trades')+' TF2OutPost.com',
-		},
-		{
 			href: 'http://dota2lounge.com/profile?id='+steamid,
-			icon: 'http://dota2lounge.com/favicon.ico',
+			icon: '//dota2lounge.com/favicon.ico',
 			text: t('trades')+' Dota2Lounge.com',
 		},
 		{
 			href: 'http://csgolounge.com/profile?id='+steamid,
-			icon: 'http://csgolounge.com/favicon.ico',
+			icon: '//csgolounge.com/favicon.ico',
 			text: t('trades')+' CSGOLounge.com',
 		},
 		{
 			href: 'http://steam.tools/itemvalue/#/'+steamid+'-730',
-			icon: 'http://steam.tools/favicon.ico',
+			icon: '//steam.tools/favicon.ico',
 			text: t('inventory')+' Steam.tools/itemvalue/',
 		},
 		{hr:true},
 		{
-			href: 'http://steammoney.com/trade/user/'+steamid,
-			icon: 'http://steammoney.com/favicon.ico',
-			text: t('profile')+' SteamMoney.com',
-		},
-		{
 			id:   'inv_spub',
 			href: 'http://steampub.ru/user/'+steamid,
-			icon: 'http://steampub.ru/favicon.ico',
+			icon: '//steampub.ru/favicon.ico',
 			text: t('profile')+' SteamPub.ru',
 		},
 		{hr:true}
@@ -230,7 +215,7 @@ function profilePageInit(){
 	// inventory links
 	var el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="http://www.iconsearch.ru/uploads/icons/basicset/16x16/present_16.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="http://store.akamai.steamstatic.com/public/images/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="http://media.steampowered.com/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="http://www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img src="http://blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="//steamstore-a.akamaihd.net/public/images/icon_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="//steamstore-a.akamaihd.net/public/images/v6/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="//steamcdn-a.akamaihd.net/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="//www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img width="16" height="16" src="//blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
 
 
 	var out = '', link;

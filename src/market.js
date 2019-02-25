@@ -1,4 +1,4 @@
-﻿function init(){
+function init(){
 	if(settings.cur.globalHideWalletBalance){
 		var el = W.$J('#marketWalletBalanceAmount')[0];
 		if(el){
@@ -86,9 +86,6 @@ function mainPage(){
 	*/
 	
 	addButtonsMyListings();
-	W.g_oMyListings.SetResponseHandler(function(){
-		setTimeout(checkboxifyMyListings, 300);
-	});
 
 	/* //need fix
 	function countSumListings(tableClass, resultId, useCount){
