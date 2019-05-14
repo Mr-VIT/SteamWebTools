@@ -11,7 +11,7 @@ $('.grouppage_header_label').text('Steam '+t('set.ext'));
 var header = $('.grouppage_header_name').html('Steam Web Tools <span class="grouppage_header_abbrev" style="font-size:21px">'+t('set.settings')+'</span>');
 var homePageUrl='https://v1t.su/projects/steam/webtools/';
 var tmp = $('.grouppage_join_area a');
-if(tmp.lenght){
+if(tmp.length){
 	tmp[0].href=homePageUrl;
 	tmp.find('span').text(t('set.homePage'));
 }else{
