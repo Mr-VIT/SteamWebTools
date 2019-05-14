@@ -17,6 +17,7 @@ if(tmp.lenght){
 }else{
 	header.after('<div class="grouppage_join_area"><a href="'+homePageUrl+'" class="btn_green_white_innerfade btn_medium"><span>'+t('set.homePage')+'</span></a></div>')
 }
+$(".responsive_local_menu > .grouppage_join_area").hide();
 $('.grouppage_friendsingroup').remove();
 $('.grouppage_member_tiles').remove();
 $('.group_tabs').remove();
