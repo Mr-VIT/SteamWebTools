@@ -1,4 +1,4 @@
-W.$J('.submenu_community').append('<a class="submenuitem swt" href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings">SWT - '+t('set.settings')+'</a>');
+W.$J('.submenu_community').append('<a class="submenuitem swt" href="https://steamcommunity.com/groups/SteamClientBeta#/swt-settings">SWT - '+t('set.settings')+'</a>');
 
 if(settings.cur.globalHideAccName){
 	var acBtnEl = W.$J('#account_pulldown')[0];

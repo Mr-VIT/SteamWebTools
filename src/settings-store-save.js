@@ -8,4 +8,4 @@ if(h && h.substr(1,13)=='swt-settings-'){
 		settings.storage.del();
 	}
 }
-W.location.href="http://steamcommunity.com/groups/SteamClientBeta#swt-settings";
+W.location.href="https://steamcommunity.com/groups/SteamClientBeta#/swt-settings";

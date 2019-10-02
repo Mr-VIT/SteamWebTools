@@ -105,7 +105,7 @@ var scripts = [
 	},
 	{
 		match:[
-			rURL_COMMUNITY+'groups/SteamClientBeta#swt-settings'
+			rURL_COMMUNITY+'groups/SteamClientBeta#?/?/swt-settings'
 		],
 		run:function(){
 			//!include settings-page.js

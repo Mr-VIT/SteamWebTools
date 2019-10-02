@@ -44,7 +44,7 @@ var createForm = function(data){
 		}
 		res+=createForm.create_groupEnd();
 	}
-	$('.maincontent>.leftcol ')[0].innerHTML='<form class="smallForm" id="editForm" name="editForm">'+res+'<div class="group_content_bodytext"><div class="forum_manage_actions"><a href="#swt-settings" class="btn_grey_white_innerfade btn_medium" id="swt_btnDef"><span>'+t('set.def')+'</span></a><button type="submit" class="btn_green_white_innerfade btn_medium"><span>'+t('save')+'</span></button></div></div></form>';
+	$('.maincontent>.leftcol ')[0].innerHTML='<form class="smallForm" id="editForm" name="editForm">'+res+'<div class="group_content_bodytext"><div class="forum_manage_actions"><a href="#/swt-settings" class="btn_grey_white_innerfade btn_medium" id="swt_btnDef"><span>'+t('set.def')+'</span></a><button type="submit" class="btn_green_white_innerfade btn_medium"><span>'+t('save')+'</span></button></div></div></form>';
 }
 createForm.create_groupStart = function(title){
 	return '<div class="group_content group_summary"><div class="formRow"><h1>'+title+'</h1></div>';
@@ -170,7 +170,7 @@ $('#swt_btnDef').click(function(){
 	settings.reset();
 	settings.save();
 	if(!settings.storage.gm) {
-		W.location.href="http://store.steampowered.com/about/#swt-settings-del";
+		W.location.href="https://store.steampowered.com/about/#swt-settings-del";
 	} else
 		W.location.reload();
 });
@@ -186,8 +186,8 @@ $("form#editForm").submit(function(event) {
 
 	event.preventDefault();
 	if(!settings.storage.gm) {
-		W.location.href="http://store.steampowered.com/about/#swt-settings-save="+encodeURIComponent(JSON.stringify(settings.cur));
+		W.location.href="https://store.steampowered.com/about/#swt-settings-save="+encodeURIComponent(JSON.stringify(settings.cur));
 	} else
-		W.location.reload();
+		W.location.href="https://steamcommunity.com/groups/SteamClientBeta#/swt-settings";
 });
 
