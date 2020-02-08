@@ -152,9 +152,9 @@ function init() {
 		var el = document.querySelector('.rightcol.game_meta_data');
 
 		links = [
-			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/favicon-16x16.png', text: t('viewin')+' SteamDB.info'},
+			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/vector_16px.svg', text: t('viewin')+' SteamDB.info'},
 			{href:'http://www.steamprices.com/'+_cc.curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png', text: t('viewin')+' SteamPrices.com'},
-			{href:'http://plati.com/asp/find.asp?ai=111350&searchstr='+gamename, icon:'https://plati.com/favicon.ico', text: t('searchin')+' Plati.com'},
+			{href:'https://plati.market/asp/find.asp?ai=111350&searchstr='+gamename, icon:'https://plati.market/favicon.ico', text: t('searchin')+' Plati.market'},
 			{href:'https://steampub.ru/search/'+gamename, icon:'https://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
 			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'https://cdn.steamgifts.com/img/favicon.ico', text: t('searchin')+' SteamGifts.com'},
 			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},

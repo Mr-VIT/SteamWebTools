@@ -89,14 +89,6 @@ var scripts = [
 	},
 	{
 		match:[
-			rURL_COMMUNITY+'app/\\d+/guides.*'
-		],
-		run:function(){
-			//!include gamehub-guides.js
-		}
-	},
-	{
-		match:[
 			rURL_COMMUNITY+'market.*'
 		],
 		run:function(){

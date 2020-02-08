@@ -29,7 +29,6 @@ var cookie_date = new Date();
 cookie_date.setTime(cookie_date.getTime()-1);
 
 links = [
-	{href:'javascript:document.cookie=\'shoppingCartGID=; path=/; expires='+cookie_date.toGMTString()+'\'; location.href=\'/cart/\';', text:t('clearCart')},
 	{href:'https://store.steampowered.com/checkout/?purchasetype=gift#quick',blank:1, text:t('quickPurchase')},
 ];
 
