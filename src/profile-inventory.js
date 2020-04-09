@@ -216,6 +216,34 @@ function inventoryPageInit(){
 
 	//// inv
 
+	// == search in tags
+	W.Filter.MatchItemTerms_old = W.Filter.MatchItemTerms;
+	W.Filter.MatchItemTerms = function(elItem, rgTerms){
+		var res =  this.MatchItemTerms_old.apply(this, arguments);
+		if(res) return res;
+		var tags = elItem.rgItem.description.tags;
+
+		for ( var iTerm = 0; iTerm < rgTerms.length; iTerm++ ) {
+			var bMatch = false;
+
+			if ( !bMatch && tags && tags.length )
+			{
+				for ( var i = 0; i < tags.length; i++ )
+				{
+					if ( tags[i].internal_name && tags[i].internal_name.match( rgTerms[iTerm] ) )
+					{
+						bMatch = true;
+						break;
+					}
+				}
+			}
+
+			if ( !bMatch )
+				return false;
+		}
+		return true;
+	}
+
 	/* *
 	 * Hide dup items functions
 	 * */
