@@ -17,6 +17,7 @@ if($('.badge_craft_button').length){
 		}
 	};
 	W.swt_craftAllAvailableBadges = function (){
+		if(!confirm(t('craftAllAvailableConfirm'))) return;
 		var $elb = $('.badge_craft_button').parents('.badge_row.is_link');
 		var badgesCount = $elb.length;
 		if(!badgesCount) {

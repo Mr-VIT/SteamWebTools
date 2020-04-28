@@ -14,6 +14,7 @@
 //cards badges
 'showDropsCard' : 'Show only with cards drops remaining',
 'craftAllAvailable' : 'Craft all available',
+'craftAllAvailableConfirm' : 'Are you sure you want to start crafting all available badges?',
 'howmany' : 'How many? of ',
 'save' : 'Save',
 'get' : 'Get',
