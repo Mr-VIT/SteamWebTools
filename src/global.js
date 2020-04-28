@@ -1,13 +1,5 @@
 W.$J('.submenu_community').append('<a class="submenuitem swt" href="https://steamcommunity.com/groups/SteamClientBeta#/swt-settings">SWT - '+t('set.settings')+'</a>');
 
-if(settings.cur.globalHideAccName){
-	var acBtnEl = W.$J('#account_pulldown')[0];
-	if(acBtnEl){
-		acBtnEl.title = acBtnEl.innerHTML;
-		acBtnEl.innerHTML = '['+t('acc')+']';
-	}
-}
-
 if(settings.cur.globalFixNavbar){
 	W.$J('head').append('<style>#global_header.swtfixed{position:fixed;z-index:9999;width:100%}.responsive_page_template_content.swtfixed{padding-top:50px}#global_header.swtfixed>.content{height:50px !important}#global_header.swtfixed div.logo{display:none}#global_header.swtfixed .menuitem{padding-top:15px !important}#global_header.swtfixed .supernav_container{left:0 !important}#global_header.swtfixed .header_installsteam_btn{display:none}.swtup{display:none}#global_header.swtfixed .swtup{display:block;float:left}</style>');
 	

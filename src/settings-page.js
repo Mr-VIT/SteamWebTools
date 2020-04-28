@@ -104,11 +104,6 @@ createForm([
 			},
 			{
 				type:'checkbox',
-				title:t('set.hideAccName'),
-				name:'globalHideAccName',
-			},
-			{
-				type:'checkbox',
 				title:t('set.hideBalance'),
 				name:'globalHideWalletBalance',
 			},

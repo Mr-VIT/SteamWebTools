@@ -5,7 +5,6 @@ var settings = {
 
 		globalLang : 'en',
 		globalFixNavbar : true,
-		globalHideAccName : true,
 		globalHideWalletBalance : true,
 		globalDisableLinkFilted : false,
 
