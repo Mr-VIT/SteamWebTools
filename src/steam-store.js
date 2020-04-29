@@ -64,7 +64,7 @@ function init() {
 						? 'app'
 						: 'package'
 					);
-					var reqUrl = 'http://store.steampowered.com/api/'+type+'details/?filters=price_overview,packages&v=1&'+type+'ids=';
+					var reqUrl = 'https://store.steampowered.com/api/'+type+'details/?filters=price_overview,packages&v=1&'+type+'ids=';
 
 
 					reqUrl += itemId+'&cc='+cc;
@@ -204,19 +204,30 @@ function init() {
 			sub : '.package_header'
 		}[itemType]).wrap(
 			$('<a href="#viewlogos" title="View Logos"></a>').click(function(){
+				var jpg='.jpg';
 				var urls = [
-					'capsule_616x353',
-					'header',
-					'header_586x192',
-					'header_292x136',
-					'capsule_231x87',
-					'capsule_184x69',
-					'capsule_sm_120',
+					'capsule_616x353'+jpg,
+					'header'+jpg,
+					'capsule_467x181'+jpg,
+					'header_292x136'+jpg,
+					'capsule_231x87'+jpg,
+					'capsule_184x69'+jpg,
+					'capsule_sm_120'+jpg,
 				];
+				if(itemType=='sub') {
+					urls.unshift('header_586x192'+jpg);
+				} else if(itemType=='app'){
+					urls=urls.concat([
+						'library_600x900_2x'+jpg,
+						'library_600x900'+jpg,
+						'logo.png',
+						'library_hero'+jpg
+					]);
+				}
 
 				var res='';
 				for(var i=0;i<urls.length;i++){
-					res+='<img src="//steamcdn-a.akamaihd.net/steam/'+itemType+'s/'+itemId+'/'+urls[i]+'.jpg"><br>';
+					res+='<img src="//steamcdn-a.akamaihd.net/steam/'+itemType+'s/'+itemId+'/'+urls[i]+'"><br>';
 				}
 
 				W.ShowDialog(t('Logos'), $(res));
