@@ -160,12 +160,12 @@ function profilePageInit(){
 	);
 
 
-	$('.profile_header').append('<div id="swt_info">SteamID64: <a href="http://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> | <a href="#getMoreInfo" onclick="getMoreInfo();return false">'+t('getMoreInfo')+'</a></div>');
+	$('.profile_header').append('<div id="swt_info">SteamID64: <a href="https://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> | <a href="#getMoreInfo" onclick="getMoreInfo();return false">'+t('getMoreInfo')+'</a></div>');
 
 	SetRepBadges('.profile_header');
 
 	W.getMoreInfo = function() {
-		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="http://cdn.steamcommunity.com/public/images/login/throbber.gif"></div>'));
+		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="//steamcommunity-a.akamaihd.net/public/images/login/throbber.gif"></div>'));
 		W.setTimeout(function(){Modal.AdjustSizing()},1);
 		$.ajax({
 			url: W.location.href+'?xml=1',
@@ -210,6 +210,7 @@ function profilePageInit(){
 	try {
 		var pm_btn = $('.profile_header_actions>a.btn_profile_action[href^="javascript:OpenFriendChat"]')[0];
 		pm_btn.outerHTML='<span class="btn_profile_action btn_medium"><span><a href="steam://friends/message/'+steamid+'">'+t('chat')+': Steam</a> | <a href="'+pm_btn.href+'">Web</a></span></span>';
+		W.OpenFriendChat=W.OpenFriendChatInWebChat; // disable dialog
 	} catch(e) {};
 
 	// inventory links
@@ -233,7 +234,8 @@ function profilePageInit(){
 		document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("afterBegin", out);
 	} catch(err) {
 		// "More" button for self profile
-		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>'+t('more')+' <img src="http://cdn.steamcommunity.com/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
+		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>'+t('more')
+		+' <img src="//steamcommunity-a.akamaihd.net/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
 	}
 
 }

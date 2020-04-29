@@ -60,7 +60,7 @@ function inventoryPageInit(){
 					amount=item._amount;
 			}
 			if(amount>1){
-				if(!confirm(t('Skip sent?'))) for(var i=0;i<amount;i++){
+				if(!confirm(t('skipSent'))) for(var i=0;i<amount;i++){
 					W.checkedForSend[item._ids[i]]=item.description.name;
 					item._subItems[i].element.addClassName('checkedForSend');
 				}
@@ -86,7 +86,7 @@ function inventoryPageInit(){
 		}
 	}
 	W.sendChecked = function(){
-		var url = 'http://store.steampowered.com/checkout/sendgift/';
+		var url = 'https://store.steampowered.com/checkout/sendgift/';
 		// first to gid
 		for(var gid in W.checkedForSend){
 			break;
