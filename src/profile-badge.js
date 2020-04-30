@@ -1,9 +1,15 @@
 var $= W.$J;
 
+// == Feature == link to steamcardexchange.net
 var app = W.location.pathname.match(/\/gamecards\/(\d+)/)[1];
-$('.gamecards_inventorylink').append('<a class="btn_grey_grey btn_small_thin" href="http://www.steamcardexchange.net/index.php?inventorygame-appid-'+app+'"><span>www.SteamCardExchange.net</span></a> ');
+var $bar = $('.gamecards_inventorylink');
+if(!$bar.length){ // foreign profile
+	$bar=$('<div class="gamecards_inventorylink"></div>').prependTo( $('.badge_detail_tasks') )
+	.append('<a class="btn_grey_grey btn_medium" href="/my/gamecards/'+app+'"><span>'+t('viewMyCardsGame')+'</span></a> ');
+}
+$bar.append('<a class="btn_grey_grey btn_small_thin" href="http://www.steamcardexchange.net/index.php?inventorygame-appid-'+app+'"><span>www.SteamCardExchange.net</span></a> ');
 
-// Craft all available lvls
+// == Feature == craft all lvls
 if($('.badge_craft_button').length){
 	W.craftAllAvailable=function(){
 		var totalCrafts = $('.badge_card_set_text_qty').text().match(/\d+/g).min(),
@@ -54,5 +60,5 @@ if($('.badge_craft_button').length){
 		W.craftAllAvailable();
 	}
 
-	$('.gamecards_inventorylink').prepend('<div style="float:right;margin-left:5px" class="btn_grey_black btn_small_thin" onclick="craftAllAvailable()"><span>'+t('craftAllAvailable')+'</span></div>');
+	$bar.prepend('<div style="float:right;margin-left:5px" class="btn_grey_black btn_small_thin" onclick="craftAllAvailable()"><span>'+t('craftAllAvailable')+'</span></div>');
 }
