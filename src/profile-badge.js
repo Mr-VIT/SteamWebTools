@@ -2,11 +2,12 @@ var $= W.$J;
 
 // == Feature == link to steamcardexchange.net
 var app = W.location.pathname.match(/\/gamecards\/(\d+)/)[1];
-var $bar = $('.gamecards_inventorylink');
+var $bar = $('.gamecards_inventorylink:first');
 if(!$bar.length){ // foreign profile
-	$bar=$('<div class="gamecards_inventorylink"></div>').prependTo( $('.badge_detail_tasks') )
+	$bar=$('<div class="gamecards_inventorylink"></div>').prependTo( $('.badge_detail_tasks:first') )
 	.append('<a class="btn_grey_grey btn_medium" href="/my/gamecards/'+app+'"><span>'+t('viewMyCardsGame')+'</span></a> ');
 }
+$bar.append('<a class="btn_grey_grey btn_small_thin" href="https://steamcommunity.com/market/search?appid=753&category_753_item_class%5B%5D=tag_item_class_5&category_753_Game%5B%5D=tag_app_'+app+'"><span>Booster Pack</span></a> ');
 $bar.append('<a class="btn_grey_grey btn_small_thin" href="http://www.steamcardexchange.net/index.php?inventorygame-appid-'+app+'"><span>www.SteamCardExchange.net</span></a> ');
 
 // == Feature == craft all lvls
