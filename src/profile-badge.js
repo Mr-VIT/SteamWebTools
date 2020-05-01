@@ -1,7 +1,8 @@
 var $= W.$J;
 
-// == Feature == link to steamcardexchange.net
 var app = W.location.pathname.match(/\/gamecards\/(\d+)/)[1];
+
+// == Feature == link to steamcardexchange.net
 var $bar = $('.gamecards_inventorylink:first');
 if(!$bar.length){ // foreign profile
 	$bar=$('<div class="gamecards_inventorylink"></div>').prependTo( $('.badge_detail_tasks:first') )
@@ -63,3 +64,11 @@ if($('.badge_craft_button').length){
 
 	$bar.prepend('<div style="float:right;margin-left:5px" class="btn_grey_black btn_small_thin" onclick="craftAllAvailable()"><span>'+t('craftAllAvailable')+'</span></div>');
 }
+
+// == Feature == link to foreign steamcards page
+$(".badge_friendwithgamecard_actions").each(function(i, el){
+	var $el=$(el);
+	$el.append('<a class="btn_grey_grey btn_medium" title="Steam Cards" href="'
+		+$el.prev('a.persona').attr('href')+'/gamecards/'+app
+		+'"><img style="height:16px;transform:scale(1.5)" src="//steamstore-a.akamaihd.net/public/images/ico/ico_cards.png"></a>');
+});
