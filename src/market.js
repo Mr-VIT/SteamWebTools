@@ -22,8 +22,9 @@ function checkboxifyMyListings(){
 	W.$J('.market_listing_cancel_button a').each(function(i, el){
 		var res = decodeURIComponent(String(el.href)).match(/mylisting', '(\d+)', (\d+), '(\d+)', '(\d+)'/i);
 		if(res){
-			W.$J(el).before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
-			W.$J(el).remove();
+			var $el=W.$J(el);
+			$el.before('<span class="item_market_action_button_contents"><input type="checkbox" class="lfremove" data-listingid="'+res[1]+'"/></span>');
+			$el.remove();
 		}
 	});
 };
@@ -94,7 +95,7 @@ function mainPage(){
 
 			var total = 0;
 			for(var i=0; myListings.length>i; i++){
-				price = parseFloat(myListings[i].innerHTML.match(/(\d+(?:[.,]\d{1,2})?)/)[1].replace(',','.'))*100;
+				price = parseFloat(myListings[i].innerHTML.match(/(\d+(?:[.,]\d{1,2})?)/)[1].replace(',','.'))*100; // use GetPriceValueAsInt()
 
 				if(useCount) {
 					i++;
@@ -122,8 +123,42 @@ function itemPage(){
 
 	//numerate listings
 	W.$J('#searchResultsRows .market_listing_item_name_block').each(function(i,e) {
-		$J(e).prepend('<div style="float:right">#'+(i+1)+'</div>')
+		W.$J(e).prepend('<div style="float:right">#'+(i+1)+'</div>')
 	});
+
+	var assets = W.g_rgAssets;
+	if(!assets) { // listings
+		return;
+	}
+
+	// == Feature == links for cards & booster packs
+	// check 753_6 context
+	assets= assets[753] && (assets[753][6] || assets[753][0]); // sometimes wrong (0) context
+	if(!assets) return;
+	var itemdata= Object.values(assets)[0];
+
+	// check for card/bpack
+	var tmp = itemdata.owner_actions && itemdata.owner_actions[0] && itemdata.owner_actions[0].link;
+	if(!tmp) return;
+	//check for card
+	if(tmp.match(/\/my\/gamecards\/\d+/)){
+		var btn= {name:'Booster Pack',
+				  link:'//steamcommunity.com/market/search?appid=753&category_753_item_class%5B%5D=tag_item_class_5&category_753_Game%5B%5D=tag_app_'+itemdata.market_fee_app }
+	} else 
+	//check for bpack
+	if(tmp.indexOf("javascript:OpenBooster")>-1){
+		var btn= {name:t('SearchCardsOnMarket'),
+				  link:'//steamcommunity.com/market/search?category_753_item_class%5B%5D=tag_item_class_2&appid=753&category_753_Game%5B%5D=tag_app_'+itemdata.market_fee_app };
+	} else return;
+
+	//add btns
+	
+	var place = W.$J('<div class="item_actions" id="largeiteminfo_item_actions"></div>').insertAfter( W.$J('#largeiteminfo_game_info') );
+	var links = [btn,
+		{name: t('viewMyCardsGame'), 
+		 link: '//steamcommunity.com/my/gamecards/'+itemdata.market_fee_app}
+	]
+	for (var i=links.length; i>0; --i, place.append('<a class="btn_small btn_grey_white_innerfade" href="'+links[i].link+'"><span>'+links[i].name+'</span></a>'));
 }
 
 function addGotoBtn(){
