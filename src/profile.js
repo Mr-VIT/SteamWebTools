@@ -216,7 +216,7 @@ function profilePageInit(){
 	// inventory links
 	var el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="//steamstore-a.akamaihd.net/public/images/icon_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="//steamstore-a.akamaihd.net/public/images/v6/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="//steamcdn-a.akamaihd.net/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="//www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img width="16" height="16" src="//blog.counter-strike.net/wp-content/themes/counterstrike_launch/favicon.ico"/></a></span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="//steamstore-a.akamaihd.net/public/images/icon_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="//steamstore-a.akamaihd.net/public/images/v6/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="//steamcdn-a.akamaihd.net/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="//www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img width="16" height="16" src="//steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/730/69f7ebe2735c366c65c0b33dae00e12dc40edbe4.jpg"/></a></span>');
 
 
 	var out = '', link;

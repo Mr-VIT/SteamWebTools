@@ -1,4 +1,5 @@
-﻿if(W.location.hash!="#quick")
+﻿// == Feature == 1-click purchase
+if(W.location.hash!="#quick")
 	return;
 
 var FinalizeTransaction_old = W.FinalizeTransaction;

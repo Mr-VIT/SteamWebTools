@@ -1,6 +1,8 @@
+// == Feature == checked boxes SSA
 W.$('accept_ssa').checked=true;
 //W.$('verify_country_only').checked=true;
 
+// == Feature == add option "To inventory" and select it
 if(W.location.search.indexOf('purchasetype=gift')>-1){
 	if(!W.$('send_self')){
 		var curSteamId64;
@@ -17,7 +19,7 @@ if(W.location.search.indexOf('purchasetype=gift')>-1){
 			W.$J('#current_friend_choice').after('<div class="cart_send_choice checkout_content"><input class="send_choice_radio" type="radio" id="send_self" name="send_method" onchange="if(this.checked)SelectGiftRecipient('+curacid+',\'\');CheckFriendDisplay();"><label for="send_self" class="send_choice_txt"> '+t('toInventory')+'</label></div>');
 		}
 	}
-	W.$('send_self').checked=true;
-	W.$('send_self').onchange();
+	var rb = W.$('send_self');
+	rb.checked=true;
+	rb.onchange();
 }
-

@@ -1,4 +1,7 @@
-﻿// block
+﻿/* Features:
+*	* button: 1-click purchase
+*	* cart history list, add to cart from history
+*/
 function createBlock(title, links){
 	var out='<h2>'+title+'</h2><div class="block"><div class="block_content">';
 
@@ -24,9 +27,6 @@ function createBlock(title, links){
 var $ = W.$J; // jQuery
 
 var el = document.querySelector('.page_content > .rightcol');
-
-var cookie_date = new Date();
-cookie_date.setTime(cookie_date.getTime()-1);
 
 links = [
 	{href:'https://store.steampowered.com/checkout/?purchasetype=gift#quick',blank:1, text:t('quickPurchase')},
