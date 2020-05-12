@@ -74,3 +74,9 @@
 'rep.white' : 'whitelisted',
 'rep.black' : 'blacklisted',
 'rep.orange' : 'suspicious',
+// inv check price before sell
+"set.sellLowPriceCheck": "Request confirmation to sell an item if the entered price is lower than the current selling price by this % percentage. (0 - off)",
+"sellLowPriceCheck.warnTitle":"Steam Web Tools - ⚠Warning:\n",
+"sellLowPriceCheck.warning":"You specify the price much lower than the current one. Are you sure you want to list the item at your price?",
+"sellLowPriceCheck.warning2":"To continue, confirm the sale price by entering it",
+"sellLowPriceCheck.loadErr":"Failed to get current item price. Check the entered and the current price yourself. List the item at your price?",

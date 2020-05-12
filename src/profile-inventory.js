@@ -483,6 +483,65 @@ function inventoryPageInit(){
 	sellWarningBlock.orgnText = sellWarningBlock.el.text();
 
 	W.SellItemDialog.OnConfirmationAccept_old = W.SellItemDialog.OnConfirmationAccept;
+	W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept;
+	// Very low price check
+	W.SellItemDialog.OnConfirmationAccept = function(event){
+		// TODO check while input price
+		if(!settings.cur.invSellItemPriceCheckMaxDiscount){
+			return W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
+		}
+		var item = W.SellItemDialog.m_item;
+		var strMarketName = GetMarketHashName( item.description );
+		$.ajax( {
+			url: '//steamcommunity.com/market/priceoverview/',
+			type: 'GET',
+			data: {
+				country: W.g_strCountryCode,
+				currency: typeof(W.g_rgWalletInfo) != 'undefined' ? W.g_rgWalletInfo['wallet_currency'] : 1,
+				appid: item.appid,
+				market_hash_name: strMarketName
+			}
+		} ).done( function ( data ) {
+			var curPriceInt;
+			try {
+				if(!data.success) throw 0;
+				curPriceInt=GetPriceValueAsInt(data.lowest_price) || (data.lowest_price= W.SellItemDialog.m_plotPriceHistory.data[0].max()[1]) *100;
+				//TODO check orders
+				if(!curPriceInt) throw 0;
+			} catch(e){
+				if(confirm(t('sellLowPriceCheck.warnTitle')+t('sellLowPriceCheck.loadErr'))) W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
+				return;
+			}
+
+			var typedPriceInt = W.SellItemDialog.GetBuyerPriceAsInt();
+			var curDiscount = 100*(1-(typedPriceInt/curPriceInt));
+
+			function myConfirm(){
+				var confText=t('sellLowPriceCheck.warnTitle')+t('sellLowPriceCheck.warning')+'\nyour price: '+W.$('market_sell_buyercurrency_input').value+' ('+W.$('market_sell_currency_input').value+') \ncurrent price: '+data.lowest_price+' \nyour lower at '+Math.round(curDiscount)+'% = '+ (curPriceInt-typedPriceInt)/100;
+
+				if(	curDiscount> 5 + settings.cur.invSellItemPriceCheckMaxDiscount ) {
+					var confirmedPrice = prompt(confText+'\n'+t('sellLowPriceCheck.warning2')+': '+W.$('market_sell_buyercurrency_input').value);
+					if(GetPriceValueAsInt(confirmedPrice)==typedPriceInt) return true;
+					alert(t('sellLowPriceCheck.warnTitle')+'❌');
+					return false;
+				} else {
+					return confirm(confText);
+				}
+			}
+
+			if(    (curPriceInt-typedPriceInt)<=2 // ignore -2 cent diff 
+				|| (curDiscount<settings.cur.invSellItemPriceCheckMaxDiscount)
+				|| myConfirm()
+			) {
+				W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
+			}
+		} ).fail(function() {
+			if(confirm(t('sellLowPriceCheck.warnTitle')+t('sellLowPriceCheck.loadErr'))) W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
+		} );
+	}
+	
+
+
 	var SellCurrentSelection_old = W.SellCurrentSelection;
 	W.SellCurrentSelection = function(){
 		sellWarningBlock.el.text(sellWarningBlock.orgnText);
@@ -552,14 +611,14 @@ function inventoryPageInit(){
 					} );
 
 				}
-				W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_new;
+				W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_new;
 			} else {
-				W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_old;
+				W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_old;
 			}
 
 
 		} else
-			W.SellItemDialog.OnConfirmationAccept = W.SellItemDialog.OnConfirmationAccept_old;
+			W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_old;
 		$('#market_sell_dialog_ok').on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
 		//W.$('market_sell_dialog_ok').observe( 'click', W.SellItemDialog.OnConfirmationAccept.bindAsEventListener(W.SellItemDialog) );
 

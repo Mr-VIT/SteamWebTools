@@ -159,7 +159,13 @@ createForm([
 				type:'checkbox',
 				title:t('set.marketMainPageFuncs'),
 				name:'marketMainPageFuncs',
-			}
+			},
+			{
+				type:'number',
+				title:t('set.sellLowPriceCheck'),
+				name:'invSellItemPriceCheckMaxDiscount',
+				min:0, max:99, step:1
+			},
 		],
 	},
 ]);

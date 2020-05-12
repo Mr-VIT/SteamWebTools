@@ -16,6 +16,8 @@ var settings = {
 		storeShowBtnGetPrices : true,
 		
 		marketMainPageFuncs: true,
+
+		invSellItemPriceCheckMaxDiscount: 25
 	},
 	cur : {},
 	storage : {
