@@ -10,3 +10,4 @@
 // @include		https://store.steampowered.com/*
 // @include		http://steamcommunity.com/*
 // @include		https://steamcommunity.com/*
+// @exclude		https://steamcommunity.com/dev*
