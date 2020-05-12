@@ -191,7 +191,8 @@ function init() {
 					type: 'POST',
 					data: {subid:subid, action:'add_to_cart', sessionid:W.g_sessionID}
 				}).done(function(data){
-					el.find('#swtcartdone').css('background-image','none').text('✔ '+t('added')).attr('href','/cart/');
+					var text = (data.indexOf('id="error_box"')==-1)? '✔ '+t('added') : '❌ Some Error'; //TODO add 'err' to lang text
+					el.find('#swtcartdone').css('background-image','none').text(text).attr('href','/cart/');
 				});
 			} else {
 				return addToCart_old.apply(this, arguments);
