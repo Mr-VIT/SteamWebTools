@@ -69,6 +69,9 @@ createForm.create_select = function(data){
 createForm.create_textLong = function(data){
 	return '<div>'+data.title+'</div><div class="formRowFields"><div class="gray_bevel for_text_input fullwidth"><input type="text" name="'+data.name+'" id="'+data.name+'" value="'+data.value+'"></div></div>';
 }
+createForm.create_number = function(data){
+	return '<label for="'+data.name+'">'+data.title+'</label> <input type="number" value="'+data.value+'" min="'+data.min+'" max="'+data.max+'" step="'+data.step+'" name="'+data.name+'" id="'+data.name+'">';
+}
 
 createForm([
 	{
@@ -171,11 +174,14 @@ $('#swt_btnDef').click(function(){
 });
 
 $("form#editForm").submit(function(event) {
-	var i, f, el;
+	var i, f, el, type;
 	for(i=0;i<createForm.fields.length;i++){
 		f=createForm.fields[i];
 		el=$('#'+f);
-		settings.cur[f] = (el.prop('type')=='checkbox') ? el.prop('checked') : el.val();
+		type = el.prop('type');
+		settings.cur[f] = (type=='checkbox') ? el.prop('checked')
+						 :(type=='number') ? el.get(0).valueAsNumber
+						 :el.val();
 	}
 	settings.save();
 
