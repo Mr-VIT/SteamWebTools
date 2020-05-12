@@ -37,6 +37,7 @@ module.exports = function(grunt) {
 		
 
 		concat: {
+			options: {separator:'\n'},
 			build: {
 				files: {
 					'_tmp/meta.js': ['src/meta.js', 'src/meta.version.js'],
