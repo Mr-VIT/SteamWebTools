@@ -23,6 +23,8 @@ if($('.badge_craft_button').length){
 		if(!badgesCount) {
 			return;
 		}
+		sessionStorage.swt_craftAllAvailable=true;
+
 		W.swt_badgesCount=badgesCount;
 
 		$elb.find('a.badge_row_overlay').each(function(i,el){

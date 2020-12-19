@@ -14,55 +14,28 @@ $bar.append('<a class="btn_grey_grey btn_small_thin" href="http://www.steamcarde
 // == Feature == craft all lvls
 if($('.badge_craft_button').length){
 	W.craftAllAvailable=function(){
-		var totalCrafts = $('.badge_card_set_text_qty').text().match(/\d+/g).min(),
-			curCraft = 0,
-			done = 0,
-			droppedItems = [];
 		W.FinishCraft_old = W.FinishCraft;
+
 		W.FinishCraft = function(){
-			if(done){ // onece only call orig. FinishCraft
-				if(done==1){  // Preventing re-adding items after the end of the last animation
-					if ( g_rgBadgeCraftData && g_bBadgeCraftAnimationReady ){
-						done++;
-					}
-					W.FinishCraft_old();
-				}
+			if(!W.g_rgBadgeCraftData)
 				return;
+			W.FinishCraft = W.FinishCraft_old;
+
+			if(sessionStorage.swt_craftAllAvailable){
+				W.parent.swt_craftBadgeDone();
 			}
-
-			if (!W.g_rgBadgeCraftData)
-				return;
-
-			curCraft++;
-
-			droppedItems=droppedItems.concat(W.g_rgBadgeCraftData.rgDroppedItems); //save all items
-
-			if(curCraft>=totalCrafts){
-				done = 1;
-				if(multiCraft){
-					W.parent.swt_craftBadgeDone();
-					//return;
-				}
-				W.g_rgBadgeCraftData.rgDroppedItems = droppedItems; //restore items
-				W.FinishCraft(); // done
-			} else {
-				$('.badge_craft_button').click(); //craft one more
-			}
+			W.FinishCraft_old();
 		};
 
-		$('.badge_craft_button').click(); // start
+		$('.badge_craft_button').last().click(); // start
 
 		return false;
 	};
 
 	// multi badges craft
-	var multiCraft = false;
-	if(W.location.hash=="#swt_craft"){
-		multiCraft = true;
+	if(W.location.hash=="#swt_craft" && sessionStorage.swt_craftAllAvailable){
 		W.craftAllAvailable();
 	}
-
-	$bar.prepend('<div style="float:right;margin-left:5px" class="btn_grey_black btn_small_thin" onclick="craftAllAvailable()"><span>'+t('craftAllAvailable')+'</span></div>');
 }
 
 // == Feature == link to foreign steamcards page
