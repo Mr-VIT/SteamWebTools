@@ -39,6 +39,7 @@
 'viewin' : 'View in',
 'searchin' : 'Search in',
 'viewMyCardsGame' : 'View my cards/badge this game',
+'badgeAnotherVersion' : 'Another Version',
 'SearchCardsOnMarket' : 'Search cards on Market',
 'adding' : 'adding',
 'added' : 'Added | View in cart',

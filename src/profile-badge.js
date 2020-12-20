@@ -2,14 +2,23 @@ var $= W.$J;
 
 var app = W.location.pathname.match(/\/gamecards\/(\d+)/)[1];
 
+
+// == Feature == link to another version of badge
+$('div.badge_title:first').append('<a class="btn_grey_grey btn_small_thin" href="'+(
+		W.location.search.indexOf('border=1')>-1
+		? W.location.origin+W.location.pathname
+		: W.location.href+'?&border=1'
+	)+'"><span><img src="https://community.cloudflare.steamstatic.com/public/images/skin_1/icon_tradeoffer.png"> '+t('badgeAnotherVersion')+'</span></a>');
+
+
 // == Feature == link to steamcardexchange.net
 var $bar = $('.gamecards_inventorylink:first');
 if(!$bar.length){ // foreign profile
 	$bar=$('<div class="gamecards_inventorylink"></div>').prependTo( $('.badge_detail_tasks:first') )
-	.append('<a class="btn_grey_grey btn_medium" href="/my/gamecards/'+app+'"><span>'+t('viewMyCardsGame')+'</span></a> ');
+	.append('<a class="btn_grey_grey btn_medium" href="/my/gamecards/'+app+W.location.search+'"><span>'+t('viewMyCardsGame')+'</span></a> ');
 }
 $bar.append('<a class="btn_grey_grey btn_small_thin" href="https://steamcommunity.com/market/search?appid=753&category_753_item_class%5B%5D=tag_item_class_5&category_753_Game%5B%5D=tag_app_'+app+'"><span>Booster Pack</span></a> ');
-$bar.append('<a class="btn_grey_grey btn_small_thin" href="http://www.steamcardexchange.net/index.php?inventorygame-appid-'+app+'"><span>www.SteamCardExchange.net</span></a> ');
+$bar.append('<a class="btn_grey_grey btn_small_thin" href="http://www.steamcardexchange.net/index.php?inventorygame-appid-'+app+'"><span>SteamCardExchange.net</span></a> ');
 
 // == Feature == craft all lvls
 if($('.badge_craft_button').length){
@@ -42,6 +51,6 @@ if($('.badge_craft_button').length){
 $(".badge_friendwithgamecard_actions").each(function(i, el){
 	var $el=$(el);
 	$el.append('<a class="btn_grey_grey btn_medium" title="Steam Cards" href="'
-		+$el.prev('a.persona').attr('href')+'/gamecards/'+app
+		+$el.prev('a.persona').attr('href')+'/gamecards/'+app+W.location.search
 		+'"><img style="height:16px;transform:scale(1.5)" src="//steamstore-a.akamaihd.net/public/images/ico/ico_cards.png"></a>');
 });
