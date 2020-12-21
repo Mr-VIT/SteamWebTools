@@ -193,6 +193,7 @@ function inventoryPageInit(){
 			$.ajax( {
 				url: '//steamcommunity.com/market/priceoverview/',
 				type: 'GET',
+				cache: true,
 				data: {
 					country: W.g_strCountryCode,
 					currency: typeof(W.g_rgWalletInfo) != 'undefined' ? W.g_rgWalletInfo['wallet_currency'] : 1,
@@ -495,6 +496,7 @@ function inventoryPageInit(){
 		$.ajax( {
 			url: '//steamcommunity.com/market/priceoverview/',
 			type: 'GET',
+			cache: true,
 			data: {
 				country: W.g_strCountryCode,
 				currency: typeof(W.g_rgWalletInfo) != 'undefined' ? W.g_rgWalletInfo['wallet_currency'] : 1,
@@ -519,17 +521,17 @@ function inventoryPageInit(){
 			function myConfirm(){
 				var confText=t('sellLowPriceCheck.warnTitle')+t('sellLowPriceCheck.warning')+'\nyour price: '+W.$('market_sell_buyercurrency_input').value+' ('+W.$('market_sell_currency_input').value+') \ncurrent price: '+data.lowest_price+' \nyour lower at '+Math.round(curDiscount)+'% = '+ (curPriceInt-typedPriceInt)/100;
 
-				if(	curDiscount> 5 + settings.cur.invSellItemPriceCheckMaxDiscount ) {
+				if(	curDiscount> 5 + settings.cur.invSellItemPriceCheckMaxDiscount ) { // require confirmation by typing if entered price is too low
 					var confirmedPrice = prompt(confText+'\n'+t('sellLowPriceCheck.warning2')+': '+W.$('market_sell_buyercurrency_input').value);
 					if(GetPriceValueAsInt(confirmedPrice)==typedPriceInt) return true;
 					alert(t('sellLowPriceCheck.warnTitle')+'❌');
 					return false;
-				} else {
+				} else {  // require simple confirmation if entered price is slightly low
 					return confirm(confText);
 				}
 			}
 
-			if(    (curPriceInt-typedPriceInt)<=2 // ignore -2 cent diff 
+			if(    (curPriceInt-typedPriceInt)<=2 // ignore -2 cent diff
 				|| (curDiscount<settings.cur.invSellItemPriceCheckMaxDiscount)
 				|| myConfirm()
 			) {
@@ -539,7 +541,6 @@ function inventoryPageInit(){
 			if(confirm(t('sellLowPriceCheck.warnTitle')+t('sellLowPriceCheck.loadErr'))) W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
 		} );
 	}
-	
 
 
 	var SellCurrentSelection_old = W.SellCurrentSelection;
