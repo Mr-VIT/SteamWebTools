@@ -45,6 +45,14 @@ var scripts = [
 	},
 	{
 		match:[
+			rURL_STORE+'steamaccount/addfunds.*',
+		],
+		run:function(){
+			//!include steam-store-addfunds.js
+		}
+	},
+	{
+		match:[
 			rURL_STORE+'.*',
 		],
 		run:function(){
