@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name 	Steam Web Tools
 // @namespace	http://v1t.su/projects/steam/webtools/
-// @version		0.9
-// @date		2020-05-13
-// @downloadURL	https://raw.githubusercontent.com/Mr-VIT/SteamWebTools/master/release/steamwebtools.tm.user.js
+// @version		0.10
+// @date		2020-12-21
+// @downloadURL https://github.com/Mr-VIT/SteamWebTools/releases/latest/download/steamwebtools.tm.user.js
 // ==/UserScript==

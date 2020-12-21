@@ -3,3 +3,4 @@ package-lock.json
 npm-debug.log
 _tmp/
 src/meta.version.js
+release/
