@@ -31,7 +31,7 @@ function checkboxifyMyListings(){
 
 function addButtonsMyListings(){
 	W.$J('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_table_header>.market_listing_edit_buttons').html('<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('checkAll')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('deleteChecked')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>');
-	
+
 	// set function
 	W.$J('#btnCheckAllListings').click(function(){
 		W.$J('.lfremove').attr('checked',!W.$J('.lfremove:first')[0].checked)
@@ -65,7 +65,7 @@ function addButtonsMyListings(){
 
 		return false;
 	});
-	
+
 	checkboxifyMyListings();
 };
 
@@ -85,7 +85,7 @@ function mainPage(){
 	W.$J('.market_content_block.my_listing_section.market_home_listing_table:nth-child(2)').append('<div class="scrollbl tablebuy"></div>').click;
 	rows.prependTo("#tabContentsMyListings .scrollbl.tablebuy");
 	*/
-	
+
 	addButtonsMyListings();
 
 	/* //need fix
@@ -118,7 +118,7 @@ function itemPage(){
 	W.$J('#market_buynow_dialog_accept_ssa, #market_buyorder_dialog_accept_ssa').prop('checked',true);
 
 	addGotoBtn();
-	
+
 	addButtonsMyListings(); // for comodity items only
 
 	//numerate listings
@@ -131,6 +131,18 @@ function itemPage(){
 		return;
 	}
 
+
+	// == Feature == replace inventory modal by "multisell" on "Sell" button for commodity items
+	var ShowModalContent_old = W.ShowModalContent;
+	W.ShowModalContent = function(){
+		var item = W.$('largeiteminfo').builtFor;
+		if(item.commodity){
+			arguments[0] = 'https://steamcommunity.com/market/multisell?appid='+item.appid+'&contextid='+item.contextid+'&qty[]=1&items[]='+item.market_hash_name;
+		}
+		return ShowModalContent_old.apply(this, arguments);
+	}
+
+
 	// == Feature == links for cards & booster packs
 	// check 753_6 context
 	assets= assets[753] && (assets[753][6] || assets[753][0]); // sometimes wrong (0) context
@@ -140,22 +152,24 @@ function itemPage(){
 	// check for card/bpack
 	var tmp = itemdata.owner_actions && itemdata.owner_actions[0] && itemdata.owner_actions[0].link;
 	if(!tmp) return;
+
+	var marketSearchUrl = '//steamcommunity.com/market/search?appid=753&category_753_Game%5B%5D=tag_app_'+itemdata.market_fee_app+'&category_753_item_class%5B%5D=tag_item_class_';
 	//check for card
 	if(tmp.match(/\/my\/gamecards\/\d+/)){
 		var btn= {name:'Booster Pack',
-				  link:'//steamcommunity.com/market/search?appid=753&category_753_item_class%5B%5D=tag_item_class_5&category_753_Game%5B%5D=tag_app_'+itemdata.market_fee_app }
-	} else 
+				  link:marketSearchUrl+'5' }
+	} else
 	//check for bpack
 	if(tmp.indexOf("javascript:OpenBooster")>-1){
 		var btn= {name:t('SearchCardsOnMarket'),
-				  link:'//steamcommunity.com/market/search?category_753_item_class%5B%5D=tag_item_class_2&appid=753&category_753_Game%5B%5D=tag_app_'+itemdata.market_fee_app };
+				  link:marketSearchUrl+'2' };
 	} else return;
 
 	//add btns
-	
+
 	var place = W.$J('<div class="item_actions" id="largeiteminfo_item_actions"></div>').insertAfter( W.$J('#largeiteminfo_game_info') );
 	var links = [btn,
-		{name: t('viewMyCardsGame'), 
+		{name: t('viewMyCardsGame'),
 		 link: '//steamcommunity.com/my/gamecards/'+itemdata.market_fee_app}
 	]
 	for (var i=links.length; i>0; --i, place.append('<a class="btn_small btn_grey_white_innerfade" href="'+links[i].link+'"><span>'+links[i].name+'</span></a>'));
