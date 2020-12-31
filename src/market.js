@@ -46,19 +46,24 @@ function addButtonsMyListings(){
 		});
 
 		function run(i){
-			if(i<data.length)
-				new W.Ajax.Request('//steamcommunity.com/market/removelisting/'+W.$J(data[i]).data('listingid'), {
-					method: 'post',
-					parameters: {
-						sessionid: W.g_sessionID,
-					},
-					onComplete: function() {
-						run(++i);
-					},
-					onSuccess: function() {
-						data[i].parentElement.parentElement.parentElement.parentElement.remove();
-					}
-				});
+			if(i>=data.length) return;
+			var $statusIcon=W.$J('<img src="//community.cloudflare.steamstatic.com/public/images/login/throbber.gif" style="width: 25px; opacity: 1;">');
+			var $el = W.$J(data[i]).after($statusIcon);
+			new W.Ajax.Request('//steamcommunity.com/market/removelisting/'+$el.data('listingid'), {
+				method: 'post',
+				parameters: {
+					sessionid: W.g_sessionID,
+				},
+				onComplete: function() {
+					run(++i);
+				},
+				onFailure: function() {
+					$statusIcon.prop('src', '//community.cloudflare.steamstatic.com/public/images/economy/market/icon_alertlistings.png');
+				},
+				onSuccess: function() {
+					data[i].parentElement.parentElement.parentElement.parentElement.remove();
+				}
+			});
 		}
 		if(data.length)
 			run(0);
