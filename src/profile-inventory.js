@@ -457,7 +457,7 @@ function inventoryPageInit(){
 	$('#swt_setpricebtn').click(function(e){
 		e.preventDefault();
 		var item = W.SellItemDialog.m_item;
-		var strMarketName = GetMarketHashName( item.description );
+		var strMarketName = W.GetMarketHashName( item.description );
 		new W.Ajax.Request( '//steamcommunity.com/market/priceoverview/', {
 			method: 'get',
 			parameters: {
@@ -492,7 +492,7 @@ function inventoryPageInit(){
 			return W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
 		}
 		var item = W.SellItemDialog.m_item;
-		var strMarketName = GetMarketHashName( item.description );
+		var strMarketName = W.GetMarketHashName( item.description );
 		$.ajax( {
 			url: '//steamcommunity.com/market/priceoverview/',
 			type: 'GET',
@@ -536,9 +536,15 @@ function inventoryPageInit(){
 				|| myConfirm()
 			) {
 				W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
+			} else {
+				W.SellItemDialog.OnFailure.call(W.SellItemDialog, event);
 			}
 		} ).fail(function() {
-			if(confirm(t('sellLowPriceCheck.warnTitle')+t('sellLowPriceCheck.loadErr'))) W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
+			if(confirm(t('sellLowPriceCheck.warnTitle')+t('sellLowPriceCheck.loadErr'))) {
+				W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
+			} else {
+				W.SellItemDialog.OnFailure.call(W.SellItemDialog, event);
+			}
 		} );
 	}
 
@@ -548,32 +554,27 @@ function inventoryPageInit(){
 		sellWarningBlock.el.text(sellWarningBlock.orgnText);
 		var res = SellCurrentSelection_old.apply(this, arguments);
 		var count = W.g_ActiveInventory.selectedItem._amount;
+		var amount;
 
 		// unbind Sell btn
-		W.$('market_sell_dialog_ok').stopObserving();
-		$('#market_sell_dialog_ok').unbind();
+		$( W.$('market_sell_dialog_ok').stopObserving() // Prototype
+		).unbind(); // jQuery
 
-		if(count>1) {
-			var amount =  parseInt(prompt(t('howmany')+count, count)) || 1;
-			amount = Math.min(amount, count);
+		if(count>1 && ( amount = Math.min( parseInt(prompt(t('howmany')+count, count)) || 1, count ) ) >1 ) {
 
-			if(amount>1){
 				W.SellItemDialog._amount=amount;
 				W.SellItemDialog._itemNum=0;
 				W.SellItemDialog._itemsFailNum=0;
 				W.SellItemDialog.OnConfirmationAccept_new = function(event){
 
-
 					W.$('market_sell_dialog_error').hide();
 					W.$('market_sell_dialog_ok').fade({duration:0.25});
 					W.$('market_sell_dialog_back').fade({duration:0.25});
-					W.$('market_sell_dialog_throbber').show();
-					W.$('market_sell_dialog_throbber').fade({duration:0.25,from:0,to:1});
+					W.$('market_sell_dialog_throbber').show().fade({duration:0.25,from:0,to:1});
 
 					var item;
 					do {
-						item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum];
-						W.SellItemDialog._itemNum++;
+					item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum++];
 					} while(!item.description.marketable);
 					W.SellItemDialog.m_item.assetid=item.assetid;
 
@@ -591,12 +592,13 @@ function inventoryPageInit(){
 						crossDomain: true,
 						xhrFields: { withCredentials: true }
 					} ).done( function ( data ) {
+						if(!data.success) ++W.SellItemDialog._itemsFailNum;
 						sellWarningBlock.el.text(
 							t('listed')+ W.SellItemDialog._itemNum +' / '+amount+
 							(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : '')
 						);
 						if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
-							W.SellItemDialog.OnSuccess.apply(W.SellItemDialog, [{ responseJSON: data }])
+							W.SellItemDialog.OnSuccess.call(W.SellItemDialog, { responseJSON: data })
 						else {
 							return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
 						}
@@ -613,10 +615,6 @@ function inventoryPageInit(){
 
 				}
 				W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_new;
-			} else {
-				W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_old;
-			}
-
 
 		} else
 			W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_old;
