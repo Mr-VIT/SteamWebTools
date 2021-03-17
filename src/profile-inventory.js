@@ -487,6 +487,12 @@ function inventoryPageInit(){
 	W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept;
 	// Very low price check
 	W.SellItemDialog.OnConfirmationAccept = function(event){
+		var typedPriceInt = W.SellItemDialog.GetBuyerPriceAsInt();
+		if(!typedPriceInt) {
+			W.SellItemDialog.OnFailure(event);
+			return;
+		}
+
 		// TODO check while input price
 		if(!settings.cur.invSellItemPriceCheckMaxDiscount){
 			return W.SellItemDialog._swt_OnConfirmationAccept_next.call(W.SellItemDialog, event);
@@ -515,7 +521,6 @@ function inventoryPageInit(){
 				return;
 			}
 
-			var typedPriceInt = W.SellItemDialog.GetBuyerPriceAsInt();
 			var curDiscount = 100*(1-(typedPriceInt/curPriceInt));
 
 			function myConfirm(){
@@ -548,6 +553,12 @@ function inventoryPageInit(){
 		} );
 	}
 
+	// rebind Confirm Sell btn
+	/* func replaced before steam script bind
+	$( W.$('market_sell_dialog_ok').stopObserving() // Prototype
+	).unbind() // jQuery
+	.on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
+	*/
 
 	var SellCurrentSelection_old = W.SellCurrentSelection;
 	W.SellCurrentSelection = function(){
@@ -556,76 +567,67 @@ function inventoryPageInit(){
 		var count = W.g_ActiveInventory.selectedItem._amount;
 		var amount;
 
-		// unbind Sell btn
-		$( W.$('market_sell_dialog_ok').stopObserving() // Prototype
-		).unbind(); // jQuery
-
 		if(count>1 && ( amount = Math.min( parseInt(prompt(t('howmany')+count, count)) || 1, count ) ) >1 ) {
 
-				W.SellItemDialog._amount=amount;
-				W.SellItemDialog._itemNum=0;
-				W.SellItemDialog._itemsFailNum=0;
-				W.SellItemDialog.OnConfirmationAccept_new = function(event){
+			W.SellItemDialog._amount=amount;
+			W.SellItemDialog._itemNum=0;
+			W.SellItemDialog._itemsFailNum=0;
+			W.SellItemDialog.OnConfirmationAccept_new = function(event){
+				W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_old; // for compatibility with other extensions
+				W.$('market_sell_dialog_error').hide();
+				W.$('market_sell_dialog_ok').fade({duration:0.25});
+				W.$('market_sell_dialog_back').fade({duration:0.25});
+				W.$('market_sell_dialog_throbber').show().fade({duration:0.25,from:0,to:1});
 
-					W.$('market_sell_dialog_error').hide();
-					W.$('market_sell_dialog_ok').fade({duration:0.25});
-					W.$('market_sell_dialog_back').fade({duration:0.25});
-					W.$('market_sell_dialog_throbber').show().fade({duration:0.25,from:0,to:1});
+				var item;
+				do {
+				item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum++];
+				} while(!item.description.marketable);
+				W.SellItemDialog.m_item.assetid=item.assetid;
 
-					var item;
-					do {
-					item = W.SellItemDialog.m_item._subItems[W.SellItemDialog._itemNum++];
-					} while(!item.description.marketable);
-					W.SellItemDialog.m_item.assetid=item.assetid;
+				$.ajax( {
+					url: 'https://steamcommunity.com/market/sellitem/',
+					type: 'POST',
+					data: {
+						sessionid: W.g_sessionID,
+						appid: W.SellItemDialog.m_item.appid,
+						contextid: W.SellItemDialog.m_item.contextid,
+						assetid: W.SellItemDialog.m_item.assetid,
+						amount: W.SellItemDialog.m_nConfirmedQuantity,
+						price: W.SellItemDialog.m_nConfirmedPrice
+					},
+					crossDomain: true,
+					xhrFields: { withCredentials: true }
+				} ).done( function ( data ) {
+					if(!data.success) ++W.SellItemDialog._itemsFailNum;
+					sellWarningBlock.el.text(
+						t('listed')+ W.SellItemDialog._itemNum +' / '+amount+
+						(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : '')
+					);
+					if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
+						W.SellItemDialog.OnSuccess.call(W.SellItemDialog, { responseJSON: data })
+					else {
+						return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
+					}
+				} ).fail( function( jqxhr ) {
+					// jquery doesn't parse json on fail
+					var data = $.parseJSON( jqxhr.responseText );
+					W.SellItemDialog._itemsFailNum++;
+					if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
+						W.SellItemDialog.OnFailure( { responseJSON: data } );
+					else {
+						return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
+					}
+				} );
 
-					$.ajax( {
-						url: 'https://steamcommunity.com/market/sellitem/',
-						type: 'POST',
-						data: {
-							sessionid: W.g_sessionID,
-							appid: W.SellItemDialog.m_item.appid,
-							contextid: W.SellItemDialog.m_item.contextid,
-							assetid: W.SellItemDialog.m_item.assetid,
-							amount: W.SellItemDialog.m_nConfirmedQuantity,
-							price: W.SellItemDialog.m_nConfirmedPrice
-						},
-						crossDomain: true,
-						xhrFields: { withCredentials: true }
-					} ).done( function ( data ) {
-						if(!data.success) ++W.SellItemDialog._itemsFailNum;
-						sellWarningBlock.el.text(
-							t('listed')+ W.SellItemDialog._itemNum +' / '+amount+
-							(W.SellItemDialog._itemsFailNum ? ' | '+t('skipped')+W.SellItemDialog._itemsFailNum : '')
-						);
-						if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
-							W.SellItemDialog.OnSuccess.call(W.SellItemDialog, { responseJSON: data })
-						else {
-							return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
-						}
-					} ).fail( function( jqxhr ) {
-						// jquery doesn't parse json on fail
-						var data = $.parseJSON( jqxhr.responseText );
-						W.SellItemDialog._itemsFailNum++;
-						if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
-							W.SellItemDialog.OnFailure( { responseJSON: data } );
-						else {
-							return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
-						}
-					} );
-
-				}
-				W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_new;
+			}
+			W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_new;
 
 		} else
 			W.SellItemDialog._swt_OnConfirmationAccept_next = W.SellItemDialog.OnConfirmationAccept_old;
-		$('#market_sell_dialog_ok').on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
-		//W.$('market_sell_dialog_ok').observe( 'click', W.SellItemDialog.OnConfirmationAccept.bindAsEventListener(W.SellItemDialog) );
 
 		return res;
 	}
-
-
-
 }
 
 
