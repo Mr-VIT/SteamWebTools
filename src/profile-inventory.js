@@ -611,12 +611,15 @@ function inventoryPageInit(){
 					}
 				} ).fail( function( jqxhr ) {
 					// jquery doesn't parse json on fail
-					var data = $.parseJSON( jqxhr.responseText );
-					W.SellItemDialog._itemsFailNum++;
-					if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
-						W.SellItemDialog.OnFailure( { responseJSON: data } );
-					else {
-						return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
+					try { // no JSON on 500 erros
+						var data = { responseJSON: JSON.parse( jqxhr.responseText ) };
+					} finally {
+						W.SellItemDialog._itemsFailNum++;
+						if(W.SellItemDialog._itemNum>=W.SellItemDialog._amount)
+							W.SellItemDialog.OnFailure( data || {} );
+						else {
+							return W.SellItemDialog.OnConfirmationAccept_new.apply(W.SellItemDialog, arguments);
+						}
 					}
 				} );
 
