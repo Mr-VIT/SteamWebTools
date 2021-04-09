@@ -34,3 +34,10 @@ if($('.badge_craft_button').length){
 	};
 	$('.badge_details_set_favorite').append('<div class="btn_grey_black btn_small_thin" onclick="swt_craftAllAvailableBadges()"><span>'+t('craftAllAvailable')+'</span></div> ');
 }
+function genLinks(){
+	return [
+		['<b>One from the SWT creator</b>', 'https://steampub.ru/cards'],
+		['Steamlvlup.com', 'https://steamlvlup.com/r/wvixup']
+	].map(item => '<a class="popup_menu_item" href="'+item[1]+'" target="_blank">'+item[0]+'</a>').join('');
+}
+$('div.profile_xp_block').append('<span class="pulldown global_action_link persona_name_text_content" onclick="ShowMenu(this,\'dropdownlevelupmenu\',\'right\',\'bottom\',true );">⬆ Level Up services</span><div class="popup_block_new" id="dropdownlevelupmenu" style="display:none;"><div class="popup_body popup_menu">'+genLinks()+'</div></div>');
