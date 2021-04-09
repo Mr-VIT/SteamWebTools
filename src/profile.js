@@ -121,21 +121,11 @@ function profilePageInit(){
 			icon: '//backpack.tf/favicon_440.ico',
 			text: t('inventory')+' Backpack.tf',
 		},
-		{
-			href: 'http://tf2b.com/tf2/'+steamid,
-			icon: '//tf2b.com/favicon.ico',
-			text: t('inventory')+' TF2B.com',
-		},
 		{hr:true},
 		{
-			href: 'http://dota2lounge.com/profile?id='+steamid,
-			icon: '//dota2lounge.com/favicon.ico',
-			text: t('trades')+' Dota2Lounge.com',
-		},
-		{
-			href: 'http://csgolounge.com/profile?id='+steamid,
+			href: 'http://old.csgolounge.com/profile/'+steamid,
 			icon: '//csgolounge.com/favicon.ico',
-			text: t('trades')+' CSGOLounge.com',
+			text: t('trades')+' old.CSGOLounge.com',
 		},
 		{
 			href: 'http://steam.tools/itemvalue/#/'+steamid+'-730',
@@ -216,26 +206,19 @@ function profilePageInit(){
 	// inventory links
 	var el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="//steamstore-a.akamaihd.net/public/images/icon_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="//steamstore-a.akamaihd.net/public/images/v6/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="//steamcdn-a.akamaihd.net/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="//www.dota2.com/images/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img width="16" height="16" src="//steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/730/69f7ebe2735c366c65c0b33dae00e12dc40edbe4.jpg"/></a></span>');
+		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="//store.cloudflare.steamstatic.com/public/images/icon_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="//store.cloudflare.steamstatic.com/public/images/v6/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="//steamcdn-a.akamaihd.net/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="https://www.dota2.com/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img width="16" height="16" src="//cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/730/69f7ebe2735c366c65c0b33dae00e12dc40edbe4.jpg"/></a></span>');
 
 
-	var out = '', link;
-	for (var i=0; i < profilesLinks.length; i++){
-		link = profilesLinks[i];
-
-		if (link.hr) {
-			out +='<hr/>';
-		} else {
-			out += '<a class="popup_menu_item" href="'+link.href+'"><img style="width:18px;height:18px" src="'+link.icon+'"> '+link.text+'</a>';
-		}
-
-	}
+	// profiles link in "More"
+	var out = profilesLinks.map(link => link.hr ? '<hr/>'
+		: '<a class="popup_menu_item" target="_blank" href="'+link.href+'"><img style="width:18px;height:18px" src="'+link.icon+'"> '+link.text+'</a>'
+	).join('');
 	try {
 		document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("afterBegin", out);
 	} catch(err) {
 		// "More" button for self profile
 		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>'+t('more')
-		+' <img src="//steamcommunity-a.akamaihd.net/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
+		+' <img src="//community.cloudflare.steamstatic.com/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
 	}
 
 }
