@@ -34,13 +34,14 @@ function addButtonsMyListings(){
 
 	// set function
 	W.$J('#btnCheckAllListings').click(function(){
-		W.$J('.lfremove').attr('checked',!W.$J('.lfremove:first')[0].checked)
+		var chboxes = W.$J('div.market_listing_cancel_button input.lfremove');
+		chboxes.prop('checked',!chboxes[0].checked);
 		return false;
 	});
 	W.$J('#btnRemoveListings').click(function(){
 		var data = [];
 
-		W.$J('.lfremove').each(function(i, el){
+		W.$J('div.market_listing_cancel_button input.lfremove').each(function(i, el){
 			if(el.checked)
 				data.push(el);
 		});
