@@ -1,0 +1,25 @@
+name: Tag to Pre-release
+
+on:
+  push:
+    tags: ['v*']
+    branches: [master]
+
+jobs:
+  create_prerelease:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 20
+      - name: Create Release
+        id: create_release
+        uses: nickatnight/releases-action@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
