@@ -8,15 +8,7 @@ t.loadText = function(text){
 		W.$J.extend(this.text, text);
 	}
 }
-t.loadText({  //default text
-//!include lang/en.js
-});
-t.loadText({
-//!include lang/ru.js
-});
-t.loadText({
-//!include lang/zh-cn.js
-});
-t.loadText({
-//!include lang/jp.js
-});
+
+t.loadText(JSON.parse( GM_getResourceText('texts:'+settings.locales[0]) ));
+if(settings.cur.globalLang != settings.locales[0])
+	t.loadText(JSON.parse( GM_getResourceText('texts:'+settings.cur.globalLang) ));
