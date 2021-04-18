@@ -158,7 +158,7 @@ function profilePageInit(){
 		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="//steamcommunity-a.akamaihd.net/public/images/login/throbber.gif"></div>'));
 		W.setTimeout(function(){Modal.AdjustSizing()},1);
 		$.ajax({
-			url: W.location.href+'?xml=1',
+			url: W.location.origin+W.location.pathname+'?xml=1',
 			context: document.body,
 			dataType: 'xml'
 		}).done(function(responseText, textStatus, xhr) {
