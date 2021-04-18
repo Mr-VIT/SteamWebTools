@@ -8,6 +8,8 @@ var W = window.unsafeWindow || window;
 
 var rURL_STORE = 'https?://store\\.steampowered\\.com/';
 var rURL_COMMUNITY = 'https?://steamcommunity\\.com/';
+var rURL_COMMUNITY_PROFILE = rURL_COMMUNITY+'(?:id/[^/]+|profiles/(?:\\d+|\\[U:1:\\d+\\]))/';
+
 var scripts = [
 	{
 		match:[
@@ -61,8 +63,7 @@ var scripts = [
 	},
 	{
 		match:[
-			rURL_COMMUNITY+'id/[^/]+/?',
-			rURL_COMMUNITY+'profiles/\\d+/?',
+			rURL_COMMUNITY_PROFILE+'?',
 		],
 		run:function(){
 			//!include profile.js
@@ -70,8 +71,7 @@ var scripts = [
 	},
 	{
 		match:[
-			rURL_COMMUNITY+'id/.+?/inventory.*',
-			rURL_COMMUNITY+'profiles/\\d+/inventory.*',
+			rURL_COMMUNITY_PROFILE+'inventory.*',
 		],
 		run:function(){
 			//!include profile-inventory.js
@@ -79,8 +79,7 @@ var scripts = [
 	},
 	{
 		match:[
-			rURL_COMMUNITY+'id/.+?/gamecards/\\d+.*',
-			rURL_COMMUNITY+'profiles/\\d+/gamecards/\\d+.*',
+			rURL_COMMUNITY_PROFILE+'gamecards/\\d+.*',
 		],
 		run:function(){
 			//!include profile-badge.js
@@ -88,8 +87,7 @@ var scripts = [
 	},
 	{
 		match:[
-			rURL_COMMUNITY+'id/.+?/badges.*',
-			rURL_COMMUNITY+'profiles/\\d+/badges.*',
+			rURL_COMMUNITY_PROFILE+'badges.*',
 		],
 		run:function(){
 			//!include profile-badges.js
@@ -132,7 +130,7 @@ var scripts = [
 var url = document.URL;
 for(var i = 0; i<scripts.length; i++) {
 	for(var j = 0; j < scripts[i].match.length; j++) {
-		var expr = new RegExp('^'+scripts[i].match[j]+'$', 'i');
+		var expr = new RegExp('^'+scripts[i].match[j]+'(?:\\?.*)?$', 'i');
 		if(expr.test(url)) {
 			scripts[i].run();
 			break;
