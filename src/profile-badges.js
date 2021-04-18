@@ -37,7 +37,9 @@ if($('.badge_craft_button').length){
 function genLinks(){
 	return [
 		['<b>One from the SWT creator</b>', 'https://steampub.ru/cards'],
-		['Steamlvlup.com', 'https://steamlvlup.com/r/wvixup']
+		['SteamLvlUp.com', 'https://steamlvlup.com/r/wvixup'],
+		['SteamLevelU.com', 'https://steamlevelu.com/p/42362760'],
+		['ShLvlUp.com', 'http://shlvlup.com/p42362760'],
 	].map(item => '<a class="popup_menu_item" href="'+item[1]+'" target="_blank">'+item[0]+'</a>').join('');
 }
 $('div.profile_xp_block').append('<span class="pulldown global_action_link persona_name_text_content" onclick="ShowMenu(this,\'dropdownlevelupmenu\',\'right\',\'bottom\',true );">⬆ Level Up services</span><div class="popup_block_new" id="dropdownlevelupmenu" style="display:none;"><div class="popup_body popup_menu">'+genLinks()+'</div></div>');
