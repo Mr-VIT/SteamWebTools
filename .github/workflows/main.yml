@@ -13,7 +13,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 20
+          fetch-depth: 0
       - name: Create Release
         id: create_release
         uses: nickatnight/releases-action@v2
