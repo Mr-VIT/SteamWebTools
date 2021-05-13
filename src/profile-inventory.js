@@ -34,7 +34,7 @@ function inventoryPageInit(){
 
 	// styles
 	document.body.insertAdjacentHTML("afterBegin",
-		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#FFF;font-weight:700;position:absolute;right:0;top:0}.swt_icon{position:absolute;top:0;left:0}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}.swt_hidden{display:none}</style>'
+		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#a0dcff;font-weight:700;float:right}.swt_icon{float:left}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}</style>'
 	);
 
 	// multi gifts sending
@@ -284,20 +284,23 @@ function inventoryPageInit(){
 				if (W.g_ActiveInventory._hideDupCounters) {
 					$('.itemcount', W.g_ActiveInventory.m_$Inventory).show();
 				} else {
+					var firstItems;
+					if (W.g_ActiveInventory.m_rgChildInventories) {
+						firstItems = {};
+						for(var context in W.g_ActiveInventory.m_rgChildInventories){
+							Object.assign(firstItems, W.g_ActiveInventory.m_rgChildInventories[context]._firstItems);
+						}
+					} else {
+						firstItems = W.g_ActiveInventory._firstItems;
+					}
 					$('.itemcount', W.g_ActiveInventory.m_$Inventory).each(function(i, el){
 						var $el = $(el);
-						var firstItems;
-						if (W.g_ActiveInventory.m_rgChildInventories) {
-							firstItems = {};
-							for(var context in W.g_ActiveInventory.m_rgChildInventories){
-								$.extend(firstItems, W.g_ActiveInventory.m_rgChildInventories[context]._firstItems);
-							}
-						} else {
-							firstItems = W.g_ActiveInventory._firstItems;
-						}
-
-						$el .text('x'+firstItems[$el.data('classid')]._amount)
+						let amount = firstItems[$el.data('classid')]._amount;
+						$el .text('x'+amount)
 							.show();
+						if(amount==1){
+							$el.attr('style', 'font-weight:normal;color:#7e7e7e');
+						}
 					});
 					W.g_ActiveInventory._hideDupCounters = true;
 				};
@@ -344,7 +347,7 @@ function inventoryPageInit(){
 
 		if (asset.appid==730) { //CSGO
 			// Item color by Rarity
-			var icons='<div class="swt_icon">',
+			var icons='',
 				tags = asset.description.tags;
 			for (var i=0;i<tags.length;i++) {
 				switch (tags[i].category) {
@@ -368,7 +371,8 @@ function inventoryPageInit(){
 						break;
 				}
 			};
-			$el.append(icons+'</div>');
+			if(icons)
+				$el.find('a.inventory_item_link').append('<div class="swt_icon">'+icons+'</div>');
 
 
 		}
@@ -396,7 +400,7 @@ function inventoryPageInit(){
 
 			this._firstItems[asset.classid]=asset;
 
-			$el.append('<div class="itemcount" data-classid="'+asset.classid+'"></div>');
+			$el.find('a.inventory_item_link').append('<span class="itemcount" data-classid="'+asset.classid+'"></span>');
 			asset.description.tags.push({
 				category: "SWT",
 				internal_name: "swt_notdup",
