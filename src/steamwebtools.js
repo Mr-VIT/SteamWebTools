@@ -95,6 +95,14 @@ var scripts = [
 	},
 	{
 		match:[
+			rURL_COMMUNITY_PROFILE+'tradeoffers.*',
+		],
+		run:function(){
+			//!include profile-tradeoffers.js
+		}
+	},
+	{
+		match:[
 			rURL_COMMUNITY+'market.*'
 		],
 		run:function(){
