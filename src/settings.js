@@ -14,7 +14,7 @@ var settings = {
 		storeCartAjax : true,
 		storeShowSubid : true,
 		storeShowBtnGetPrices : true,
-		
+
 		marketMainPageFuncs: true,
 
 		invSellItemPriceCheckMaxDiscount: 25
@@ -43,12 +43,12 @@ var settings = {
 		},
 	},
 	load : function(){
-		this.cur = W.$J.extend({}, this.defaults);
+		this.cur = Object.assign({}, this.defaults);
 
 		var data = this.storage.get();
 		if(data) {
 			if(typeof data === 'string') data=JSON.parse(data)
-			W.$J.extend(this.cur, data);
+			Object.assign(this.cur, data);
 		} else {
 			// detect browser locale and set for extension
 			var locale = W.navigator.language.toLowerCase();
@@ -75,7 +75,7 @@ var settings = {
 			setTimeout(function(){
 				W.$J("#global_header .submenu_community .submenuitem.swt").css(style);
 			},2000);
-			
+
 		}
 	},
 	save : function(){
