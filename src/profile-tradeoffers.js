@@ -10,7 +10,8 @@ W.swt_checkcardswap = async function(){
 	var modalId = $trade.prop('id')+'_swt_modal';
 
 
-	$table = $('<div id="'+modalId+'"><img src="//steamcommunity-a.akamaihd.net/public/images/login/throbber.gif"></div>');
+	var $table = $('<div id="'+modalId+'"><div id="swt_loadstate"></div><img src="//steamcommunity-a.akamaihd.net/public/images/login/throbber.gif"></div>');
+	var $loadstate = $table.find('#swt_loadstate');
 	var Modal = W.ShowDialog('Check cards swap 1:1', $table);
 
 	var tagsToType = {
@@ -36,9 +37,15 @@ W.swt_checkcardswap = async function(){
 	var reItemSearch = /BuildHover\( '.*', (.*)\);/i;
 
 	// load data for all items in trade
-	for (let el of $trade.find('div.tradeoffer_items div.trade_item').get()){
+	let elements = $trade.find('div.tradeoffer_items div.trade_item').get();
+	for (let i=0, n=elements.length; i<n; ++i) {
+		let el = elements[i];
+
 		var key = el.dataset.economyItem;
 		if(itemsDescriptions[key]) continue;
+
+		$loadstate.text(i+' / '+n);
+
 		var data = await $J.ajax({
 			url: "//steamcommunity.com/" + getUrl(key),
 			cache: true,
