@@ -1,14 +1,6 @@
 var $ = W.$J;
 function init() {
 
-	if(settings.cur.globalHideWalletBalance){
-		var el = $('#header_wallet_balance')[0];
-		if(el){
-			el.title = el.innerHTML;
-			el.innerHTML = '['+t('balance')+']';
-		}
-	}
-
 	if(settings.cur.storeShowCartBtn){
 		$('#store_header_cart_btn').css('display','block');
 	}

@@ -24,3 +24,12 @@ if(settings.cur.globalFixNavbar){
 		W.document.onscroll = scroll;
 	}
 }
+
+// == Feature == Hide Wallet Balance
+if(settings.cur.globalHideWalletBalance){
+	var el = $J('#header_wallet_balance')[0];
+	if(el){
+		el.title = el.innerHTML;
+		el.innerHTML = '['+t('balance')+']';
+	}
+}
