@@ -4,6 +4,7 @@
 // @domain		store.steampowered.com
 // @grant		GM_xmlhttpRequest
 // @grant		GM_xhr
+// @grant		GM_openInTab
 // @grant		GM_getValue
 // @grant		GM_setValue
 // @grant		GM_deleteValue
