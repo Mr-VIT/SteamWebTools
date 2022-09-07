@@ -103,6 +103,14 @@ var scripts = [
 	},
 	{
 		match:[
+			rURL_COMMUNITY_PROFILE+'edit.*',
+		],
+		run:function(){
+			//!include profile-edit.js
+		}
+	},
+	{
+		match:[
 			rURL_COMMUNITY+'market.*'
 		],
 		run:function(){

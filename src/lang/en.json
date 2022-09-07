@@ -12,6 +12,8 @@
 "trades" : "Trades",
 "chat" : "Chat",
 "more" : "More",
+"prEd.showanim":"Show only animated",
+"prEd.hideFbdg":"Hide Favorite Badge from Profile",
 "showDropsCard" : "Show only with cards drops remaining",
 "craftAllAvailable" : "Craft all available",
 "craftAllAvailableConfirm" : "Are you sure you want to start crafting all available badges?",
