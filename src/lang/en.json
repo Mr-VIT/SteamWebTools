@@ -12,6 +12,7 @@
 "trades" : "Trades",
 "chat" : "Chat",
 "more" : "More",
+"prAddNick":"Add custom nick",
 "prEd.showanim":"Show only animated",
 "prEd.hideFbdg":"Hide Favorite Badge from Profile",
 "showDropsCard" : "Show only with cards drops remaining",

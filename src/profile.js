@@ -89,6 +89,16 @@ function profilePageInit(){
 	steamid = W.g_rgProfileData.steamid;
 
 	var profilesLinks = [
+		{hr:true},
+		{
+			href: 'javascript:ShowNicknameModal()',
+			icon: '//community.akamai.steamstatic.com/public/images/skin_1/notification_icon_edit_bright.png',
+			text: t('prAddNick'),
+			internal: true,
+			filter: ()=>{
+				return W.g_steamID && document.getElementById('btn_add_friend')
+			}
+		},
 		{
 			href: 'http://checkrep.ru/#steam:'+steamid,
 			icon: '//checkrep.ru/favicon.ico',
@@ -211,10 +221,12 @@ function profilePageInit(){
 
 	// profiles link in "More"
 	var out = profilesLinks.map(link => link.hr ? '<hr/>'
-		: '<a class="popup_menu_item" target="_blank" href="'+link.href+'"><img style="width:18px;height:18px" src="'+link.icon+'"> '+link.text+'</a>'
+		: (!link.filter || link.filter())
+		? `<a class="popup_menu_item" ${link.internal?'':'target="_blank"'} href="${link.href}"><img style="width:18px;height:18px" src="${link.icon}"> ${link.text}</a>`
+		: ''
 	).join('');
 	try {
-		document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("afterBegin", out);
+		document.querySelector('#profile_action_dropdown>.popup_body.popup_menu').insertAdjacentHTML("beforeEnd", out);
 	} catch(err) {
 		// "More" button for self profile
 		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>'+t('more')
