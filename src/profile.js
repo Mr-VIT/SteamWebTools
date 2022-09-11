@@ -233,6 +233,26 @@ function profilePageInit(){
 		+' <img src="//community.cloudflare.steamstatic.com/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
 	}
 
+	// == Feature == like profile button
+	var comments = Object.values(g_rgCommentThreads)[0];
+	if(comments){
+		comments.m_voteupID = 'swt_btnLikeProfile';
+		comments.m_votecountID = 'swt_countProfLikes';
+		var likebtn =
+		$(`<span id="${comments.m_voteupID}" class="btn_profile_action btn_medium ico_hover" data-tooltip-text="Like this profile"><span><i class="ico18 thumb_up"></i> <span id="${comments.m_votecountID}">${comments.m_cUpVotes} ${t('prLiked')}</span></span></span>`).prependTo('div.responsive_status_info').click(()=>{
+			CCommentThread.VoteUp(comments.m_strName);
+			comments.m_nRenderAjaxSequenceNumber=-1; // prevent scrolling to comments section on success
+		});
+		if(comments.m_bLoadingUserHasUpVoted)
+			likebtn.addClass('active')
+			//likebtn.find('i.thumb_up').addClass('accepted_and_voted')
+		// enable tooltip: $J(window).trigger('Responsive_SmallScreenModeToggled')
+	} /*else {
+		0 comments, but at the same time there may be likes
+		TODO check comment/Profile/render for likes
+	}*/
+
+
 }
 
 if (W.g_rgProfileData) {

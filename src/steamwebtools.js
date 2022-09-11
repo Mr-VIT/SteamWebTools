@@ -71,6 +71,14 @@ var scripts = [
 	},
 	{
 		match:[
+			rURL_COMMUNITY_PROFILE+'allcomments\\b.*',
+		],
+		run:function(){
+			//!include profile-comments.js
+		}
+	},
+	{
+		match:[
 			rURL_COMMUNITY_PROFILE+'inventory.*',
 		],
 		run:function(){

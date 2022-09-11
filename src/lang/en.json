@@ -13,6 +13,7 @@
 "chat" : "Chat",
 "more" : "More",
 "prAddNick":"Add custom nick",
+"prLiked":"users liked this profile",
 "prEd.showanim":"Show only animated",
 "prEd.hideFbdg":"Hide Favorite Badge from Profile",
 "showDropsCard" : "Show only with cards drops remaining",
