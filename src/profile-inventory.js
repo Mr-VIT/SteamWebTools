@@ -1,7 +1,22 @@
 var $ = W.$J;
 
 function inventoryPageInit(){
-	var SWT_NOT_DUP_KEY = 'swt_notdup';
+
+
+	function getMarketPrice(appid, market_hash_name){
+		return $.ajax( {
+			url: '//steamcommunity.com/market/priceoverview/',
+			type: 'GET',
+			cache: true,
+			data: {
+				country: W.g_strCountryCode,
+				currency: W.g_rgWalletInfo?.wallet_currency ?? 1,
+				appid,
+				market_hash_name
+			}
+		} )
+	}
+
 	// for subid detect
 	var ajaxTarget = {descriptions:[]};
 
@@ -34,7 +49,7 @@ function inventoryPageInit(){
 
 	// styles
 	document.body.insertAdjacentHTML("afterBegin",
-		'<style>.checkedForSend{background:#366836!important}.itemcount{background:#292929;color:#a0dcff;font-weight:700;float:right}.swt_icon{float:left}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}</style>'
+		'<style>.checkedForSend{background:#366836!important}.itemcount{display:var(--itemcountDisp);background:#292929;color:#a0dcff;font-weight:700;float:right}.swt_icon{float:left}.swt_icon-st{background:#CF6A32;color:#fff}.swt_icon-t{background:#FDEC14;color:#000}#inventory_logos{display:none}</style>'
 	);
 
 	// multi gifts sending
@@ -141,7 +156,7 @@ function inventoryPageInit(){
 	W.BuildHover = function( sNewInfo, item, UserYou ){
 		// gifts
 		if(W.g_ActiveInventory && (W.g_ActiveInventory.appid == 753)){
-			if ((item.contextid==1) && !(item.description && item.description.descriptions && item.description.descriptions.withClassid)) {
+			if ((item.contextid==1) && !item.description?.descriptions?.withClassid) {
 
 				if(!item.description.descriptions)
 					item.description.descriptions = [];
@@ -188,19 +203,10 @@ function inventoryPageInit(){
 				return res;
 			}
 			var market_hash_name = itmdescr.market_hash_name || itmdescr.market_name;
-			elActions.appendChild(W.CreateMarketActionButton('blue', 'http://steamcommunity.com/market/listings/'+item.appid+'/'+market_hash_name, t('minMarketPrice')+': <span id="swt_lowestItemPrice_'+item.classid+'">?</span>'));
+			elActions.appendChild(W.CreateMarketActionButton('blue', `//steamcommunity.com/market/listings/${item.appid}/${market_hash_name}`, `${t('minMarketPrice')}: <span id="swt_lowestItemPrice_${item.classid}">?</span>`));
 			$(elActions).css('display', 'block');
-			$.ajax( {
-				url: '//steamcommunity.com/market/priceoverview/',
-				type: 'GET',
-				cache: true,
-				data: {
-					country: W.g_strCountryCode,
-					currency: typeof(W.g_rgWalletInfo) != 'undefined' ? W.g_rgWalletInfo['wallet_currency'] : 1,
-					appid: item.appid,
-					market_hash_name: market_hash_name
-				}
-			} ).done( function ( data ) {
+			getMarketPrice(item.appid, market_hash_name)
+			.done( function ( data ) {
 				var price=t('reqErr');
 				if(data.success){
 					price=data.lowest_price
@@ -227,17 +233,15 @@ function inventoryPageInit(){
 		for ( var iTerm = 0; iTerm < rgTerms.length; iTerm++ ) {
 			var bMatch = false;
 
-			if ( !bMatch && tags && tags.length )
-			{
+			if ( tags?.length )
 				for ( var i = 0; i < tags.length; i++ )
 				{
-					if ( tags[i].internal_name && tags[i].internal_name.match( rgTerms[iTerm] ) )
+					if ( tags[i].internal_name?.match( rgTerms[iTerm] ) )
 					{
 						bMatch = true;
 						break;
 					}
 				}
-			}
 
 			if ( !bMatch )
 				return false;
@@ -249,19 +253,37 @@ function inventoryPageInit(){
 	 * Hide dup items functions
 	 * */
 
+	class FilterTag{
+		constructor(name, value){
+			this.localized_tag_name = name;
+			this.internal_name = value;
+		}
+		category = "SWT";
+		localized_category_name = "Steam Web Tools";
+	}
+
+	var tagHideDup = new FilterTag("Hide Dup",    "notdup"),
+		tagMore1   = new FilterTag("More than 1", "more1");
+
+
+
 	// == hide dup work with another filters
 	W.Filter.UpdateTagFiltering_old = W.Filter.UpdateTagFiltering;
 	W.Filter.UpdateTagFiltering = function(rgNewTags){
 		if (W.localStorage.hideDupItems) {
-			rgNewTags['SWT']=[SWT_NOT_DUP_KEY];
+			if(rgNewTags[tagHideDup.category])
+				rgNewTags[tagHideDup.category].unshift(tagHideDup.internal_name)
+			else
+				rgNewTags[tagHideDup.category]=[tagHideDup.internal_name];
 		}
 		return this.UpdateTagFiltering_old.apply(this, arguments);
 	}
 	// check dup in original item data
 	W.Filter.MatchItemTags_old = W.Filter.MatchItemTags;
 	W.Filter.MatchItemTags = function( elItem, rgTags ){
-		if (rgTags && rgTags[0]==SWT_NOT_DUP_KEY) {
-			return (elItem.rgItem._amount > 0) || (elItem.rgItem.amount > 1) ;
+		if (rgTags?.[0] == tagHideDup.internal_name) {
+			return (elItem.rgItem._amount > (rgTags?.[1] == tagMore1.internal_name ? 1 : 0))
+				|| (elItem.rgItem.amount > 1) ;
 		} else
 			return this.MatchItemTags_old.apply(this, arguments);
 	}
@@ -276,14 +298,13 @@ function inventoryPageInit(){
 	var hideDupFilter = function (){
 		if(W.localStorage.hideDupItems){
 
-			W.Filter.rgCurrentTags['SWT']=[SWT_NOT_DUP_KEY];
+			W.Filter.rgCurrentTags[tagHideDup.category]=[tagHideDup.internal_name];
 
 			var applyDupFilter = function(){
 				W.Filter.OnFilterChange();
 
-				if (W.g_ActiveInventory._hideDupCounters) {
-					$('.itemcount', W.g_ActiveInventory.m_$Inventory).show();
-				} else {
+				// create counters
+				if (!W.g_ActiveInventory._hideDupCounters) {
 					var firstItems;
 					if (W.g_ActiveInventory.m_rgChildInventories) {
 						firstItems = {};
@@ -297,37 +318,29 @@ function inventoryPageInit(){
 						var $el = $(el);
 						let amount = firstItems[$el.data('classid')]._amount;
 						$el .text('x'+amount)
-							.show();
+
 						if(amount==1){
 							$el.attr('style', 'font-weight:normal;color:#7e7e7e');
 						}
 					});
 					W.g_ActiveInventory._hideDupCounters = true;
 				};
+
+				W.tabcontent_inventory.style.setProperty("--itemcountDisp", "block");
 			}
 
 			W.g_ActiveInventory.LoadCompleteInventory().done(applyDupFilter);
 
 		} else {
-			delete W.Filter.rgCurrentTags.SWT;
-			W.Filter.rgLastTags['SWT']=[SWT_NOT_DUP_KEY];
+			delete W.Filter.rgCurrentTags[tagHideDup.category];
+			W.Filter.rgLastTags[tagHideDup.category]=[tagHideDup.internal_name];
 			W.Filter.OnFilterChange();
-			$('.itemcount').hide();
+			W.tabcontent_inventory.style.setProperty("--itemcountDisp", "none");
 		}
 		// return to page selectedItem
 		if(W.g_ActiveInventory.selectedItem)
 			W.g_ActiveInventory.EnsurePageActiveForItem( W.g_ActiveInventory.selectedItem.element );
 	}
-
-	// check box click
-	W.onchangehidedup = function(e){
-		if(e.target.checked){
-			W.localStorage.hideDupItems = 1;
-		} else {
-			W.localStorage.removeItem('hideDupItems');
-		}
-		hideDupFilter();
-	};
 
 	// activate filter onload page
 	var checkHideDupFilter = function(){
@@ -379,7 +392,7 @@ function inventoryPageInit(){
 
 		// below hide dup fn only
 		if (asset.is_stackable) {
-			return;
+			return $el;
 		}
 
 		if (!this._firstItems) {
@@ -387,7 +400,9 @@ function inventoryPageInit(){
 		}
 		var fi; // first items with same classId
 		if (fi = this._firstItems[asset.classid]) {
-			fi._amount++;
+			if(++fi._amount == 2){
+				fi.description.tags.push(tagMore1);
+			}
 
 			fi._ids.push(asset.assetid);
 			fi._subItems.push(asset);
@@ -401,50 +416,23 @@ function inventoryPageInit(){
 			this._firstItems[asset.classid]=asset;
 
 			$el.find('a.inventory_item_link').append('<span class="itemcount" data-classid="'+asset.classid+'"></span>');
-			asset.description.tags.push({
-				category: "SWT",
-				internal_name: "swt_notdup",
-				localized_category_name: "Steam Web Tools",
-				localized_tag_name: "Hide Dup"
-			});
+			asset.description.tags.push(tagHideDup);
 		}
 
 		return $el;
 	}
 
-	// == Fix Steam Bug : The old page is shown below after use filter
-	W.CInventory.prototype.SetActivePage_old = W.CInventory.prototype.SetActivePage;
-	W.CInventory.prototype.SetActivePage = function( iPage ) {
-		if ( iPage >= this.m_cPages )
-			return;
-
-		//if ( this.m_iCurrentPage >= 0 && this.m_iCurrentPage < this.m_cPages ) // FIX
-			this.m_rgPages[ this.m_iCurrentPage ].hide();
-
-		this.m_rgPages[iPage].show();
-		this.m_iCurrentPage = iPage;
-		this.UpdatePageCounts();
-
-		this.PreloadPageImages( this.m_iCurrentPage );
-	}
-	// == / Fix Steam Bug
-
-
 	// insert check box - hide dup items
-	$('#inventory_pagecontrols').before('<label><input type="checkbox" name="hidedup" onchange="window.onchangehidedup(event)" '+((W.localStorage.hideDupItems)?'checked="true"':'')+'/>'+t('hideDup')+'</label>');
-
-	/**
-	 * SIH v1.10.1 fix sort items
-	 **/
-	setTimeout(function(){
-		if (!W.SortItem) return;
-		var SortItem_old = W.SortItem;
-		W.SortItem = function () {
-			if(!W.$J('#Lnk_SortItems').data('asc')) return;
-			SortItem_old.apply(W, arguments);
+	$(`<label><input type="checkbox" ${((W.localStorage.hideDupItems)?'checked="true"':'')}/>${t('hideDup')}</label>`)
+	.insertBefore('#inventory_pagecontrols')
+	.find('input').change(function(e){
+		if(e.target.checked){
+			W.localStorage.hideDupItems = 1;
+		} else {
+			W.localStorage.removeItem('hideDupItems');
 		}
-	}, 1500);
-	// END fix
+		hideDupFilter();
+	});
 
 
 	//// sell dialog accept ssa checked
@@ -462,24 +450,16 @@ function inventoryPageInit(){
 		e.preventDefault();
 		var item = W.SellItemDialog.m_item;
 		var strMarketName = W.GetMarketHashName( item.description );
-		new W.Ajax.Request( '//steamcommunity.com/market/priceoverview/', {
-			method: 'get',
-			parameters: {
-				country: W.g_strCountryCode,
-				currency: typeof( W.g_rgWalletInfo ) != 'undefined' ? W.g_rgWalletInfo['wallet_currency'] : 1,
-				appid: item.appid,
-				market_hash_name: strMarketName
-			},
-			onSuccess: function( transport ) {
-				if ( transport.responseJSON && transport.responseJSON.success ){
-					var price = W.GetPriceValueAsInt(transport.responseJSON.lowest_price);
-					price--;
+		getMarketPrice(item.appid, strMarketName)
+		.done(data=>{
+			var price = W.GetPriceValueAsInt(data.lowest_price);
+			price--;
 
-					$('#market_sell_buyercurrency_input').val(W.v_currencyformat(price, W.GetCurrencyCode(W.g_rgWalletInfo['wallet_currency'])));
-					W.SellItemDialog.OnBuyerPriceInputKeyUp();
-				}
-			}
+			$('#market_sell_buyercurrency_input').val(W.v_currencyformat(price, W.GetCurrencyCode(W.g_rgWalletInfo['wallet_currency'])));
+			W.SellItemDialog.OnBuyerPriceInputKeyUp();
+
 		});
+
 
 	});
 
@@ -503,17 +483,8 @@ function inventoryPageInit(){
 		}
 		var item = W.SellItemDialog.m_item;
 		var strMarketName = W.GetMarketHashName( item.description );
-		$.ajax( {
-			url: '//steamcommunity.com/market/priceoverview/',
-			type: 'GET',
-			cache: true,
-			data: {
-				country: W.g_strCountryCode,
-				currency: typeof(W.g_rgWalletInfo) != 'undefined' ? W.g_rgWalletInfo['wallet_currency'] : 1,
-				appid: item.appid,
-				market_hash_name: strMarketName
-			}
-		} ).done( function ( data ) {
+		getMarketPrice(item.appid, strMarketName)
+		.done( function ( data ) {
 			var curPriceInt;
 			try {
 				if(!data.success) throw 0;
@@ -556,13 +527,6 @@ function inventoryPageInit(){
 			}
 		} );
 	}
-
-	// rebind Confirm Sell btn
-	/* func replaced before steam script bind
-	$( W.$('market_sell_dialog_ok').stopObserving() // Prototype
-	).unbind() // jQuery
-	.on("click", $.proxy(W.SellItemDialog.OnConfirmationAccept, W.SellItemDialog));
-	*/
 
 	var SellCurrentSelection_old = W.SellCurrentSelection;
 	W.SellCurrentSelection = function(){
