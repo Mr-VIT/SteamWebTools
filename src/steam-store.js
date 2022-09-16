@@ -1,6 +1,15 @@
 var $ = W.$J;
 function init() {
 
+	// == Feature == skip age check
+	// mostly for incognito tab with cc
+	//if(location.pathname.includes('/agecheck/')){
+	if(W.app_agegate){
+		document.cookie='birthtime=1;path=/;max-age=31536000';
+		location.replace(location.href.replace('/agecheck/','/'));
+		return;
+	}
+
 	if(settings.cur.storeShowCartBtn){
 		$('#store_header_cart_btn').css('display','block');
 	}
@@ -65,7 +74,7 @@ function init() {
 		// check if not available in current region
 		if(!document.getElementById('appHubAppName') && document.getElementById('error_box')){
 			$('<p style="display:table" class="btn_blue_steamui btn_medium"><span>'+t('viewAnon')+'</span></p>')
-			.prependTo('#error_box')
+			.appendTo('#error_box')
 			.click(()=>{
 				var xhr = window.GM_xmlhttpRequest || window.GM_xhr;
 				var url = W.location.origin+`/${itemType}/${itemId}?cc=us`;
@@ -86,6 +95,11 @@ function init() {
 					alert('unsupported');
 
 			})
+
+			if(itemType=='app'){
+				$('#error_box').append(`<iframe src="https://store.steampowered.com/widget/${itemId}/?dynamiclink=1&cc=us" frameborder="0" width="100%" height="190"></iframe>`)
+			}
+
 
 			return; // cz no elements on page
 		}
