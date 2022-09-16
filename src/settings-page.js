@@ -118,6 +118,31 @@ createForm([
 		],
 	},
 	{
+		group:t('profile'),
+		rows:[
+			{
+				type:'checkbox',
+				title:t('set.prCollShowcases'),
+				name:'profileСollapseShowcases',
+			},
+			{
+				type:'checkbox',
+				title:t('set.prCsOpenNotes'),
+				name:'profileCsOpenNotes',
+			},
+			{
+				type:'checkbox',
+				title:t('set.prRepBadges'),
+				name:'profileRepBadges',
+			},
+			{
+				type:'checkbox',
+				title:t('set.prLikeBtn'),
+				name:'profileLikeBtn',
+			},
+		]
+	},
+	{
 		group:t('set.store'),
 		rows:[
 			{
@@ -197,4 +222,3 @@ $("form#editForm").submit(function(event) {
 	} else
 		W.location.href="https://steamcommunity.com/groups/SteamClientBeta#/swt-settings";
 });
-

@@ -1,8 +1,8 @@
 var $ = W.$J, steamid;
 
-function SetRepBadges(selector){
-	document.querySelector(selector).insertAdjacentHTML('afterBegin',
-		'<div id="swt_badges"><a id="csmbadge" class="badge" href="http://checkrep.ru/#steam:'+steamid+'">CRep: <span></sapn></a> <a id="srbadge" class="badge" href="http://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a></div>'
+function SetRepBadges(){
+	document.querySelector('.profile_header').insertAdjacentHTML('afterBegin',
+		'<div id="swt_badges"><a id="csmbadge" class="badge" href="https://checkrep.ru/#steam:'+steamid+'">CRep: <span></sapn></a> <a id="srbadge" class="badge" href="https://steamrep.com/profiles/'+steamid+'">SR: <span></sapn></a></div>'
 	);
 
 	var badges = {
@@ -40,28 +40,26 @@ function SetRepBadges(selector){
 		$('#csmbadge')[0].style.background = '#'+badges[res.csm].color;
 		$('#csmbadge span').text(t(badges[res.csm].text));
 
-		var srbcolor;
-		if(!res.srcom){
-			res.srcom = t(badges[0].text);
-			srbcolor = badges[0].color;
-		} else {
-			if(res.srcom.indexOf('SCAMMER')>-1){
-				srbcolor = badges[3].color;
-			} else
-			if(res.srcom.indexOf('CAUTION')>-1){
-				srbcolor = badges[4].color;
-			} else
-			if(res.srcom.indexOf('MIDDLEMAN')>-1){
-				srbcolor = badges[1].color;
-			} else
-			if((res.srcom.indexOf('TRUSTED SELLER')>-1)||(res.srcom.indexOf('ADMIN')>-1)){
-				srbcolor = badges[2].color;
-			} else {
-				srbcolor = badges[0].color;
+		var srbcolorId = 0;
+		if(res.srcom) {
+			let colors = {
+				"SCAMMER": 3,
+				"CAUTION": 4,
+				"MIDDLEMAN": 1,
+				"TRUSTED SELLER": 2,
+				"ADMIN": 2,
+			};
+			for(let str in colors){
+				if(res.srcom.includes(str)) {
+					srbcolorId = colors[str];
+					break;
+				}
 			}
+		} else {
+			res.srcom = t(badges[0].text);
 		}
 
-		$('#srbadge')[0].style.background = '#'+srbcolor;
+		$('#srbadge')[0].style.background = '#'+badges[srbcolorId].color;
 		$('#srbadge span').text(res.srcom);
 		$('#swt_badges').show();
 	}
@@ -71,7 +69,7 @@ function SetRepBadges(selector){
 		var xhr = window.GM_xmlhttpRequest || window.GM_xhr;
 		xhr({
 			method : 'GET',
-			url  : 'http://checkrep.ru/api/swt9Hk02yFhf/0/repforext2/'+steamid,
+			url  : 'https://checkrep.ru/api/swt9Hk02yFhf/0/repforext2/'+steamid,
 			onload: function(response) {
 				setRepStatus(JSON.parse(response.responseText));
 			}
@@ -162,7 +160,8 @@ function profilePageInit(){
 
 	$('.profile_header').append('<div id="swt_info">SteamID64: <a href="https://steamcommunity.com/profiles/'+steamid+'">'+steamid+'</a> | <a href="#getMoreInfo" onclick="getMoreInfo();return false">'+t('getMoreInfo')+'</a></div>');
 
-	SetRepBadges('.profile_header');
+	if(settings.cur.profileRepBadges)
+		SetRepBadges();
 
 	W.getMoreInfo = function() {
 		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="//steamcommunity-a.akamaihd.net/public/images/login/throbber.gif"></div>'));
@@ -234,24 +233,59 @@ function profilePageInit(){
 	}
 
 	// == Feature == like profile button
-	var comments = Object.values(g_rgCommentThreads)[0];
-	if(comments){
-		comments.m_voteupID = 'swt_btnLikeProfile';
-		comments.m_votecountID = 'swt_countProfLikes';
-		var likebtn =
-		$(`<span id="${comments.m_voteupID}" class="btn_profile_action btn_medium ico_hover" data-tooltip-text="Like this profile"><span><i class="ico18 thumb_up"></i> <span id="${comments.m_votecountID}">${comments.m_cUpVotes} ${t('prLiked')}</span></span></span>`).prependTo('div.responsive_status_info').click(()=>{
-			CCommentThread.VoteUp(comments.m_strName);
-			comments.m_nRenderAjaxSequenceNumber=-1; // prevent scrolling to comments section on success
-		});
-		if(comments.m_bLoadingUserHasUpVoted)
-			likebtn.addClass('active')
-			//likebtn.find('i.thumb_up').addClass('accepted_and_voted')
-		// enable tooltip: $J(window).trigger('Responsive_SmallScreenModeToggled')
-	} /*else {
-		0 comments, but at the same time there may be likes
-		TODO check comment/Profile/render for likes
-	}*/
+	if(settings.cur.profileLikeBtn){
+		var comments = Object.values(g_rgCommentThreads)[0];
+		if(comments){
+			comments.m_voteupID = 'swt_btnLikeProfile';
+			comments.m_votecountID = 'swt_countProfLikes';
+			var likebtn =
+			$(`<span id="${comments.m_voteupID}" class="btn_profile_action btn_medium ico_hover profile_count_link" data-tooltip-text="Like this profile"><span><i class="ico18 thumb_up"></i> <span id="${comments.m_votecountID}">${comments.m_cUpVotes} ${t('prLiked')}</span></span></span>`)
+			.insertAfter('div.responsive_status_info')
+			.click(()=>{
+				CCommentThread.VoteUp(comments.m_strName);
+				comments.m_nRenderAjaxSequenceNumber=-1; // prevent scrolling to comments section on success
+			});
+			if(comments.m_bLoadingUserHasUpVoted)
+				likebtn.addClass('active')
+				//likebtn.find('i.thumb_up').addClass('accepted_and_voted')
+			// enable tooltip: $J(window).trigger('Responsive_SmallScreenModeToggled')
+		} /*else {
+			0 comments, but at the same time there may be likes
+			TODO check comment/Profile/render for likes
+		}*/
+	}
 
+	// == Feature == showcases like spoilers
+	let showcaseHeaders =
+	$('.profile_customization_header')
+	.click(e => {
+		$(e.target).next().toggle()
+	})
+	.css('cursor', 'pointer');
+	if(settings.cur.profileСollapseShowcases){
+		let blocks = showcaseHeaders
+		.show() // for illustrations
+		.next().hide();
+
+		if(settings.cur.profileCsOpenNotes){
+			blocks.filter(function(i, el){
+				let note = $('.showcase_notes', el);
+				return note.length ? note.text().trim().length>0
+					: false;
+			})
+			.show();
+		}
+	}
+
+	// == Feature == scroll to comments by pressing [C]
+	$( document ).keyup(e => {
+		if (e.target != document.body) {
+			return;
+		}
+		if(67==e.which && !e.ctrlKey){
+			document.querySelector('.profile_comment_area').scrollTo();
+		}
+	});
 
 }
 

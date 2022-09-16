@@ -17,6 +17,11 @@ var settings = {
 
 		marketMainPageFuncs: true,
 
+		profileLikeBtn: true,
+		profileСollapseShowcases: false,
+		profileCsOpenNotes: true,
+		profileRepBadges: true,
+
 		invSellItemPriceCheckMaxDiscount: 25
 	},
 	cur : {},
