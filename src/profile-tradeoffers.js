@@ -5,6 +5,7 @@ $('div.tradeoffer_footer>div.tradeoffer_footer_actions').prepend('<span class="p
 var itemsDescriptions = {};
 W.swt_checkcardswap = async function(){
 	// TODO multi lang
+	// 		load data from badge page: cards in set, cards in inv for fair swap check
 
 	var $trade = $('div.tradeoffer:has(span.pulldown.focus)');
 	var modalId = $trade.prop('id')+'_swt_modal';
@@ -70,7 +71,7 @@ W.swt_checkcardswap = async function(){
 			if(item._type) {
 				let key = item._type+'_'+item.market_fee_app;
 				if( ! (type = items.typed[key]) ){
-					type = items.typed[key]           = {type: item.type, "0":0, "1":0};
+					type = items.typed[key]           = {type: item.type, app: item.market_fee_app, "0":0, "1":0};
 				}
 			} else {
 				if( ! (type = items.other[item.hoverkey]) ){
@@ -100,7 +101,7 @@ W.swt_checkcardswap = async function(){
 		let item = items.typed[type],
 			curRes = item[0] <= item[1];
 		checkRes &&= curRes;
-		str+='<tr><td>'+item.type+'</td><td>'+(item[0])+'</td><td>'+compCount(1, curRes)+'</td><td>'+item[1]+'</td></tr>'
+		str+=`<tr><td><a target="_blank" href="/my/gamecards/${item.app}">[B]</a> ${item.type}</td><td>${(item[0])}</td><td>${compCount(1, curRes)}</td><td>${item[1]}</td></tr>`
 	}
 	// TODO set checkRes = false if others ?
 
