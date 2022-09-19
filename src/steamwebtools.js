@@ -119,6 +119,14 @@ var scripts = [
 	},
 	{
 		match:[
+			rURL_COMMUNITY_PROFILE+'friends/?',
+		],
+		run:function(){
+			//!include profile-friends.js
+		}
+	},
+	{
+		match:[
 			rURL_COMMUNITY+'market.*'
 		],
 		run:function(){
