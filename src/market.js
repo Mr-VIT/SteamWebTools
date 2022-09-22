@@ -6,7 +6,7 @@ function init(){
 			el.innerHTML = '['+t('balance')+']';
 		}
 	}
-	var el = W.$J('.pick_and_sell_button').length;
+	var el = W.$J('.pick_and_sell_button:first').length;
 	if(el){
 		if(settings.cur.marketMainPageFuncs) mainPage();
 	} else
@@ -39,16 +39,11 @@ function addButtonsMyListings(){
 		return false;
 	});
 	W.$J('#btnRemoveListings').click(function(){
-		var data = [];
-
-		W.$J('div.market_listing_cancel_button input.lfremove').each(function(i, el){
-			if(el.checked)
-				data.push(el);
-		});
+		var data = W.$J('div.market_listing_cancel_button input.lfremove:checked').get();
 
 		function run(i){
 			if(i>=data.length) return;
-			var $statusIcon=W.$J('<img src="//community.cloudflare.steamstatic.com/public/images/login/throbber.gif" style="width: 25px; opacity: 1;">');
+			var $statusIcon=W.$J('<i class="waiting_dialog_throbber"/>');
 			var $el = W.$J(data[i]).after($statusIcon);
 			new W.Ajax.Request('//steamcommunity.com/market/removelisting/'+$el.data('listingid'), {
 				method: 'post',
@@ -155,35 +150,60 @@ function itemPage(){
 	if(!assets) return;
 	var itemdata= Object.values(assets)[0];
 
-	// check for card/bpack
-	var tmp = itemdata.owner_actions && itemdata.owner_actions[0] && itemdata.owner_actions[0].link;
-	if(!tmp) return;
+	if(!itemdata) return;
 
-	var marketSearchUrl = '//steamcommunity.com/market/search?appid=753&category_753_Game%5B%5D=tag_app_'+itemdata.market_fee_app+'&category_753_item_class%5B%5D=tag_item_class_';
-	//check for card
-	if(tmp.match(/\/my\/gamecards\/\d+/)){
-		var btn= {name:'Booster Pack',
-				  link:marketSearchUrl+'5' }
-	} else
-	//check for bpack
-	if(tmp.indexOf("javascript:OpenBooster")>-1){
-		var btn= {name:t('SearchCardsOnMarket'),
-				  link:marketSearchUrl+'2' };
-	} else return;
+	// detect item
+	var itemlink = itemdata.owner_actions?.[0]?.link;
+	if(!itemlink) return;
 
-	//add btns
+	// is card/bpack
+	+function(){
+		var marketSearchUrl = '/market/search?appid=753&category_753_Game%5B%5D=tag_app_'+itemdata.market_fee_app+'&category_753_item_class%5B%5D=tag_item_class_';
+		//check for card
+		if(itemlink.match(/\/my\/gamecards\/\d+/)){
+			var btn= {name:'Booster Pack',
+					link:marketSearchUrl+'5' }
+		} else
+		//check for bpack
+		if(itemlink.includes("javascript:OpenBooster")){
+			var btn= {name:t('SearchCardsOnMarket'),
+					link:marketSearchUrl+'2' };
+		} else return;
 
-	var place = W.$J('<div class="item_actions" id="largeiteminfo_item_actions"></div>').insertAfter( W.$J('#largeiteminfo_game_info') );
-	var links = [btn,
-		{name: t('viewMyCardsGame'),
-		 link: '//steamcommunity.com/my/gamecards/'+itemdata.market_fee_app}
-	]
-	for (var i=links.length; i>0; --i, place.append('<a class="btn_small btn_grey_white_innerfade" href="'+links[i].link+'"><span>'+links[i].name+'</span></a>'));
+		//add btns
+
+		var place = W.$J('<div class="item_actions" id="largeiteminfo_item_actions"></div>').insertAfter( W.$J('#largeiteminfo_game_info') );
+		var links = [btn,
+			{name: t('viewMyCardsGame'),
+			link: '/my/gamecards/'+itemdata.market_fee_app}
+		]
+		for (var i=links.length; i>0; --i, place.append('<a class="btn_small btn_grey_white_innerfade" href="'+links[i].link+'"><span>'+links[i].name+'</span></a>'));
+
+		return true;
+	}()
+	// is emoticon
+	|| +function(){
+		if( !W.g_steamID ||
+			!itemdata.descriptions.last()?.value.includes('/emoticon/')) return;
+
+		W.$J.ajax({
+			url: '/actions/EmoticonList',
+			type: 'GET',
+			cache: true
+		}).done(list=>{
+			W.$J('#largeiteminfo_item_descriptors').append(t('inInv')+': '+(list.includes(itemdata.name) ? '✅' : '❌'))
+		})
+
+		return true;
+	}()
+
+
 }
 
 function addGotoBtn(){
-	W.$J("#searchResults_btn_next").after(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">'+t('go')+'</span>');
-	W.$J('#swt_gotopagebtn').click(function(){
+	W.$J(' <input id="swt_gotopagevl" type="text" value="1" size="3"/><span class="pagebtn" id="swt_gotopagebtn">'+t('go')+'</span>')
+	.insertAfter('#searchResults_btn_next')
+	.filter('#swt_gotopagebtn').click(function(){
 		W.g_oSearchResults.GoToPage(W.$('swt_gotopagevl').value-1);
 	})
 }

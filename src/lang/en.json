@@ -30,6 +30,7 @@
 "go" : "Go",
 "checkAll" : "Check all",
 "deleteChecked" : "Delete checked",
+"inInv": "In my inventory",
 "addSubidsToCart" : "Add SubIDs to cart",
 "add" : "Add",
 "addChecked" : "Add checked",
