@@ -602,7 +602,7 @@ function inventoryPageInit(){
 }
 
 
-if (W.g_strInventoryLoadURL) {
+if (W.g_bIsInventoryPage) {
 	if (!W.CInventory.prototype.LoadCompleteInventory) return; // fix for old scripts in ?modal=1&market=1
 	inventoryPageInit();
 }

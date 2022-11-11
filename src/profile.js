@@ -259,7 +259,7 @@ function profilePageInit(){
 	let showcaseHeaders =
 	$('.profile_customization_header')
 	.click(e => {
-		$(e.target).next().toggle()
+		$(e.target).next().slideToggle('fast')
 	})
 	.css('cursor', 'pointer');
 	if(settings.cur.profileСollapseShowcases){
