@@ -1,5 +1,5 @@
 var settings = {
-	locales : ['en', 'ru', 'jp', 'zh-cn'],
+	locales : ['en', 'ru', 'pt-br', 'jp', 'zh-cn'],
 	defaults : {
 		version : 1,
 

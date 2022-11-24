@@ -91,6 +91,10 @@ createForm([
 						value : 'ru',
 					},
 					{
+						text : 'Brazilian Portuguese',
+						value : 'pt-br',
+					},
+					{
 						text : '简体中文',
 						value : 'zh-cn',
 					},
