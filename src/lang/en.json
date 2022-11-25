@@ -81,6 +81,7 @@
 "set.prCollShowcases":"Collapse all Showcases. Click a title to open it",
 "set.prCsOpenNotes":"⬆️Leave showcases with text notes open",
 "set.prRepBadges":"Show Rep badges",
+"set.sellSetPriceDiff":"In the sell item dialog, apply this difference to current lowest price | in min currency values, such as cents",
 "rep.unk" : "unknown",
 "rep.mdlman" : "middleman",
 "rep.white" : "whitelisted",

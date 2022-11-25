@@ -70,7 +70,7 @@ createForm.create_textLong = function(data){
 	return '<div>'+data.title+'</div><div class="formRowFields"><div class="gray_bevel for_text_input fullwidth"><input type="text" name="'+data.name+'" id="'+data.name+'" value="'+data.value+'"></div></div>';
 }
 createForm.create_number = function(data){
-	return '<label for="'+data.name+'">'+data.title+'</label> <input type="number" value="'+data.value+'" min="'+data.min+'" max="'+data.max+'" step="'+data.step+'" name="'+data.name+'" id="'+data.name+'">';
+	return `<label for="${data.name}">${data.title}</label>: <input type="number" value="${data.value}" min="${data.min}" max="${data.max}" step="${data.step}" name="${data.name}" id="${data.name}">`;
 }
 
 createForm([
@@ -194,6 +194,12 @@ createForm([
 				title:t('set.sellLowPriceCheck'),
 				name:'invSellItemPriceCheckMaxDiscount',
 				min:0, max:99, step:1
+			},
+			{
+				type:'number',
+				title:t('set.sellSetPriceDiff'),
+				name:'invSellItemSetPriceDiff',
+				step: 1
 			},
 		],
 	},

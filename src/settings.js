@@ -22,7 +22,8 @@ var settings = {
 		profileCsOpenNotes: true,
 		profileRepBadges: true,
 
-		invSellItemPriceCheckMaxDiscount: 25
+		invSellItemPriceCheckMaxDiscount: 25,
+		invSellItemSetPriceDiff: -1,
 	},
 	cur : {},
 	storage : {

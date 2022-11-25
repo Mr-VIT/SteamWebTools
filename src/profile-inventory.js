@@ -2,6 +2,10 @@ var $ = W.$J;
 
 function inventoryPageInit(){
 
+	// prefer using SIH func for compatibility
+	function getPriceAsInt(){
+		return (W.getPriceAsInt ?? W.GetPriceValueAsInt).apply(this, arguments);
+	}
 
 	function getMarketPrice(appid, market_hash_name){
 		return $.ajax( {
@@ -445,15 +449,16 @@ function inventoryPageInit(){
 	 */
 
 	//// set lowest price btn
-	$('#market_sell_dialog_input_area').before('<div style="text-align:right;margin-bottom:0.5em;"><a href="#" id="swt_setpricebtn">['+t('setlowestprice')+' -0,01]</a></div>');
+	$('#market_sell_dialog_input_area').before('<div style="text-align:right;margin-bottom:0.5em;"><a href="#" id="swt_setpricebtn">['+t('setlowestprice')+(settings.cur.invSellItemSetPriceDiff>0?' +':' ')
+	+W.v_currencyformat(settings.cur.invSellItemSetPriceDiff, W.GetCurrencyCode(W.g_rgWalletInfo['wallet_currency']))
+	+']</a></div>');
 	$('#swt_setpricebtn').click(function(e){
 		e.preventDefault();
 		var item = W.SellItemDialog.m_item;
 		var strMarketName = W.GetMarketHashName( item.description );
 		getMarketPrice(item.appid, strMarketName)
 		.done(data=>{
-			var price = W.GetPriceValueAsInt(data.lowest_price);
-			price--;
+			var price = getPriceAsInt(data.lowest_price) + settings.cur.invSellItemSetPriceDiff;
 
 			$('#market_sell_buyercurrency_input').val(W.v_currencyformat(price, W.GetCurrencyCode(W.g_rgWalletInfo['wallet_currency'])));
 			W.SellItemDialog.OnBuyerPriceInputKeyUp();
@@ -488,7 +493,7 @@ function inventoryPageInit(){
 			var curPriceInt;
 			try {
 				if(!data.success) throw 0;
-				curPriceInt=GetPriceValueAsInt(data.lowest_price) || (data.lowest_price= W.SellItemDialog.m_plotPriceHistory.data[0].max()[1]) *100;
+				curPriceInt=getPriceAsInt(data.lowest_price) || (data.lowest_price= W.SellItemDialog.m_plotPriceHistory.data[0].max()[1]) *100;
 				//TODO check orders
 				if(!curPriceInt) throw 0;
 			} catch(e){
@@ -503,7 +508,7 @@ function inventoryPageInit(){
 
 				if(	curDiscount> 5 + settings.cur.invSellItemPriceCheckMaxDiscount ) { // require confirmation by typing if entered price is too low
 					var confirmedPrice = prompt(confText+'\n'+t('sellLowPriceCheck.warning2')+': '+W.$('market_sell_buyercurrency_input').value);
-					if(GetPriceValueAsInt(confirmedPrice)==typedPriceInt) return true;
+					if(getPriceAsInt(confirmedPrice)==typedPriceInt) return true;
 					alert(t('sellLowPriceCheck.warnTitle')+'❌');
 					return false;
 				} else {  // require simple confirmation if entered price is slightly low
