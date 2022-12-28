@@ -45,21 +45,22 @@ function addButtonsMyListings(){
 			if(i>=data.length) return;
 			var $statusIcon=W.$J('<i class="waiting_dialog_throbber"/>');
 			var $el = W.$J(data[i]).after($statusIcon);
-			new W.Ajax.Request('//steamcommunity.com/market/removelisting/'+$el.data('listingid'), {
-				method: 'post',
-				parameters: {
+			W.$J.ajax({
+				url: '/market/removelisting/'+$el.data('listingid'),
+				type: 'post',
+				data: {
 					sessionid: W.g_sessionID,
 				},
-				onComplete: function() {
+				complete: function() {
 					run(++i);
 				},
-				onFailure: function() {
-					$statusIcon.prop('src', '//community.cloudflare.steamstatic.com/public/images/economy/market/icon_alertlistings.png');
+				error: function() {
+					$statusIcon.replaceWith('<img src="//community.cloudflare.steamstatic.com/public/images/economy/market/icon_alertlistings.png" />');
 				},
-				onSuccess: function() {
+				success:function() {
 					data[i].parentElement.parentElement.parentElement.parentElement.remove();
 				}
-			});
+			})
 		}
 		if(data.length)
 			run(0);

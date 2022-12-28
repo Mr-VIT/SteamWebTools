@@ -449,9 +449,9 @@ function inventoryPageInit(){
 	 */
 
 	//// set lowest price btn
-	$('#market_sell_dialog_input_area').before('<div style="text-align:right;margin-bottom:0.5em;"><a href="#" id="swt_setpricebtn">['+t('setlowestprice')+(settings.cur.invSellItemSetPriceDiff>0?' +':' ')
+	$('#market_sell_dialog_input_area').before('<div style="text-align:right;margin-bottom:0.5em;"><a href="#" id="swt_setpricebtn">['+t('setlowestprice')+(settings.cur.invSellItemSetPriceDiff>0?' +':' -')
 	+W.v_currencyformat(settings.cur.invSellItemSetPriceDiff, W.GetCurrencyCode(W.g_rgWalletInfo['wallet_currency']))
-	+']</a></div>');
+	+']</a><a href="//steamcommunity.com/groups/SteamClientBeta#/swt-settings" title="Change in settings">📝</a></div>');
 	$('#swt_setpricebtn').click(function(e){
 		e.preventDefault();
 		var item = W.SellItemDialog.m_item;
