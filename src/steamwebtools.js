@@ -6,7 +6,7 @@ var W = window.unsafeWindow || window;
 
 //!include global.js
 
-var rURL_STORE = 'https?://store\\.steampowered\\.com/';
+var rURL_STORE = 'https?://(store|checkout)\\.steampowered\\.com/';
 var rURL_COMMUNITY = 'https?://steamcommunity\\.com/';
 var rURL_COMMUNITY_PROFILE = rURL_COMMUNITY+'(?:id/[^/]+|profiles/(?:\\d+|\\[U:1:\\d+\\]))/';
 

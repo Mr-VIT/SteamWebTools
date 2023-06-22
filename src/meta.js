@@ -7,5 +7,6 @@
 // @icon		http://mr-vit.github.io/SteamWebTools/icon-64.png
 // @run-at		document-idle
 // @match		*://store.steampowered.com/*
+// @match		*://checkout.steampowered.com/*
 // @match		*://steamcommunity.com/*
 // @exclude		https://steamcommunity.com/dev*
