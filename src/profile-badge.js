@@ -4,11 +4,10 @@ var app = W.location.pathname.match(/\/gamecards\/(\d+)/)?.[1];
 if(!app) return;
 
 // == Feature == link to another version of badge
-$('div.badge_title:first').append('<a class="btn_grey_grey btn_small_thin" href="'+(
-		W.location.search.includes('border=1')
-		? W.location.origin+W.location.pathname
-		: W.location.href+'?&border=1'
-	)+'"><span><img src="https://community.cloudflare.steamstatic.com/public/images/skin_1/icon_tradeoffer.png"> '+t('badgeAnotherVersion')+'</span></a>');
+$('div.badge_title:first').append('<a class="btn_grey_grey btn_small_thin" href="'
+	+W.location.origin+W.location.pathname
+	+(W.location.search.includes('border=1') ? '' : '?border=1')
+	+'"><span><img src="https://community.cloudflare.steamstatic.com/public/images/skin_1/icon_tradeoffer.png"> '+t('badgeAnotherVersion')+'</span></a>');
 
 
 // == Feature == link to steamcardexchange.net
