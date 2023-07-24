@@ -198,6 +198,32 @@ function itemPage(){
 		return true;
 	}()
 
+	// all types GetGooValue
+	for(let act of itemdata.owner_actions){
+		let res;
+		if(res=act.link.match(/^javascript:GetGooValue\( '%contextid%', '%assetid%', (\d+), (\d+), (\d+)/)){
+			W.$J.ajax({
+				url: '/auction/ajaxgetgoovalueforitemtype/',
+				type: 'GET',
+				cache: true,
+				data: {
+					appid: res[1],
+					item_type: res[2],
+					border_color: res[3]
+				}
+			}).done(res=>{
+				let str='<p>Goo Value: '+res.goo_value,
+					gv = parseInt(res.goo_value),
+					price = parseInt(CreateBuyOrderDialog.m_nBestBuyPrice);
+				if(gv && price){
+					str+= '<br>1000 gems: '+
+					W.v_currencyformat( 1000*price/gv,
+						W.GetCurrencyCode( W.g_rgWalletInfo['wallet_currency'] ) )
+				}
+				W.$J('#largeiteminfo_item_descriptors').append(str+'</p>')
+			})
+		}
+	}
 
 }
 
