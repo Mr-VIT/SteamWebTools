@@ -274,33 +274,43 @@ function init() {
 			sub : '.package_header'
 		}[itemType]).wrap(
 			$('<a href="#viewlogos" title="View Logos"></a>').click(function(){
-				var jpg='.jpg';
+
+				function makeImgEl(url, stl){
+					stl = stl ? `style="${stl}" ` : '';
+					return `<img ${stl}src="https://steamcdn-a.akamaihd.net/steam/${itemType}s/${itemId}/${url}"><br>`;
+				}
+
 				var urls = [
-					'capsule_616x353'+jpg,
-					'header'+jpg,
-					'capsule_467x181'+jpg,
-					'header_292x136'+jpg,
-					'capsule_231x87'+jpg,
-					'capsule_184x69'+jpg,
-					'capsule_sm_120'+jpg,
+					'capsule_616x353.jpg',
+					'header.jpg',
+					'capsule_467x181.jpg',
+					'header_292x136.jpg',
+					'capsule_231x87.jpg',
+					'capsule_184x69.jpg',
+					'capsule_sm_120.jpg',
 				];
 				if(itemType=='sub') {
-					urls.unshift('header_586x192'+jpg);
-				} else if(itemType=='app'){
-					urls=urls.concat([
-						'library_600x900_2x'+jpg,
-						'library_600x900'+jpg,
-						'logo.png',
-						'library_hero'+jpg
-					]);
+					urls.unshift('header_586x192.jpg');
 				}
+				res = urls.map(makeImgEl).join('');
 
-				var res='';
-				for(var i=0;i<urls.length;i++){
-					res+='<img src="//steamcdn-a.akamaihd.net/steam/'+itemType+'s/'+itemId+'/'+urls[i]+'"><br>';
+				if(itemType=='app'){
+					res =
+						makeImgEl('library_hero.jpg', 'max-width:100%')+
+						makeImgEl('logo.png', 'position:absolute;left:0;top:0;border:1px #0f0 solid')+
+						'<div style="float:right">'+
+						[	'library_600x900_2x.jpg',
+							'library_600x900.jpg',
+							'portrait.png',
+						].map(makeImgEl).join('')+
+						'</div>' + res;
 				}
+				//W.ShowDialog(t('Logos'), $(res));
 
-				W.ShowDialog(t('Logos'), $(res));
+				window.open(URL.createObjectURL(
+					new Blob([res], { type: "text/html" })
+				));
+
 				return false;
 			})
 		)
