@@ -182,6 +182,7 @@ function profilePageInit(){
 			var srv = steamid2 % 2;
 			var accountid = steamid2 - 7960265728;
 			steamid2 = "STEAM_0:" + srv + ":" + ((accountid-srv)/2);
+			var shortId = accountid.toString(16).replace(/./g, s=>'bcdfghjkmnpqrtvw'[parseInt(s,16)]);
 
 			function template(a, b){
 				return '<tr><td><b>'+ a +'</b></td><td>'+ b +'</td>';
@@ -189,9 +190,10 @@ function profilePageInit(){
 
 			$('#swtexinfo').html(
 				'<table>'+
-				template('CommunityID', steamid)+
+				template('SteamID64', steamid)+
 				template('SteamID', steamid2)+
 				template('AccountID', accountid)+
+				template('Short ID', 'https://s.team/p/'+shortId)+
 				template('Registration date', accCrDate)+
 				template('VAC', (vacBanned=='0'?'Clear':'Banned'))+
 				template('Trade Ban', tradeBanState)+
