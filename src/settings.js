@@ -11,7 +11,6 @@ var settings = {
 		storeShowCCbtn : true,
 		storeCCList : 'ru ua us ar fr no gb au br de jp',
 		storeShowCartBtn : true,
-		storeCartAjax : true,
 		storeShowSubid : true,
 		storeShowBtnGetPrices : true,
 

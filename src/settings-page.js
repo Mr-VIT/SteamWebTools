@@ -166,11 +166,6 @@ createForm([
 			},
 			{
 				type:'checkbox',
-				title:t('set.cartAjax'),
-				name:'storeCartAjax',
-			},
-			{
-				type:'checkbox',
 				title:t('set.showSubid'),
 				name:'storeShowSubid',
 			},

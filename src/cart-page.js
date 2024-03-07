@@ -11,12 +11,14 @@ function createBlock(title, links){
 		out+='<a class="btn_small btnv6_blue_hoverfade" href="'+link.href+'"'+(link.blank ? ' target="_blank"':'')+'><span>'+link.text+'</span></a><br/>'
 	}
 
-	out+='<br/><h2>'+t('addSubidsToCart')+'</h2> <form id="addtocartsubids" method="post"><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subids" placeholder="1, 2, 3"/><input type="submit" value="'+t('add')+'" class="btn_small btnv6_blue_hoverfade"></form><label><input type="checkbox" id="swt_cb_asbundleid">Bundle Id</label><br><form id="formcarthist" method="post"><input type="submit" value="'+t('addChecked')+'" style="float:right" class="btn_small btnv6_blue_hoverfade"><h2>'+t('cartHist')+'</h2><input type="hidden" name="sessionid" value="'+W.g_sessionID+'"><input type="hidden" name="action" value="add_to_cart">';
+	out+=`<br/><h2>${t('addSubidsToCart')}</h2> <form id="addtocartsubids" method="post"><input type="hidden" name="sessionid" value="${W.g_sessionID}"><input type="hidden" name="action" value="add_to_cart"><input type="text" name="subids" placeholder="1, 2, 3"/><input type="submit" value="${t('add')}" class="btn_small btnv6_blue_hoverfade"></form><label><input type="checkbox" id="swt_cb_asbundleid">Bundle Id</label><br>
+	<form id="formcarthist" method="post"><h2>${t('cartHist')}</h2><input type="submit" value="${t('addChecked')}" class="btn_small btnv6_blue_hoverfade"><input type="hidden" name="sessionid" value="${W.g_sessionID}"><input type="hidden" name="action" value="add_to_cart">`;
 
-	var cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
+	var cartHistory = W.localStorage['swtcarthistory'] ? JSON.parse(W.localStorage['swtcarthistory']) : [];
 	var chStr = '';
-	for(var i=0; i<cartHistory.length; i++) {
-		chStr = '<input type="checkbox" name="subid[]" value="'+cartHistory[i].subid+'">  <a href="/'+(cartHistory[i].link || 'sub/'+cartHistory[i].subid)+'/">'+(cartHistory[i].name || 'SubID: '+cartHistory[i].subid)+'</a><br>[<a href="/sub/'+cartHistory[i].subid+'/">'+cartHistory[i].subid+'</a>] ('+(cartHistory[i].price || 'N/A')+')<br><br>' + chStr;
+	for(let i=cartHistory.length-1; i>=0; --i) {
+		let itm = cartHistory[i];
+		chStr+= '<br><br><input type="checkbox" name="subid[]" value="'+itm.subid+'">  <a href="/'+(itm.link || 'sub/'+itm.subid)+'/">'+(itm.name || 'SubID: '+itm.subid)+'</a><br>[<a href="/sub/'+itm.subid+'/">'+itm.subid+'</a>] ('+(itm.price || 'N/A')+')';
 	}
 
 	out += chStr + '</form></div></div>';
@@ -25,14 +27,12 @@ function createBlock(title, links){
 }
 
 var $ = W.$J; // jQuery
-
-var el = document.querySelector('.page_content > .rightcol');
-
+// TODO test for new cart
 links = [
 	{href:'https://store.steampowered.com/checkout/?purchasetype=gift#quick',blank:1, text:t('quickPurchase')},
 ];
 
-el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
+$('#page_root').after(createBlock('Steam Web Tools', links));
 
 $('#addtocartsubids').bind('submit',function(){
 	var t = $(this);
@@ -45,17 +45,31 @@ $('#addtocartsubids').bind('submit',function(){
 	var
 		subids = t.find('input[name="subids"]').val(),
 		s,
-		cartHistory = W.localStorage['swtcarthistory'] && JSON.parse(W.localStorage['swtcarthistory']) || [];
+		cartHistory = W.localStorage['swtcarthistory'] ? JSON.parse(W.localStorage['swtcarthistory']) : [];
 
 	subids = subids.split(',');
 	for (var i=0; i < subids.length; i++) {
-		s = subids[i].trim();
+		s = subids[i] = Number(subids[i].trim());
 		t.append('<input type="hidden" name="subid[]" value="'+s+'"/>');
-
-		cartHistory.push({subid: s});
+		if(cartHistory.at(-1).subid!=s)
+			cartHistory.push({subid: s});
 	}
 	while(cartHistory.length>20){
 		cartHistory.shift();
 	}
 	W.localStorage['swtcarthistory'] = JSON.stringify(cartHistory);
-})
+
+	if(W.g_bUseNewCartAPI && W.AddItemToCart){
+		W.AddItemToCart(subids);
+		return false;
+	}
+});
+
+$('#formcarthist').bind('submit',function(){
+
+	if(W.g_bUseNewCartAPI && W.AddItemToCart){
+		let subids = $('input[name="subid[]"]:checked', this).toArray().map(i=>Number(i.value));
+		W.AddItemToCart(subids);
+		return false;
+	}
+});

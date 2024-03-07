@@ -11,7 +11,10 @@ function init() {
 	}
 
 	if(settings.cur.storeShowCartBtn){
-		$('#store_header_cart_btn').css('display','block');
+		let $cart = $('#cart_status_data>div[data-featuretarget="shoppingcart-count-widget"]');
+		if(!$cart.data('props')?.count){
+			$cart.after($('div.responsive_menu_user_cart>a').clone().css('background', '#5c7e10'))
+		}
 	}
 
 	// == Feature == cc switch
@@ -233,7 +236,7 @@ function init() {
 
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
 
-		// ajax add to cart | cart history
+		// cart history
 		var addToCart_old = W.addToCart;
 		W.addToCart = function(subid){
 			var form = $('[name="add_to_cart_'+subid+'"]');
@@ -241,31 +244,19 @@ function init() {
 
 			var cartHistory = W.localStorage.swtcarthistory && JSON.parse(W.localStorage.swtcarthistory) || [];
 			if(cartHistory.length>=20) cartHistory.shift();
-			cartHistory.push({
-				subid: subid,
-				name: el.find('h1').text().match(/\S+\s(.+)/i)[1],
-				price: el.find('.game_purchase_price.price').text().trim() || el.find('.discount_final_price').text().trim(),
-				link: itemType+'/'+itemId
-			});
-			W.localStorage.swtcarthistory = JSON.stringify(cartHistory);
 
-			if(settings.cur.storeCartAjax){
-				el.find('.game_purchase_action_bg .btn_addtocart:last>a').after('<a id="swtcartdone" href="#">'+t('adding')+'</a>');
-				$.ajax({
-					url: form.attr('action'),
-					type: 'POST',
-					data: {subid:subid, action:'add_to_cart', sessionid:W.g_sessionID}
-				}).done(data=>{
-					var text = (data.indexOf('id="error_box"')==-1)? '✔ '+t('added') : '❌ Some Error'; //TODO add 'err' to lang text
-					el.find('#swtcartdone').css('background-image','none').text(text).attr('href','/cart/');
-					// restore orig fn, useful on error
-					W.addToCart = addToCart_old;
-				}).error((jqXHR, textStatus, errorThrown)=>{
-					if(!errorThrown) return addToCart_old.apply(this, arguments);
-				})
-			} else {
-				return addToCart_old.apply(this, arguments);
+			if(cartHistory.at(-1)?.subid!=subid){
+				cartHistory.push({
+					subid: subid,
+					name: el.find('h1').text().match(/\S+\s(.+)/i)[1],
+					price: el.find('.game_purchase_price.price').text().trim() || el.find('.discount_final_price').text().trim(),
+					link: itemType+'/'+itemId
+				});
+				W.localStorage.swtcarthistory = JSON.stringify(cartHistory);
 			}
+
+			return addToCart_old.apply(this, arguments);
+
 		};
 
 		//add btn : view logos
