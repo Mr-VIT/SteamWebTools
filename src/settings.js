@@ -18,7 +18,7 @@ var settings = {
 		marketMainPageFuncs: true,
 
 		profileLikeBtn: true,
-		profileСollapseShowcases: false,
+		profileCollapseShowcases: false,
 		profileCsOpenNotes: true,
 		profileRepBadges: true,
 

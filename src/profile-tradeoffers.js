@@ -93,7 +93,7 @@ W.swt_checkcardswap = async function(){
 		groupItems(
 			$trade.find('div.tradeoffer_items.'+el+' div.trade_item').get()
 			.map(el => itemsDescriptions[el.dataset.economyItem])
-		, senderIsMe ? 1-i : i ) // my=0, his=1
+		, senderIsMe ? 1-i : i ) // my=0, Their=1
 	);
 
 	var str='', checkRes=true;
@@ -105,7 +105,7 @@ W.swt_checkcardswap = async function(){
 	}
 	// TODO set checkRes = false if others ?
 
-	var body = '<h2>Community items</h2><table class="swt_swpcheck"><tr><td></td><td>My</td><td>'+compCount(1, checkRes)+'</td><td>His</td></tr>'
+	var body = '<h2>Community items</h2><table class="swt_swpcheck"><tr><td></td><td>My</td><td>'+compCount(1, checkRes)+'</td><td>Their</td></tr>'
 		+'<tr><td><b><i>Total</i></b></td><td>'  +items.all[0].length +'</td><td>'
 		+compCount(items.all[0].length, items.all[1].length)
 		+'</td><td>' +items.all[1].length +'</td></tr>'
@@ -116,7 +116,7 @@ W.swt_checkcardswap = async function(){
 	items.other=Object.values(items.other);
 
 	if(items.other.length){
-		body+= '<br/><h2>Other</h2><table class="swt_swpcheck"><tr><td>My</td><td>Item type</td><td>His</td></tr>';
+		body+= '<br/><h2>Other</h2><table class="swt_swpcheck"><tr><td>My</td><td>Item type</td><td>Their</td></tr>';
 		for(let i=0, n=items.other.length ; i<n; ++i) {
 			let el = items.other[i], item = el.item;
 			body+='<tr><td>'+(el[0]||'')
