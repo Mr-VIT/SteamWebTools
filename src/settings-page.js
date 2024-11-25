@@ -22,10 +22,9 @@ $('.grouppage_member_tiles').remove();
 $('.group_tabs').remove();
 $('.rightcol ').remove();
 
-
+let fieldsToSave = [];
 var createForm = function(data){
 	var res = '';
-	createForm.fields = [];
 
 	var rows, row, i, j;
 	for(i=0;i<data.length;i++){
@@ -34,9 +33,17 @@ var createForm = function(data){
 		for(j=0;j<rows.length;j++){
 			row=rows[j];
 
-			createForm.fields.push(row.name);
+			if(row.type){
+				fieldsToSave.push(row);
 
-			row.value = settings.cur[row.name];
+				if(row.data){
+					row.value = row.data.get();
+				} else {
+					row.value = settings.cur[row.name];
+				}
+			} else {
+				row.type='_text';
+			}
 
 			res+='<div class="formRow">';
 			res+=createForm['create_'+row.type](row);
@@ -45,6 +52,9 @@ var createForm = function(data){
 		res+=createForm.create_groupEnd();
 	}
 	$('.maincontent>.leftcol ')[0].innerHTML='<form class="smallForm" id="editForm" name="editForm">'+res+'<div class="group_content_bodytext"><div class="forum_manage_actions"><a href="#/swt-settings" class="btn_grey_white_innerfade btn_medium" id="swt_btnDef"><span>'+t('set.def')+'</span></a><button type="submit" class="btn_green_white_innerfade btn_medium"><span>'+t('save')+'</span></button></div></div></form>';
+}
+createForm.create__text = function(data){
+	return '<p>'+data.title+'</p>';
 }
 createForm.create_groupStart = function(title){
 	return '<div class="group_content group_summary"><div class="formRow"><h1>'+title+'</h1></div>';
@@ -71,6 +81,9 @@ createForm.create_textLong = function(data){
 }
 createForm.create_number = function(data){
 	return `<label for="${data.name}">${data.title}</label>: <input type="number" value="${data.value}" min="${data.min}" max="${data.max}" step="${data.step}" name="${data.name}" id="${data.name}">`;
+}
+createForm.create_textarea = function(data){
+	return `<div class="formRowFields"><div class="gray_bevel fullwidth"><textarea class="dynInput" rows="8" name="${data.name}" id="${data.name}" placeholder="${data.title}">${$("<p>").text(data.value).html()}</textarea></div></div>`;
 }
 
 createForm([
@@ -210,18 +223,26 @@ $('#swt_btnDef').click(function(){
 });
 
 $("form#editForm").submit(function(event) {
-	var i, f, el, type;
-	for(i=0;i<createForm.fields.length;i++){
-		f=createForm.fields[i];
-		el=$('#'+f);
-		type = el.prop('type');
-		settings.cur[f] = (type=='checkbox') ? el.prop('checked')
-						 :(type=='number') ? el.get(0).valueAsNumber
-						 :el.val();
+	var i, el;
+	for(i=0; i<fieldsToSave.length; ++i){
+		let field = fieldsToSave[i];
+
+		el=$('#'+field.name);
+
+		let value = (field.type=='checkbox') ? el.prop('checked')
+					:(field.type=='number') ? el.get(0).valueAsNumber
+					:el.val();
+
+		if(field.data){
+			field.data.set(value)
+		} else
+			settings.cur[field.name] = value;
 	}
+
 	settings.save();
 
 	event.preventDefault();
+
 	if(!settings.storage.gm) {
 		W.location.href="https://store.steampowered.com/about/#swt-settings-save="+encodeURIComponent(JSON.stringify(settings.cur));
 	} else

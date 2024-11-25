@@ -28,23 +28,23 @@ var settings = {
 	storage : {
 		key : 'SWTSettings',
 		gm : window.GM_getValue ? true : false,
-		set : function(data){
+		set : function(data, key=this.key){
 			if(this.gm){
-				GM_setValue(this.key, data);
+				GM_setValue(key, data);
 			} else
-				W.localStorage.setItem(this.key, data);
+				W.localStorage.setItem(key, data);
 		},
-		get : function(){
+		get : function(key=this.key){
 			if(this.gm){
-				return GM_getValue(this.key);
+				return GM_getValue(key);
 			} else
-				return W.localStorage.getItem(this.key);
+				return W.localStorage.getItem(key);
 		},
-		del : function(){
+		del : function(key=this.key){
 			if(this.gm){
-				GM_deleteValue(this.key);
+				GM_deleteValue(key);
 			} else
-				W.localStorage.removeItem(this.key);
+				W.localStorage.removeItem(key);
 		},
 	},
 	load : function(){
