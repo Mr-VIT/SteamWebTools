@@ -125,7 +125,7 @@ function getMyCards(){
 /**
  *
  * @param {string} url partner profile url
- * @returns {[CardData]}
+ * @returns {Promise<[CardData]>}
  */
 async function getPartnerCards(url){
 	// todo better gamecards url
@@ -143,7 +143,7 @@ async function getPartnerCards(url){
  *
  * @param {[CardData]} myCards
  * @param {string} partnerUrl
- * @returns {string}
+ * @returns {Promise<string>}
  */
 async function matchWithPartner(myCards, partnerUrl){
 	let theirСards = await getPartnerCards(partnerUrl);
@@ -188,9 +188,8 @@ async function matchWithAll(e){
 
 	myCards = getMyCards();
 	if(!myCards.maxCount || myCards.maxCount<2) {
-		$out.append('no match');
+		$out.append(t('cm.noMatch'));
 		return false;
-
 	}
 
 	let partners = new Set();
@@ -211,7 +210,7 @@ async function matchWithAll(e){
 				$out.append($('.badge_friendwithgamecard>a.persona[href="'+purl+'"]').parent().css('float','none'));
 				$out.append(goodRes);
 			} else {
-				$out.append('<br>❌'+(badRes||'no match'));
+				$out.append('<br>❌'+(badRes||t('cm.noMatch')));
 			}
 		}
 		$out.append('<br><br>');
@@ -219,7 +218,8 @@ async function matchWithAll(e){
 
 	return false;
 }
-$('<a class="btn_grey_grey btn_medium"><span>Match with all</span></a>').appendTo('div.gamecards_inventorylink').click(matchWithAll);
+$(`<a class="btn_grey_grey btn_medium"><span>${t('cm.matchall')}</span></a>`)
+.appendTo('div.gamecards_inventorylink').click(matchWithAll);
 
 async function matchCardsShowModal(e){
 	const modalTitl = 'Сard swap matcher';
@@ -245,7 +245,7 @@ async function matchCardsShowModal(e){
 	} finally {
 		modal.Dismiss();
 		console.log(showRes);
-		modal = W.ShowDialog(modalTitl, showRes||'no match');
+		modal = W.ShowDialog(modalTitl, showRes||t('cm.noMatch'));
 		if(showRes) // add btn "Offer a trade"
 			modal.m_$StandardContent.append($popup.children('div:first').clone());
 	}
