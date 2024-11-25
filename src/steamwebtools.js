@@ -1,6 +1,10 @@
 !function(){
 var W = window.unsafeWindow || window;
 
+let CDN = W.VALVE_PUBLIC_PATH?.match('//\\w+(\\..+?/)')?.[1];
+if(!CDN)
+	CDN='.steamstatic.com/';
+
 //!include settings.js
 //!include lang.js
 

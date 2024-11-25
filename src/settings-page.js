@@ -2,7 +2,7 @@ var $ = W.$J;
 
 $('#group_tab_content_overview').show().attr('id','swt_content1');
 
-$('head').append($('<link href="//steamcommunity-a.akamaihd.net/public/css/skin_1/groupadmin.css" rel="stylesheet" type="text/css">'));
+$('head').append($('<link href="//community'+CDN+'public/css/skin_1/groupadmin.css" rel="stylesheet" type="text/css">'));
 
 $('.grouppage_logo').css('background-image','none');
 $('.grouppage_logo>img')[0].src='//v1t.su/projects/steam/webtools/imgs/steam-big-icon.png';

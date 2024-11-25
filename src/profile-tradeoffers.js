@@ -11,7 +11,7 @@ W.swt_checkcardswap = async function(){
 	var modalId = $trade.prop('id')+'_swt_modal';
 
 
-	var $table = $('<div id="'+modalId+'"><div id="swt_loadstate"></div><img src="//steamcommunity-a.akamaihd.net/public/images/login/throbber.gif"></div>');
+	var $table = $('<div id="'+modalId+'"><div id="swt_loadstate"></div><img src="//community'+CDN+'public/images/login/throbber.gif"></div>');
 	var $loadstate = $table.find('#swt_loadstate');
 	var Modal = W.ShowDialog('Check cards swap 1:1', $table);
 
@@ -120,7 +120,7 @@ W.swt_checkcardswap = async function(){
 		for(let i=0, n=items.other.length ; i<n; ++i) {
 			let el = items.other[i], item = el.item;
 			body+='<tr><td>'+(el[0]||'')
-			+'</td><td data-economy-item="'+item.hoverkey+'"><img src="https://community.akamai.steamstatic.com/economy/image/'+item.icon_url+'/96fx96f">'
+			+'</td><td data-economy-item="'+item.hoverkey+'"><img src="https://community'+CDN+'economy/image/'+item.icon_url+'/96fx96f">'
 			+(item.is_stackable ? item.amount+'x ' : '')
 			+item.name+'<br>'+item.type+'</td><td>'
 			+(el[1]||'')+'</td></tr>';

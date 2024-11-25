@@ -55,7 +55,7 @@ function addButtonsMyListings(){
 					run(++i);
 				},
 				error: function() {
-					$statusIcon.replaceWith('<img src="//community.cloudflare.steamstatic.com/public/images/economy/market/icon_alertlistings.png" />');
+					$statusIcon.replaceWith('<img src="//community'+CDN+'public/images/economy/market/icon_alertlistings.png" />');
 				},
 				success:function() {
 					data[i].parentElement.parentElement.parentElement.parentElement.remove();

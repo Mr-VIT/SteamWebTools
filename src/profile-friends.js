@@ -43,10 +43,10 @@ let frVchangesBtn = $J(`<button class="profile_friends manage_link btnv6_blue_ho
             str +=
             `<div class="friend_block_v2 persona" id="fr_${removed[i]}" data-miniprofile="${removed[i]}">
                 <a class="selectable_overlay" href="/profiles/[U:1:${removed[i]}]"></a>
-                <div class="player_avatar friend_block_link_overlay"><img src="//avatars.akamai.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg"></div>
+                <div class="player_avatar friend_block_link_overlay"><img src="//avatars${CDN}fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg"></div>
                 <div class="friend_block_content">${removed[i]}</div>
             </div>`;
-            $J.ajax(`https://steamcommunity.com/miniprofile/${removed[i]}/json`).done(data=>{
+            $J.ajax(`/miniprofile/${removed[i]}/json`).done(data=>{
                 let $el=$J('#fr_'+removed[i]);
                 $el.find('img').attr('src', data.avatar_url);
 

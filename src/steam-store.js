@@ -44,7 +44,7 @@ function init() {
 
 		var changeCCmenuHTML = '\
 		<span class="pulldown" onclick="ShowMenu(this, \'cc_menu\', \'left\', \'bottom\', true);">CC'+
-		(curCC ?': <img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+curCC.toLowerCase()+'.gif"/> '+curCC:'')+
+		(curCC ?': <img src="//community'+CDN+'public/images/countryflags/'+curCC.toLowerCase()+'.gif"/> '+curCC:'')+
 		' </span>\
 <div class="popup_block_new dropdownhidden" id="cc_menu">\
 <div class="popup_body popup_menu shadow_content" id="cc_list"></div></div>';
@@ -55,7 +55,7 @@ function init() {
 			url= W.location.origin+W.location.pathname+'?cc=';
 
 		for(var i=0; i < ccListA.length; i++){
-			s += '<a class="popup_menu_item" href="'+url+ccListA[i]+'"><img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+ccListA[i]+'.gif" style="width:16px"/> '+ccListA[i].toUpperCase()+'</a>';
+			s += '<a class="popup_menu_item" href="'+url+ccListA[i]+'"><img src="//community'+CDN+'public/images/countryflags/'+ccListA[i]+'.gif" style="width:16px"/> '+ccListA[i].toUpperCase()+'</a>';
 		}
 
 		document.getElementById('cc_list').innerHTML=s;
@@ -200,7 +200,7 @@ function init() {
 				for(var k=0; k < subs.length; k++) {
 					var str = t('prices')+':';
 					for(var i=0; i < ccListA.length; i++){
-						str += '<div class="swt_price_'+k+'_'+ccListA[i]+'"><a href="?cc='+ccListA[i]+'"><img src="//steamcommunity-a.akamaihd.net/public/images/countryflags/'+ccListA[i]+'.gif" style="width:16px"/> '+ccListA[i].toUpperCase()+'</a> <span>...</span></div>';
+						str += '<div class="swt_price_'+k+'_'+ccListA[i]+'"><a href="?cc='+ccListA[i]+'"><img src="//community'+CDN+'public/images/countryflags/'+ccListA[i]+'.gif" style="width:16px"/> '+ccListA[i].toUpperCase()+'</a> <span>...</span></div>';
 
 					}
 					subs[k].el.innerHTML = str;
@@ -230,8 +230,8 @@ function init() {
 		];
 
 		if(itemType=='app'){
-			links.push({href:'//steamcommunity.com/my/gamecards/'+itemId, icon:'//steamstore-a.akamaihd.net/public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')});
-			links.push({href:'//steamcommunity.com/market/search?q=&category_753_Game%5B%5D=tag_app_'+itemId+'&category_753_item_class%5B%5D=tag_item_class_2&appid=753', icon:'//steamstore-a.akamaihd.net/public/images/v6/ico/ico_cards.png', text: t('SearchCardsOnMarket')})
+			links.push({href:'//steamcommunity.com/my/gamecards/'+itemId, icon:'//store'+CDN+'public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')});
+			links.push({href:'//steamcommunity.com/market/search?q=&category_753_Game%5B%5D=tag_app_'+itemId+'&category_753_item_class%5B%5D=tag_item_class_2&appid=753', icon:'//store'+CDN+'public/images/v6/ico/ico_cards.png', text: t('SearchCardsOnMarket')})
 		}
 
 		el.insertAdjacentHTML('afterBegin', createBlock('Steam Web Tools', links));
@@ -268,7 +268,7 @@ function init() {
 
 				function makeImgEl(url, stl){
 					stl = stl ? `style="${stl}" ` : '';
-					return `<img ${stl}src="https://steamcdn-a.akamaihd.net/steam/${itemType}s/${itemId}/${url}"><br>`;
+					return `<img ${stl}src="https://cdn${CDN}steam/${itemType}s/${itemId}/${url}"><br>`;
 				}
 
 				var urls = [

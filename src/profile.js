@@ -90,7 +90,7 @@ function profilePageInit(){
 		{hr:true},
 		{
 			href: 'javascript:ShowNicknameModal()',
-			icon: '//community.akamai.steamstatic.com/public/images/skin_1/notification_icon_edit_bright.png',
+			icon: '//community'+CDN+'public/images/skin_1/notification_icon_edit_bright.png',
 			text: t('prAddNick'),
 			internal: true,
 			filter: ()=>{
@@ -164,7 +164,7 @@ function profilePageInit(){
 		SetRepBadges();
 
 	W.getMoreInfo = function() {
-		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="//steamcommunity-a.akamaihd.net/public/images/login/throbber.gif"></div>'));
+		var Modal = W.ShowDialog(t('extInfo'), $('<div id="swtexinfo"><img src="//community'+CDN+'public/images/login/throbber.gif"></div>'));
 		W.setTimeout(function(){Modal.AdjustSizing()},1);
 		$.ajax({
 			url: W.location.origin+W.location.pathname+'?xml=1',
@@ -217,7 +217,15 @@ function profilePageInit(){
 	// inventory links
 	var el = document.querySelector('.profile_count_link a[href$="inventory/"]');
 	if(el)
-		el.insertAdjacentHTML('afterEnd', ': <span class="linkActionSubtle"><a title="Steam Gifts" href="'+el.href+'#753_1"><img src="//store.cloudflare.steamstatic.com/public/images/icon_gift.png"/></a> <a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="//store.cloudflare.steamstatic.com/public/images/v6/ico/ico_cards.png"/></a> <a title="TF2" href="'+el.href+'#440"><img src="//steamcdn-a.akamaihd.net/apps/tf2/blog/images/favicon.ico"/></a> <a title="Dota 2" href="'+el.href+'#570"><img src="https://www.dota2.com/favicon.ico"/></a> <a title="CSGO" href="'+el.href+'#730"><img width="16" height="16" src="//cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/730/69f7ebe2735c366c65c0b33dae00e12dc40edbe4.jpg"/></a></span>');
+		el.insertAdjacentHTML('afterEnd',
+			': <span class="linkActionSubtle">'
+			+'<a title="Steam Gifts" href="'+el.href+'#753_1"><img src="//store'+CDN+'public/images/icon_gift.png"/></a>'
+			+'<a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="//store'+CDN+'public/images/v6/ico/ico_cards.png"/></a>'
+			+'<a title="TF2" href="'+el.href+'#440"><img src="//cdn'+CDN+'apps/tf2/blog/images/favicon.ico"/></a>'
+			+'<a title="Dota 2" href="'+el.href+'#570"><img src="https://www.dota2.com/favicon.ico"/></a>'
+			+'<a title="CSGO" href="'+el.href+'#730"><img width="16" height="16" src="//cdn'+CDN+'steamcommunity/public/images/apps/730/69f7ebe2735c366c65c0b33dae00e12dc40edbe4.jpg"/></a>'
+			+'</span>'
+		);
 
 
 	// profiles link in "More"
@@ -231,7 +239,7 @@ function profilePageInit(){
 	} catch(err) {
 		// "More" button for self profile
 		$('.profile_header_actions').append('<span class="btn_profile_action btn_medium" onclick="ShowMenu(this,\'profile_action_dropdown\',\'right\')"><span>'+t('more')
-		+' <img src="//community.cloudflare.steamstatic.com/public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
+		+' <img src="//community'+CDN+'public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
 	}
 
 	// == Feature == like profile button

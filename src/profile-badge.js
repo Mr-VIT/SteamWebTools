@@ -7,7 +7,7 @@ if(!app) return;
 $('div.badge_title:first').append('<a class="btn_grey_grey btn_small_thin" href="'
 	+W.location.origin+W.location.pathname
 	+(W.location.search.includes('border=1') ? '' : '?border=1')
-	+'"><span><img src="https://community.cloudflare.steamstatic.com/public/images/skin_1/icon_tradeoffer.png"> '+t('badgeAnotherVersion')+'</span></a>');
+	+'"><span><img src="https://community'+CDN+'public/images/skin_1/icon_tradeoffer.png"> '+t('badgeAnotherVersion')+'</span></a>');
 
 
 // == Feature == link to steamcardexchange.net
@@ -57,8 +57,8 @@ if(friendsCards.length) {
 	.each(function(i, el){
 		var $el=$(el),
 			personaUrl = $el.prev('a.persona').attr('href');
-		$el.append(`<a class="btn_grey_grey btn_medium" href="${personaUrl}/gamecards/${app+W.location.search}" target="_blank"><img style="height:16px;transform:scale(1.5)" src="//steamstore-a.akamaihd.net/public/images/ico/ico_cards.png">Their Cards</a>
-		<a class="btn_grey_grey btn_medium" href="//steamtradematcher.com/tools/specscan/${personaUrl.split('/').at(-1)}" target="_blank"><img src="//community.akamai.steamstatic.com/public/images/skin_1/icon_tradeoffer.png"> TradeMatcher</a>`)
+		$el.append(`<a class="btn_grey_grey btn_medium" href="${personaUrl}/gamecards/${app+W.location.search}" target="_blank"><img style="height:16px;transform:scale(1.5)" src="//store${CDN}public/images/ico/ico_cards.png">Their Cards</a>
+		<a class="btn_grey_grey btn_medium" href="//steamtradematcher.com/tools/specscan/${personaUrl.split('/').at(-1)}" target="_blank"><img src="//community${CDN}public/images/skin_1/icon_tradeoffer.png"> TradeMatcher</a>`)
 		$('<div class="btn_grey_grey btn_medium" title="good for both">Find matching</div>')
 		.appendTo($el)
 		.click(matchCardsShowModal)
