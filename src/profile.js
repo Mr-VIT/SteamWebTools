@@ -114,11 +114,6 @@ function profilePageInit(){
 			text: t('searchinforums')+' SteamRep.com',
 		},
 		{
-			href: 'http://www.google.com/#q='+steamid+' inurl:sourceop.com',
-			icon: '//www.sourceop.com/themes/hl2/images/favicon.ico',
-			text: t('searchinforums')+' SourceOP.com',
-		},
-		{
 			href: 'http://www.steamtrades.com/user/'+steamid,
 			icon: 'https://cdn.steamtrades.com/img/favicon.ico',
 			text: t('profile')+' SteamTrades.com',
@@ -130,11 +125,6 @@ function profilePageInit(){
 			text: t('inventory')+' Backpack.tf',
 		},
 		{hr:true},
-		{
-			href: 'http://old.csgolounge.com/profile/'+steamid,
-			icon: '//csgolounge.com/favicon.ico',
-			text: t('trades')+' old.CSGOLounge.com',
-		},
 		{
 			href: 'http://steam.tools/itemvalue/#/'+steamid+'-730',
 			icon: '//steam.tools/favicon.ico',
@@ -150,6 +140,16 @@ function profilePageInit(){
 		{hr:true}
 
 	];
+
+	try{
+		// TODO add UI
+		let userLinks = GM_getValue('profileExternalLinks');
+		console.log('SWT', userLinks)
+		for(let el of userLinks){
+			el.href=el.href.replace('{STEAMID}', steamid);
+		}
+		profilesLinks=profilesLinks.concat(userLinks);
+	} catch(e){}
 
 
 	// Styles

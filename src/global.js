@@ -1,5 +1,6 @@
 // == Feature == add link to SWT settings page
-W.$J('.submenu_community').append('<a class="submenuitem swt" href="https://steamcommunity.com/groups/SteamClientBeta#/swt-settings">SWT - '+t('set.settings')+'</a>');
+W.$J('.submenu_Community')
+.append('<a class="submenuitem swt" href="https://steamcommunity.com/groups/SteamClientBeta#/swt-settings">SWT - '+t('set.settings')+'</a>');
 
 // == Feature == fix top navbar & to top button
 if(settings.cur.globalFixNavbar){
