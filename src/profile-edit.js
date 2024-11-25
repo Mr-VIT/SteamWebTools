@@ -10,6 +10,8 @@ $J(document).on('focus', selector, function(){
 		if(!btns.FilterBg) {
 			btns.FilterBg = $J(btnTemplate(t('prEd.showanim')))
 			.click(function(){
+				// class names dyn generated now
+				//TODO fix
 				$J("div[class^='profilebackground_BackgroundOption_']")
 				.not("[class*='WithVideo']")
 				.hide()

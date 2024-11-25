@@ -169,8 +169,12 @@ async function matchWithPartner(myCards, partnerUrl){
 			mc.count-=mCanGiveCnt;
 			tc.count-=mCanGiveCnt;
 
+			let els =[mc.name, tc.name].map(str=>{
+				return `[<a class="cardName" title="Click to Copy">${str}</a>]`
+			})
+
 			//todo card icons
-			res+=`${mCanGiveCnt}x [${mc.name}] ⇄ [${tc.name}]<br>`;
+			res+=`${mCanGiveCnt}x ${els[0]} ⇄ ${els[1]}<br>`;
 		}
 	}
 	// restore amount
@@ -184,6 +188,10 @@ async function matchWithAll(e){
 	$(e.target).remove();
 	$out = 	$('<div class="badge_detail_tasks"></div>').insertAfter('div.badge_detail_tasks.footer');
 	$out[0].scrollIntoView();
+
+	$out.on('click', '.cardName', function(){
+		navigator.clipboard.writeText(this.innerText);
+	});
 
 
 	myCards = getMyCards();

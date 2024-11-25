@@ -16,7 +16,7 @@ if(settings.cur.globalFixNavbar){
 			header = W.$J('#global_header'),
 			pageContent = W.$J('.responsive_page_template_content');
 
-		pageContent[0].style.setProperty("--headerheight", header[0].clientHeight+"px");
+		pageContent[0]?.style.setProperty("--headerheight", header[0].clientHeight+"px");
 		$w = W.$J(window);
 
 		W.document.onscroll = ()=>{
