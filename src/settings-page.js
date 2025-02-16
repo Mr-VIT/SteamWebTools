@@ -211,6 +211,35 @@ createForm([
 			},
 		],
 	},
+	{
+		//TODO translations
+		group:'Store Item external links',
+		rows:[
+			{
+				title: '<i>example:</i> link title {T:searchin}/{T:viewin} Site name;https://example.com/{TYPE}-{ID}-{NAME}<br><b>{TYPE}</b> = <i>app</i> or <i>sub</i> | <b>{ID}</b> = <i>730</i> | <b>{NAME}</b> = <i>Counter Strile 2</i><br><b>{T:searchin}</b> = <i>'+t('searchin')+'</i> | <b>{T:viewin}</b> = <i>'+t('viewin')+'</i>'
+			},
+			{
+				type:'textarea',
+				title:'link title {T:searchin}/{T:viewin} Example;https://example.com/{TYPE}-{ID}-{NAME}',
+				name:'storeItemExtLinks',
+			},
+		],
+	},
+	{
+		//TODO translations
+		group:'Additional Profile external links',
+		rows:[
+			{
+				title: '<i>example:</i> link title;https://example.com/{STEAMID}<br><b>{STEAMID}</b> = <i>76012345678901234</i>'
+			},
+			{
+				type:'textarea',
+				title:'link title;https://example.com/{STEAMID}',
+				name:'profileExtLinks',
+			},
+		],
+	},
+
 ]);
 
 $('#swt_btnDef').click(function(){

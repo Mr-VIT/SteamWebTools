@@ -218,16 +218,24 @@ function init() {
 
 		var el = document.querySelector('.rightcol.game_meta_data');
 
-		// TODO customized
-		links = [
-			{href:'http://steamdb.info/'+itemType+'/'+itemId+'/', icon:'https://steamdb.info/static/logos/vector_16px.svg', text: t('viewin')+' SteamDB.info'},
-			{href:'http://www.steamprices.com/'+curCC.toLowerCase()+'/'+itemType+'/'+itemId, icon:'https://www.steamprices.com/assets/images/favicons/favicon-16x16.png', text: t('viewin')+' SteamPrices.com'},
-			{href:'https://plati.market/asp/find.asp?ai=111350&searchstr='+gamename, icon:'https://plati.market/favicon.ico', text: t('searchin')+' Plati.market'},
-			{href:'https://steampub.ru/search/'+gamename, icon:'https://steampub.ru/favicon.ico', text: t('searchin')+' SteamPub.ru'},
-			{href:'http://www.steamgifts.com/giveaways/search?q='+gamename, icon:'https://cdn.steamgifts.com/img/favicon.ico', text: t('searchin')+' SteamGifts.com'},
-			{href:'https://steambroker.com/tradeoffers.php?appid=753&refid=42362508&query='+gamename, icon:'https://steambroker.com/favicon.ico', text: t('searchin')+' SteamBroker.com'},
-			{href:'http://steam-trader.com/games/?r=45962&text='+gamename, icon:'https://steam-trader.com/favicon.ico', text: t('searchin')+' Steam-Trader.com'},
-		];
+		let links;
+		try{
+			let storeItemExtLinks = settings.cur.storeItemExtLinks;
+			if(!storeItemExtLinks) throw 0;
+			storeItemExtLinks = storeItemExtLinks.split('\n').map(el=>{
+				el = el.match(/^(.+?);(.+)$/);
+				if(el) return {
+					text: el[1].replace(/{T:(.+?)}/, function replacer(match, p1) {
+						return t(p1);
+					}),
+					href: el[2].replace('{TYPE}', itemType).replace('{ID}', itemId).replace('{NAME}', gamename)
+				};
+				else {
+					return {hr:true};
+				}
+			})
+			links = storeItemExtLinks;
+		} catch(e){}
 
 		if(itemType=='app'){
 			links.push({href:'//steamcommunity.com/my/gamecards/'+itemId, icon:'//store'+CDN+'public/images/v6/ico/ico_cards.png', text: t('viewMyCardsGame')});
@@ -321,6 +329,7 @@ function createBlock(title, links){
 	var link;
 	for (var i=0; i < links.length; i++) {
 		link = links[i];
+		link.icon??= 'https://www.google.com/s2/favicons?sz=16&domain='+encodeURIComponent(link.href?.match(/\/\/(.+?)(\/|$)/)?.[1]);
 		out+='<div class="game_area_details_specs"><div class="icon"><a href="'+link.href+'"><img style="height:16px" src="'+link.icon+'" referrerpolicy="no-referrer"></a></div><a class="name" href="'+link.href+'">'+link.text+'</a></div>';
 	}
 

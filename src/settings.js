@@ -23,6 +23,9 @@ var settings = {
 
 		invSellItemPriceCheckMaxDiscount: 25,
 		invSellItemSetPriceDiff: -1,
+
+		storeItemExtLinks:'{T:viewin} SteamDB.info;https://steamdb.info/{TYPE}/{ID}/\n{T:searchin} Plati.market;https://plati.market/asp/find.asp?ai=111350&searchstr={NAME}\n{T:searchin} SteamPub.ru;https://steampub.ru/search/{NAME}\n{T:searchin} SteamGifts.com;https://www.steamgifts.com/giveaways/search?q={NAME}\n{T:searchin} Steam-Trader.com;https://steam-trader.com/games/?r=45962&text={NAME}',
+		profileExtLinks:'',
 	},
 	cur : {},
 	storage : {

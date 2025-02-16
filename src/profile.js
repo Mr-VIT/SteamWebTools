@@ -143,11 +143,21 @@ function profilePageInit(){
 
 	try{
 		// TODO add UI
-		let userLinks = GM_getValue('profileExternalLinks');
-		console.log('SWT', userLinks)
-		for(let el of userLinks){
-			el.href=el.href.replace('{STEAMID}', steamid);
-		}
+		let userLinks = settings.cur.profileExtLinks;
+		console.log('SWT', userLinks);
+		if(!userLinks) throw 0;
+		userLinks = userLinks.split('\n').map(el=>{
+			el = el.match(/^(.+?);(.+)$/);
+			if(el) return {
+				text: el[1],
+				href: el[2].replace('{STEAMID}', steamid),
+				icon: 'https://www.google.com/s2/favicons?sz=16&domain='+encodeURIComponent(el[2]?.match(/\/\/(.+?)(\/|$)/)?.[1])
+			};
+			else {
+				return {hr:true};
+			}
+		})
+
 		profilesLinks=profilesLinks.concat(userLinks);
 	} catch(e){}
 
