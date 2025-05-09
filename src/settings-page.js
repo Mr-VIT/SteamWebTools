@@ -217,6 +217,7 @@ createForm([
 		rows:[
 			{
 				title: '<i>example:</i> link title {T:searchin}/{T:viewin} Site name;https://example.com/{TYPE}-{ID}-{NAME}<br><b>{TYPE}</b> = <i>app</i> or <i>sub</i> | <b>{ID}</b> = <i>730</i> | <b>{NAME}</b> = <i>Counter Strile 2</i><br><b>{T:searchin}</b> = <i>'+t('searchin')+'</i> | <b>{T:viewin}</b> = <i>'+t('viewin')+'</i>'
+				+'<br>Set to empty to reset to default'
 			},
 			{
 				type:'textarea',
@@ -264,8 +265,13 @@ $("form#editForm").submit(function(event) {
 
 		if(field.data){
 			field.data.set(value)
-		} else
+		} else {
+			if(value===''){
+				value = settings.defaults[field.name]
+			}
 			settings.cur[field.name] = value;
+		}
+
 	}
 
 	settings.save();
