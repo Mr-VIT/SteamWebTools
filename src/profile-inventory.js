@@ -348,12 +348,22 @@ function inventoryPageInit(){
 
 	// activate filter onload page
 	var checkHideDupFilter = function(){
-		if (W.g_ActiveInventory && W.g_ActiveInventory.m_bActive) {
+		if (W.g_ActiveInventory?.m_bActive) {
 			hideDupFilter()
 		} else {
 			setTimeout(checkHideDupFilter, 1000);
 		}
 	}
+
+	// fix steam scripts with old limit per load
+	W.Filter.FILTER_ASSETS_PER_LOAD = 2500;
+	W.CInventory.prototype.LoadMoreAssets_old = W.CInventory.prototype.LoadMoreAssets;
+	W.CInventory.prototype.LoadMoreAssets = function(count){
+		if(count>W.Filter.FILTER_ASSETS_PER_LOAD)
+			count = W.Filter.FILTER_ASSETS_PER_LOAD;
+		return W.CInventory.prototype.LoadMoreAssets_old.apply(this, arguments)
+	}
+
 	checkHideDupFilter();
 	// == END hide dup functions
 
