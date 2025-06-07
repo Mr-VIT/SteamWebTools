@@ -142,9 +142,7 @@ function profilePageInit(){
 	];
 
 	try{
-		// TODO add UI
 		let userLinks = settings.cur.profileExtLinks;
-		console.log('SWT', userLinks);
 		if(!userLinks) throw 0;
 		userLinks = userLinks.split('\n').map(el=>{
 			el = el.match(/^(.+?);(.+)$/);
