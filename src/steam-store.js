@@ -247,20 +247,24 @@ function init() {
 		// cart history
 		var addToCart_old = W.addToCart;
 		W.addToCart = function(subid){
-			var form = $('[name="add_to_cart_'+subid+'"]');
-			var el=form.parent();
+			try {
+				var form = $('[name="add_to_cart_'+subid+'"]');
+				var el=form.parent();
 
-			var cartHistory = W.localStorage.swtcarthistory && JSON.parse(W.localStorage.swtcarthistory) || [];
-			if(cartHistory.length>=20) cartHistory.shift();
+				var cartHistory = W.localStorage.swtcarthistory && JSON.parse(W.localStorage.swtcarthistory) || [];
+				if(cartHistory.length>=20) cartHistory.shift();
 
-			if(cartHistory.at(-1)?.subid!=subid){
-				cartHistory.push({
-					subid: subid,
-					name: el.find('h1').text().match(/\S+\s(.+)/i)[1],
-					price: el.find('.game_purchase_price.price').text().trim() || el.find('.discount_final_price').text().trim(),
-					link: itemType+'/'+itemId
-				});
-				W.localStorage.swtcarthistory = JSON.stringify(cartHistory);
+				if(cartHistory.at(-1)?.subid!=subid){
+					cartHistory.push({
+						subid: subid,
+						name: el.find('h1,h2').text().match(/\S+\s(.+)/i)[1],
+						price: el.find('.game_purchase_price.price').text().trim() || el.find('.discount_final_price').text().trim(),
+						link: itemType+'/'+itemId
+					});
+					W.localStorage.swtcarthistory = JSON.stringify(cartHistory);
+				}
+			} catch (e) {
+				console.error(e)
 			}
 
 			return addToCart_old.apply(this, arguments);
