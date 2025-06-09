@@ -30,19 +30,27 @@ function checkboxifyMyListings(){
 };
 
 function addButtonsMyListings(){
-	W.$J('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_table_header>.market_listing_edit_buttons').html('<a href="#checkAllListings" id="btnCheckAllListings" class="item_market_action_button item_market_action_button_blue"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('checkAll')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a> <a href="#removeListings" id="btnRemoveListings" class="item_market_action_button item_market_action_button_green"><span class="item_market_action_button_edge item_market_action_button_left"></span><span class="item_market_action_button_contents">'+t('deleteChecked')+'</span><span class="item_market_action_button_edge item_market_action_button_right"></span></a>');
 
-	// set function
-	W.$J('#btnCheckAllListings').click(function(){
+	let btnCheckAllListings = W.$J(W.CreateMarketActionButton('blue', '', t('checkAll'))).click(function(){
 		var chboxes = W.$J('div.market_listing_cancel_button input.lfremove');
 		chboxes.prop('checked',!chboxes[0].checked);
 		return false;
 	});
-	W.$J('#btnRemoveListings').click(function(){
-		var data = W.$J('div.market_listing_cancel_button input.lfremove:checked').get();
+
+	let btnRemoveListings = W.$J(W.CreateMarketActionButton('green', '', t('deleteChecked'))).click(function(){
+		let self = this;
+
+		if(self._inProcess)
+			return self._inProcess = false;
+
+		let data = W.$J('div.market_listing_cancel_button input.lfremove:checked').get();
+		if(!data.length)
+			return false;
+
+		self._inProcess = true;
 
 		function run(i){
-			if(i>=data.length) return;
+			if(i>=data.length) return self._inProcess=false;
 			var $statusIcon=W.$J('<i class="waiting_dialog_throbber"/>');
 			var $el = W.$J(data[i]).after($statusIcon);
 			W.$J.ajax({
@@ -52,7 +60,8 @@ function addButtonsMyListings(){
 					sessionid: W.g_sessionID,
 				},
 				complete: function() {
-					run(++i);
+					if(self._inProcess)
+						run(++i);
 				},
 				error: function() {
 					$statusIcon.replaceWith('<img src="//community'+CDN+'public/images/economy/market/icon_alertlistings.png" />');
@@ -62,11 +71,38 @@ function addButtonsMyListings(){
 				}
 			})
 		}
-		if(data.length)
-			run(0);
+		run(0);
 
 		return false;
 	});
+
+	W.$J('#tabContentsMyListings .market_home_listing_table:nth-child(1) .market_listing_table_header>.market_listing_edit_buttons')
+	.append(btnCheckAllListings, btnRemoveListings);
+
+	//if item page
+	let item = Object.values(W.g_rgListingInfo)?.[0];
+	if(item?.converted_price_per_unit) {
+		// sometimes g_rgListingInfo does not have a lowest price
+		let lowestPrice = item.converted_price_per_unit + item.converted_publisher_fee_per_unit + item.converted_steam_fee_per_unit;
+		if(!W.getPriceAsInt) // prefer using SIH func for compatibility
+			W.getPriceAsInt = W.GetPriceValueAsInt;
+
+		W.$J(W.CreateMarketActionButton('green', '', t('Remove Overpriced')))
+		.click(function(){
+			W.$J('div.market_listing_cancel_button input.lfremove')
+			.each((i,e)=>{
+				let $e = W.$J(e);
+				let price = W.getPriceAsInt($e.parents('#mylisting_'+$e.data('listingid')+':first').find('.market_listing_price:first>span>span:first').text());
+				if(price>lowestPrice){
+					$e.prop('checked', true);
+				}
+			});
+			btnRemoveListings.click();
+			return false;
+		})
+		.insertAfter(btnCheckAllListings)
+		btnRemoveListings.prop('style', 'position:relative;z-index:13').before('<br>')
+	}
 
 	checkboxifyMyListings();
 };
