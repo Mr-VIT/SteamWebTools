@@ -16,6 +16,38 @@ function init(){
 	if(document.getElementById('largeiteminfo_item_name')){
 		itemPage();
 	}
+	else if(document.getElementById('market_mutlisell_maincontent')){
+		// fix steam scripts with old limit per load
+		if(W.Filter?.FILTER_ASSETS_PER_LOAD>2500){
+			W.Filter.FILTER_ASSETS_PER_LOAD = 2500;
+			W.CInventory.prototype.LoadMoreAssets_old = W.CInventory.prototype.LoadMoreAssets;
+			W.CInventory.prototype.LoadMoreAssets = function(count){
+				if(count>W.Filter.FILTER_ASSETS_PER_LOAD)
+					count = W.Filter.FILTER_ASSETS_PER_LOAD;
+				return W.CInventory.prototype.LoadMoreAssets_old.apply(this, arguments)
+			}
+		}
+
+		function forceReloadJS(srcUrlContains) {
+			$J('script:empty[src*="' + srcUrlContains + '"]').each((i, el)=>{
+				let $el = $J(el);
+				let src = $el.attr('src');
+				$el.remove();
+				$J('<script/>').attr('src', src).appendTo('head');
+			});
+		}
+
+		let intId = setInterval(() => {
+			if($J('#market_multisell_errmsg:visible').html('Page fixed by SWT').length){
+				clearInterval(intId);
+				$J('#market_multisell_loading').show();
+				forceReloadJS('market_multisell.js')
+			} else if(!$J('#market_multisell_loading:visible').length){
+				clearInterval(intId);
+			}
+		}, 1000);
+
+	}
 }
 
 function checkboxifyMyListings(){
