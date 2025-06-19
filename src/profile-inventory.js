@@ -24,116 +24,116 @@ function inventoryPageInit(){
 
 	// only for gifts inv
 	var ajaxTarget;
-	W.ShowItemInventory_old = W.ShowItemInventory;
-	W.ShowItemInventory = function(appid, contextid, assetid, bLoadCompleted){
-		if(!W.getSubid && appid==753){
-			// for subid detect
-			ajaxTarget = {descriptions:[]};
-			W.getSubid = function(target){
-				ajaxTarget.element = target;
+	// @dev W.ShowItemInventory - it is called before the userscript
+	function initGiftsInvFeatures(){
+		if(W.getSubid) return;
 
-				var item = W.g_ActiveInventory.selectedItem;
+		// for subid detect
+		ajaxTarget = {descriptions:[]};
+		W.getSubid = function(target){
+			ajaxTarget.element = target;
 
-				ajaxTarget.classid = item.classid;
-				ajaxTarget.giftId = item.assetid;
-				ajaxTarget.giftName = encodeURIComponent(item.description.name);
+			var item = W.g_ActiveInventory.selectedItem;
 
-				new W.Ajax.Request( '//steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
-					method: 'post',
-					parameters: { sessionid: W.g_sessionID },
-					onSuccess: function( transport ) {
-						W.setSubID(transport.responseJSON.packageid, ajaxTarget);
+			ajaxTarget.classid = item.classid;
+			ajaxTarget.giftId = item.assetid;
+			ajaxTarget.giftName = encodeURIComponent(item.description.name);
+
+			new W.Ajax.Request( '//steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
+				method: 'post',
+				parameters: { sessionid: W.g_sessionID },
+				onSuccess: function( transport ) {
+					W.setSubID(transport.responseJSON.packageid, ajaxTarget);
+				}
+			});
+		}
+		W.setSubID=function(subid, ajaxTarget){
+			var str = 'SubscriptionID = <a href="https://steamdb.info/sub/'+subid+'">'+subid+'</a>';
+			ajaxTarget.element.outerHTML=str;
+			var ds = ajaxTarget.descriptions[ajaxTarget.classid];
+			ds[ds.length-1]={value:str, type:'html'};
+			ds.withSubid=true;
+		}
+
+		// multi gifts sending
+		W.checkedForSend={};
+		W.checkForSend = function(giftId){
+			var item = W.g_ActiveInventory.selectedItem;
+			if(item.checkedForSend){
+				item.checkedForSend=false;
+				item.element.removeClassName('checkedForSend');
+				if(item._amount>1){
+					for(var i=0;i<item._amount;i++){
+						delete W.checkedForSend[item._ids[i]];
 					}
-				});
-			}
-			W.setSubID=function(subid, ajaxTarget){
-				var str = 'SubscriptionID = <a href="https://steamdb.info/sub/'+subid+'">'+subid+'</a>';
-				ajaxTarget.element.outerHTML=str;
-				var ds = ajaxTarget.descriptions[ajaxTarget.classid];
-				ds[ds.length-1]={value:str, type:'html'};
-				ds.withSubid=true;
-			}
-
-			// multi gifts sending
-			W.checkedForSend={};
-			W.checkForSend = function(giftId){
-				var item = W.g_ActiveInventory.selectedItem;
-				if(item.checkedForSend){
-					item.checkedForSend=false;
-					item.element.removeClassName('checkedForSend');
-					if(item._amount>1){
-						for(var i=0;i<item._amount;i++){
-							delete W.checkedForSend[item._ids[i]];
-						}
-					} else {
-						delete W.checkedForSend[giftId];
-					}
-
 				} else {
-					var amount = 1;
-					if(item._amount>1) {
-						amount =  parseInt(prompt(t('howmany')+item._amount, item._amount)) || 1;
-						if (amount>item._amount)
-							amount=item._amount;
+					delete W.checkedForSend[giftId];
+				}
+
+			} else {
+				var amount = 1;
+				if(item._amount>1) {
+					amount =  parseInt(prompt(t('howmany')+item._amount, item._amount)) || 1;
+					if (amount>item._amount)
+						amount=item._amount;
+				}
+				if(amount>1){
+					if(!confirm(t('skipSent'))) for(var i=0;i<amount;i++){
+						W.checkedForSend[item._ids[i]]=item.description.name;
+						item._subItems[i].element.addClassName('checkedForSend');
 					}
-					if(amount>1){
-						if(!confirm(t('skipSent'))) for(var i=0;i<amount;i++){
-							W.checkedForSend[item._ids[i]]=item.description.name;
+					else for(var i=0;i<amount;i++){
+						let sitem = item._subItems[i],
+							skipit = false;
+						if(sitem.description.owner_descriptions)
+							for(let j=0; j<sitem.description.owner_descriptions.length; ++j){
+							if(sitem.description.owner_descriptions[j].value.match(/data-miniprofile=|\S+@\S+/i)){
+								skipit = true;
+								break;
+							}
+						}
+						if(!skipit) {
+							W.checkedForSend[item._subItems[i].assetid]=item.description.name;
 							item._subItems[i].element.addClassName('checkedForSend');
 						}
-						else for(var i=0;i<amount;i++){
-							var sitem = item._subItems[i],
-								skipit = false;
-							if(sitem.description.owner_descriptions) for(var j=0;j<sitem.description.owner_descriptions.length;j++){
-								if(sitem.description.owner_descriptions[j].value.match(/data-miniprofile=|\S+@\S+/i)){
-									skipit = true;
-									break;
-								}
-							}
-							if(!skipit) {
-								W.checkedForSend[item._subItems[i].assetid]=item.description.name;
-								item._subItems[i].element.addClassName('checkedForSend');
-							}
-						}
-					} else {
-						W.checkedForSend[giftId]=item.description.name;
-						item.checkedForSend=true;
-						item.element.addClassName('checkedForSend');
 					}
-				}
-			}
-			W.sendChecked = function(){
-				var url = 'https://store.steampowered.com/checkout/sendgift/';
-				// first to gid
-				for(var gid in W.checkedForSend){
-					break;
-				}
-
-				url+=gid+'#multisend='+encodeURIComponent(JSON.stringify(W.checkedForSend));
-
-				W.location.href=url;
-
-			}
-			// END multi gifts sending
-
-			if(W.g_bViewingOwnProfile){
-				//// gifts notes
-				var giftsNotes = W.localStorage.giftsNotes;
-				if(giftsNotes)
-					giftsNotes = JSON.parse(giftsNotes);
-				else giftsNotes={};
-				W.loadGiftNote = function(){
-					var gid = W.g_ActiveInventory.selectedItem.assetid;
-					if(!$('#iteminfo'+W.iActiveSelectView+'_item_tags_content textarea.giftnote').length)
-						$('#iteminfo'+W.iActiveSelectView+'_item_tags_content').append('<br/><textarea class="giftnote" style="width:100%">'+(giftsNotes[gid]||'')+'</textarea><button onclick="saveGiftNote(\''+gid+'\')">'+t('save')+'</button>');
-				}
-				W.saveGiftNote = function(gid){
-					giftsNotes[gid]=$('#iteminfo'+W.iActiveSelectView+'_content textarea.giftnote').val();
-					W.localStorage.giftsNotes = JSON.stringify(giftsNotes);
+				} else {
+					W.checkedForSend[giftId]=item.description.name;
+					item.checkedForSend=true;
+					item.element.addClassName('checkedForSend');
 				}
 			}
 		}
-		return W.ShowItemInventory_old.apply(this, arguments);
+		W.sendChecked = function(){
+			var url = 'https://store.steampowered.com/checkout/sendgift/';
+			// first to gid
+			for(var gid in W.checkedForSend){
+				break;
+			}
+
+			url+=gid+'#multisend='+encodeURIComponent(JSON.stringify(W.checkedForSend));
+
+			W.location.href=url;
+
+		}
+		// END multi gifts sending
+
+		if(W.g_bViewingOwnProfile){
+			//// gifts notes
+			var giftsNotes = W.localStorage.giftsNotes;
+			if(giftsNotes)
+				giftsNotes = JSON.parse(giftsNotes);
+			else giftsNotes={};
+			W.loadGiftNote = function(){
+				var gid = W.g_ActiveInventory.selectedItem.assetid;
+				if(!$('#iteminfo'+W.iActiveSelectView+'_item_tags_content textarea.giftnote').length)
+					$('#iteminfo'+W.iActiveSelectView+'_item_tags_content').append('<br/><textarea class="giftnote" style="width:100%">'+(giftsNotes[gid]||'')+'</textarea><button onclick="saveGiftNote(\''+gid+'\')">'+t('save')+'</button>');
+			}
+			W.saveGiftNote = function(gid){
+				giftsNotes[gid]=$('#iteminfo'+W.iActiveSelectView+'_content textarea.giftnote').val();
+				W.localStorage.giftsNotes = JSON.stringify(giftsNotes);
+			}
+		}
 	}
 
 
@@ -168,6 +168,7 @@ function inventoryPageInit(){
 	W.BuildHover = function( sNewInfo, item, UserYou ){
 		// gifts
 		if(W.g_ActiveInventory?.appid == 753){
+			initGiftsInvFeatures();
 			if ((item.contextid==1) && !item.description?.descriptions?.withClassid) {
 
 				if(!item.description.descriptions)
@@ -186,15 +187,13 @@ function inventoryPageInit(){
 				if(item.description.owner_actions) {
 					item.description.owner_actions.push({
 						link:'javascript:checkForSend("%assetid%")',
-						name:t('checkForSend')
-					});
-					item.description.owner_actions.push({
+						name:'✔️'+t('checkForSend')
+					},{
 						link:'javascript:sendChecked()',
-						name:t('sendChecked')
-					});
-					item.description.owner_actions.push({
+						name:'📨'+t('sendChecked')
+					},{
 						link:'javascript:loadGiftNote()',
-						name:t('showNote')
+						name:'📝'+t('showNote')
 					});
 				}
 			}
