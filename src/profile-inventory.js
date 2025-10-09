@@ -9,15 +9,9 @@ function inventoryPageInit(){
 
 	function getMarketPrice(appid, market_hash_name){
 		return $.ajax( {
-			url: '//steamcommunity.com/market/priceoverview/',
+			url: `/market/priceoverview/?appid=${appid}&country=${W.g_strCountryCode}&currency=${W.g_rgWalletInfo?.wallet_currency ?? 1}&market_hash_name=${encodeURIComponent(market_hash_name)}`,
 			type: 'GET',
 			cache: true,
-			data: {
-				country: W.g_strCountryCode,
-				currency: W.g_rgWalletInfo?.wallet_currency ?? 1,
-				appid,
-				market_hash_name
-			}
 		} )
 	}
 
