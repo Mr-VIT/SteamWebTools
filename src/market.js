@@ -17,6 +17,7 @@ function init(){
 		itemPage();
 	}
 	else if(document.getElementById('market_mutlisell_maincontent')){
+		// fixed by steam, mb remove?
 		// fix steam scripts with old limit per load
 		if(W.Filter?.FILTER_ASSETS_PER_LOAD>2500){
 			W.Filter.FILTER_ASSETS_PER_LOAD = 2500;
@@ -47,6 +48,16 @@ function init(){
 			}
 		}, 1000);
 
+		let price = location.hash.match('#price=(\\d+)')?.[1];
+		if(price){
+			price = W.v_currencyformat(
+				Number(price)+settings.cur.invSellItemSetPriceDiff,
+				W.GetCurrencyCode(W.g_rgWalletInfo['wallet_currency'])
+			)
+			let el = document.querySelector('input[id$="_price_paid"]');
+			el.value = price;
+			$J(el).blur();
+		}
 	}
 }
 
@@ -114,13 +125,19 @@ function addButtonsMyListings(){
 	//if item page
 	let item = Object.values(W.g_rgListingInfo)?.[0];
 	if(item?.converted_price_per_unit) {
-		// sometimes g_rgListingInfo does not have a lowest price
-		let lowestPrice = item.converted_price_per_unit + item.converted_publisher_fee_per_unit + item.converted_steam_fee_per_unit;
+
 		if(!W.getPriceAsInt) // prefer using SIH func for compatibility
 			W.getPriceAsInt = W.GetPriceValueAsInt;
 
 		W.$J(W.CreateMarketActionButton('green', '', t('Remove Overpriced')))
 		.click(function(){
+
+			let lowestPrice = Number(W.CreateBuyOrderDialog.m_nBestBuyPrice);
+			if(!(lowestPrice>0)){
+				// sometimes g_rgListingInfo does not have a lowest price
+				lowestPrice = item.converted_price_per_unit + item.converted_fee_per_unit;
+			}
+
 			W.$J('div.market_listing_cancel_button input.lfremove')
 			.each((i,e)=>{
 				let $e = W.$J(e);
@@ -206,8 +223,11 @@ function itemPage(){
 	var ShowModalContent_old = W.ShowModalContent;
 	W.ShowModalContent = function(){
 		var item = W.$('largeiteminfo').builtFor;
+		let lowestPrice = Number(W.CreateBuyOrderDialog.m_nBestBuyPrice) + settings.cur.invSellItemSetPriceDiff;
 		if(item.commodity){
-			arguments[0] = 'https://steamcommunity.com/market/multisell?appid='+item.appid+'&contextid='+item.contextid+'&qty[]=1&items[]='+item.market_hash_name;
+			arguments[0] = '/market/multisell?appid='+item.appid+'&contextid='+item.contextid+'&qty[]=1&items[]='
+			+encodeURIComponent(item.market_hash_name)
+			+'#price='+lowestPrice;
 		}
 		return ShowModalContent_old.apply(this, arguments);
 	}
