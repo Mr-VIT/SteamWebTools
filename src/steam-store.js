@@ -11,9 +11,15 @@ function init() {
 	}
 
 	if(settings.cur.storeShowCartBtn){
-		let $cart = $('#cart_status_data>div[data-featuretarget="shoppingcart-count-widget"]');
-		if(!$cart.data('props')?.count){
-			$cart.after($('div.responsive_menu_user_cart>a').clone().css('background', '#5c7e10'))
+		const cfgKey = 'store_user_config';
+		let cfg = $J('#application_config')?.data(cfgKey);
+		let dataCart = cfg?.accountcart?.cart
+		if(dataCart && !dataCart?.line_items?.length){
+			dataCart.line_items = [{}];
+			$J('#application_config').attr('data-'+cfgKey, JSON.stringify(cfg));
+			setTimeout(()=>{
+				$J('div[role="navigation"] a[href*="/cart"]>span').text('0');
+			},1e3)
 		}
 	}
 
