@@ -18,7 +18,8 @@ function init() {
 			dataCart.line_items = [{}];
 			$J('#application_config').attr('data-'+cfgKey, JSON.stringify(cfg));
 			setTimeout(()=>{
-				$J('div[role="navigation"] a[href*="/cart"]>span').text('0');
+				$('div[role="navigation"] a[href*="/cart"] span:first')
+				.text('0');
 			},1e3)
 		}
 	}
