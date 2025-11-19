@@ -13,7 +13,7 @@ function init(){
 	if(document.getElementById('searchResults')){
 		addGotoBtn();
 	} else
-	if(document.getElementById('largeiteminfo_item_name')){
+	if(document.querySelector('#mainContents div.market_listing_nav')){
 		itemPage();
 	}
 	else if(document.getElementById('market_mutlisell_maincontent')){
@@ -222,7 +222,8 @@ function itemPage(){
 	// == Feature == replace inventory modal by "multisell" on "Sell" button for commodity items
 	var ShowModalContent_old = W.ShowModalContent;
 	W.ShowModalContent = function(){
-		var item = W.$('largeiteminfo').builtFor;
+		let asset = Object.values(W.g_rgListingInfo)[0].asset;
+		let item = W.g_rgAssets[asset.appid][asset.contextid][asset.id];
 		let lowestPrice = Number(W.CreateBuyOrderDialog.m_nBestBuyPrice) + settings.cur.invSellItemSetPriceDiff;
 		if(item.commodity){
 			arguments[0] = '/market/multisell?appid='+item.appid+'&contextid='+item.contextid+'&qty[]=1&items[]='
