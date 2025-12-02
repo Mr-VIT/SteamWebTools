@@ -118,15 +118,25 @@ function inventoryPageInit(){
 			if(giftsNotes)
 				giftsNotes = JSON.parse(giftsNotes);
 			else giftsNotes={};
+
+			let getIteminfoSelector = ()=> '#iteminfo'+W.iActiveSelectView+'>div>div>div>div>div';
 			W.loadGiftNote = function(){
 				var gid = W.g_ActiveInventory.selectedItem.assetid;
-				if(!$('#iteminfo'+W.iActiveSelectView+'_item_tags_content textarea.giftnote').length)
-					$('#iteminfo'+W.iActiveSelectView+'_item_tags_content').append('<br/><textarea class="giftnote" style="width:100%">'+(giftsNotes[gid]||'')+'</textarea><button onclick="saveGiftNote(\''+gid+'\')">'+t('save')+'</button>');
+				if(!$(getIteminfoSelector()+' textarea.giftnote').length){
+
+					$(getIteminfoSelector())
+						.append('<br/><textarea class="giftnote" style="width:100%">'+(giftsNotes[gid]||'')+'</textarea><button onclick="saveGiftNote(\''+gid+'\')">'+t('save')+'</button>');
+				}
 			}
+			let giftsNotesChanged;
 			W.saveGiftNote = function(gid){
-				giftsNotes[gid]=$('#iteminfo'+W.iActiveSelectView+'_content textarea.giftnote').val();
-				W.localStorage.giftsNotes = JSON.stringify(giftsNotes);
+				giftsNotes[gid]=$(getIteminfoSelector()+' textarea.giftnote').val();
+				giftsNotesChanged=true;
 			}
+			W.addEventListener("beforeunload", function(){
+				if(giftsNotesChanged)
+					W.localStorage.giftsNotes = JSON.stringify(giftsNotes);
+			})
 		}
 	}
 
@@ -158,15 +168,15 @@ function inventoryPageInit(){
 	}
 
 	//// action for gifts and items
-	var BuildHover_orig = W.BuildHover;
-	W.BuildHover = function( sNewInfo, item, UserYou ){
+	let BuildItemElement_orig = W.CInventory.prototype.BuildItemElement;
+	W.CInventory.prototype.BuildItemElement = function( item, $Item ){
 		// gifts
-		if(W.g_ActiveInventory?.appid == 753){
+		if(item.appid == 753){
 			initGiftsInvFeatures();
 			if ((item.contextid==1) && !item.description?.descriptions?.withClassid) {
 
-				if(!item.description.descriptions)
-					item.description.descriptions = [];
+
+			item.description.descriptions ??= [];
 
 				item.description.descriptions.withClassid=true;
 
@@ -174,8 +184,7 @@ function inventoryPageInit(){
 				if(W.g_bViewingOwnProfile)
 					item.description.descriptions.push({value:'<a href="#" onclick="getSubid(event.target);return false">'+t('get')+' SubscriptionID</a>',type:'html'});
 
-				if(!ajaxTarget.descriptions[item.classid])
-					ajaxTarget.descriptions[item.classid] = item.description.descriptions;
+				ajaxTarget.descriptions[item.classid] ??= item.description.descriptions;
 
 
 				if(item.description.owner_actions) {
@@ -193,7 +202,7 @@ function inventoryPageInit(){
 			}
 		}
 
-		return BuildHover_orig.apply(this, arguments);
+		return BuildItemElement_orig.apply(this, arguments);
 	}
 
 
