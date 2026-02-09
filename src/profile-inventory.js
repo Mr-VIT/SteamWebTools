@@ -16,37 +16,25 @@ function inventoryPageInit(){
 	}
 
 
-	// only for gifts inv
-	var ajaxTarget;
 	// @dev W.ShowItemInventory - it is called before the userscript
 	function initGiftsInvFeatures(){
 		if(W.getSubid) return;
 
-		// for subid detect
-		ajaxTarget = {descriptions:[]};
-		W.getSubid = function(target){
-			ajaxTarget.element = target;
-
+		W.getSubid = async function(targetEl){
 			var item = W.g_ActiveInventory.selectedItem;
 
-			ajaxTarget.classid = item.classid;
-			ajaxTarget.giftId = item.assetid;
-			ajaxTarget.giftName = encodeURIComponent(item.description.name);
+			let json = await (await fetch('/gifts/' + item.assetid + '/validateunpack')).json();
 
-			new W.Ajax.Request( '//steamcommunity.com/gifts/' + ajaxTarget.giftId + '/validateunpack', {
-				method: 'post',
-				parameters: { sessionid: W.g_sessionID },
-				onSuccess: function( transport ) {
-					W.setSubID(transport.responseJSON.packageid, ajaxTarget);
-				}
-			});
-		}
-		W.setSubID=function(subid, ajaxTarget){
-			var str = 'SubscriptionID = <a href="https://steamdb.info/sub/'+subid+'">'+subid+'</a>';
-			ajaxTarget.element.outerHTML=str;
-			var ds = ajaxTarget.descriptions[ajaxTarget.classid];
-			ds[ds.length-1]={value:str, type:'html'};
-			ds.withSubid=true;
+			if(json.packageid) {
+				let str = 'SubscriptionID = <a href="https://steamdb.info/sub/'+json.packageid+'">'+json.packageid+'</a>';
+				targetEl.outerHTML=str;
+
+				let ds = item.description.descriptions
+				ds[ds.length-1]={value:str, type:'html'};
+				ds.withSubid=true;
+			} else {
+				targetEl.innerHTML+=' ❌ERROR'
+			}
 		}
 
 		// multi gifts sending
@@ -183,9 +171,6 @@ function inventoryPageInit(){
 				item.description.descriptions.push({value:'ClassID = '+item.classid});
 				if(W.g_bViewingOwnProfile)
 					item.description.descriptions.push({value:'<a href="#" onclick="getSubid(event.target);return false">'+t('get')+' SubscriptionID</a>',type:'html'});
-
-				ajaxTarget.descriptions[item.classid] ??= item.description.descriptions;
-
 
 				if(item.description.owner_actions) {
 					item.description.owner_actions.push({
