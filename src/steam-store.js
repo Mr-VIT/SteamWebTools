@@ -3,9 +3,11 @@ function init() {
 
 	// == Feature == skip age check
 	// mostly for incognito tab with cc
-	//if(location.pathname.includes('/agecheck/')){
-	if(W.app_agegate){
+	function setBirthtimeCookie(){
 		document.cookie='birthtime=1;path=/;max-age=31536000';
+	}
+	if(W.app_agegate){
+		setBirthtimeCookie();
 		location.replace(location.href.replace('/agecheck/','/'));
 		return;
 	}
@@ -77,32 +79,24 @@ function init() {
 
 
 	// for app/sub page
-	var res = String(W.location.pathname).match(/^\/(sub|app)\/(\d+)/i);
+	var res = String(W.location.pathname).match(/^(\/news)?\/(sub|app)\/(\d+)/i);
 	if(res){
-		var itemType = res[1], itemId = res[2];
+		let [, isNews, itemType, itemId] = res;
 
 		// check if not available in current region
 		if(!document.getElementById('appHubAppName') && document.getElementById('error_box')){
 			$('<p style="display:table" class="btn_blue_steamui btn_medium"><span>'+t('viewAnon')+'</span></p>')
 			.appendTo('#error_box')
-			.click(()=>{
-				var xhr = window.GM_xmlhttpRequest || window.GM_xhr;
-				var url = W.location.origin+`/${itemType}/${itemId}?cc=us`;
-				if(xhr){
-					xhr({
-						url: url, method: 'GET',
-						anonymous : true,
-						cookie: 'birthtime=1', // agecheck broken if cc provided
-						responseType: 'blob',
-						onload: data=>{
-							W.open(URL.createObjectURL(data.response), "_self");
-						}
-					});
-				}
-				else if(GM_openInTab)
-					GM_openInTab(url, {incognito:true})
-				else
-					alert('unsupported');
+			.click(async()=>{
+
+				let oUrl = new URL(W.location.href);
+				oUrl.searchParams.set('cc', 'us');
+				let url = oUrl.toString();
+
+				setBirthtimeCookie(); // agecheck broken if cc provided
+				document.cookie='steamLoginSecure=;Max-Age=10'; //temp override httpOnly login cookie
+
+				location.assign(url);
 
 			})
 
@@ -114,6 +108,8 @@ function init() {
 			return; // cz no elements on page
 		}
 
+		if(isNews) return;
+		//app|sub
 
 		var els = document.querySelectorAll('.game_area_purchase_game');
 		if(settings.cur.storeShowSubid || settings.cur.storeShowBtnGetPrices){
@@ -315,7 +311,6 @@ function init() {
 						].map(makeImgEl).join('')+
 						'</div>' + res;
 				}
-				//W.ShowDialog(t('Logos'), $(res));
 
 				window.open(URL.createObjectURL(
 					new Blob([res], { type: "text/html" })
