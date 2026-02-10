@@ -160,7 +160,15 @@ var scripts = [
 		run:function(){
 			//!include linkfilter.js
 		}
-	}
+	},
+	{
+		match:[
+			rURL_COMMUNITY_PROFILE+'home.*',
+		],
+		run:function(){
+			//!include community-home.js
+		}
+	},
 ];
 
 var url = document.URL;
