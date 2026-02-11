@@ -5,11 +5,11 @@ $('#group_tab_content_overview').show().attr('id','swt_content1');
 $('head').append($('<link href="//community'+CDN+'public/css/skin_1/groupadmin.css" rel="stylesheet" type="text/css">'));
 
 $('.grouppage_logo').css('background-image','none');
-$('.grouppage_logo>img')[0].src='//v1t.su/projects/steam/webtools/imgs/steam-big-icon.png';
+const homePageUrl=GM_info.script?.homepage;
+$('.grouppage_logo>img')[0].src=homePageUrl+'imgs/steam-big-icon.png';
 
 $('.grouppage_header_label').text('Steam '+t('set.ext'));
-var header = $('.grouppage_header_name').html('Steam Web Tools <span class="grouppage_header_abbrev" style="font-size:21px">'+t('set.settings')+'</span>');
-var homePageUrl='https://v1t.su/projects/steam/webtools/';
+var header = $('.grouppage_header_name').html('Steam Web Tools <span class="grouppage_header_abbrev" style="font-size:21px">v'+GM_info.script.version+' - '+t('set.settings')+'</span>');
 var tmp = $('.grouppage_join_area a');
 if(tmp.length){
 	tmp[0].href=homePageUrl;
@@ -77,7 +77,7 @@ createForm.create_select = function(data){
 	return res;
 }
 createForm.create_textLong = function(data){
-	return '<div>'+data.title+'</div><div class="formRowFields"><div class="gray_bevel for_text_input fullwidth"><input type="text" name="'+data.name+'" id="'+data.name+'" value="'+data.value+'"></div></div>';
+	return `<div>${data.title}</div><div class="formRowFields"><div class="gray_bevel for_text_input fullwidth"><input type="text" name="${data.name}" id="${data.name}" value="${data.value}" placeholder="${data.placeholder}"></div></div>`;
 }
 createForm.create_number = function(data){
 	return `<label for="${data.name}">${data.title}</label>: <input type="number" value="${data.value}" min="${data.min}" max="${data.max}" step="${data.step}" name="${data.name}" id="${data.name}">`;
@@ -170,6 +170,7 @@ createForm([
 			{
 				type:'textLong',
 				title:t('set.CCList'),
+				placeholder: 'empty = reset to default',
 				name:'storeCCList',
 			},
 			{

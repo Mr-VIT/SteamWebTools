@@ -283,6 +283,7 @@ function init() {
 
 				function makeImgEl(url, stl){
 					stl = stl ? `style="${stl}" ` : '';
+					// @dev only old uploaded. todo new
 					return `<img ${stl}src="https://cdn${CDN}steam/${itemType}s/${itemId}/${url}"><br>`;
 				}
 

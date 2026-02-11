@@ -9,7 +9,7 @@ var settings = {
 		globalDisableLinkFilted : false,
 
 		storeShowCCbtn : true,
-		storeCCList : 'ru ua us ar fr no gb au br de jp',
+		storeCCList : 'ru ua kz ge us eu nl gb cn',
 		storeShowCartBtn : true,
 		storeShowSubid : true,
 		storeShowBtnGetPrices : true,
