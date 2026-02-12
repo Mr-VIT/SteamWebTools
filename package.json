@@ -1,7 +1,7 @@
 {
   "name": "steamwebtools",
   "main": "Gruntfile.js",
-  "version": "0.16.8",
+  "version": "0.17.0",
   "devDependencies": {
     "grunt": "^1.5.3",
     "grunt-contrib-clean": "^2.0.1",
@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/Mr-VIT/SteamWebTools/issues"
   },
-  "homepage": "https://v1t.su/projects/steam/webtools/"
+  "homepage": "https://v1t.su/projects/steam/webtools/",
+  "scripts": {
+    "build": "npm x -- grunt",
+    "build:github": "npm x -- grunt build:github"
+  }
 }
