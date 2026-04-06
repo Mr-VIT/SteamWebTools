@@ -107,7 +107,7 @@ function inventoryPageInit(){
 				giftsNotes = JSON.parse(giftsNotes);
 			else giftsNotes={};
 
-			let getIteminfoSelector = ()=> '#iteminfo'+W.iActiveSelectView+'>div>div>div>div>div';
+			let getIteminfoSelector = ()=> '#iteminfo'+W.iActiveSelectView+'>div>div';
 			W.loadGiftNote = function(){
 				var gid = W.g_ActiveInventory.selectedItem.assetid;
 				if(!$(getIteminfoSelector()+' textarea.giftnote').length){
