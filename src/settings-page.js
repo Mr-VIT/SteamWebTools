@@ -232,7 +232,7 @@ createForm([
 		group:'Additional Profile external links',
 		rows:[
 			{
-				title: '<i>example:</i> link title;https://example.com/{STEAMID}<br><b>{STEAMID}</b> = <i>76012345678901234</i>'
+				title: '<i>example:</i> link title;https://example.com/{STEAMID}/{ACCOUNTID}<br><b>{STEAMID}</b> = <i>76012345678901234</i><br><b>{ACCOUNTID}</b> = <i>12345678</i>'
 			},
 			{
 				type:'textarea',

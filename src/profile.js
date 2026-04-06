@@ -86,6 +86,12 @@ function profilePageInit(){
 
 	steamid = W.g_rgProfileData.steamid;
 
+	// calc STEAMID
+	let steamid2 = parseInt(steamid.substr(-10),10);
+	let srv = steamid2 % 2;
+	let accountid = steamid2 - 7960265728;
+	steamid2 = "STEAM_0:" + srv + ":" + ((accountid-srv)/2);
+
 	var profilesLinks = [
 		{hr:true},
 		{
@@ -130,7 +136,7 @@ function profilePageInit(){
 			el = el.match(/^(.+?);(.+)$/);
 			if(el) return {
 				text: el[1],
-				href: el[2].replace('{STEAMID}', steamid),
+				href: el[2].replaceAll(/\{(\w+)\}/g, (o,s)=> ({steamid, accountid}[s.toLowerCase()]) ?? o ),
 				icon: 'https://www.google.com/s2/favicons?sz=16&domain='+encodeURIComponent(el[2]?.match(/\/\/(.+?)(\/|$)/)?.[1])
 			};
 			else {
@@ -168,11 +174,6 @@ function profilePageInit(){
 			var vacBanned = xml.find('vacBanned').text();
 			var accCrDate = xml.find('memberSince').text();
 
-			// calc STEAMID
-			var steamid2 = parseInt(steamid.substr(-10),10);
-			var srv = steamid2 % 2;
-			var accountid = steamid2 - 7960265728;
-			steamid2 = "STEAM_0:" + srv + ":" + ((accountid-srv)/2);
 			var shortId = accountid.toString(16).replace(/./g, s=>'bcdfghjkmnpqrtvw'[parseInt(s,16)]);
 
 			function template(a, b){
