@@ -102,17 +102,7 @@ function profilePageInit(){
 			icon: '//checkrep.ru/favicon.ico',
 			text: t('checkin')+' CheckRep.ru',
 		},
-		{
-			href: 'http://steamrep.com/profiles/'+steamid,
-			icon: '//steamrep.com/favicon.ico',
-			text: t('checkin')+' SteamRep.com',
-		},
 		{hr:true},
-		{
-			href: 'http://forums.steamrep.com/search/search?keywords='+steamid,
-			icon: '//steamrep.com/favicon.ico',
-			text: t('searchinforums')+' SteamRep.com',
-		},
 		{
 			href: 'http://www.steamtrades.com/user/'+steamid,
 			icon: 'https://cdn.steamtrades.com/img/favicon.ico',
@@ -131,14 +121,6 @@ function profilePageInit(){
 			text: t('inventory')+' Steam.tools/itemvalue/',
 		},
 		{hr:true},
-		{
-			id:   'inv_spub',
-			href: 'http://steampub.ru/user/'+steamid,
-			icon: '//steampub.ru/favicon.ico',
-			text: t('profile')+' SteamPub.ru',
-		},
-		{hr:true}
-
 	];
 
 	try{
