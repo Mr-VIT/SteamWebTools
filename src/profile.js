@@ -237,6 +237,19 @@ function profilePageInit(){
 		+' <img src="//community'+CDN+'public/images/profile/profile_action_dropdown.png"/></span></span><div class="popup_block" id="profile_action_dropdown" style="visibility:visible;display:none"><div class="popup_body popup_menu">'+out+'</div></div>')
 	}
 
+
+	// == Feature == unhidden data in private profiles
+	if($('.profile_private_info').length) {
+		let links = [
+			['posthistory', 'Discussion Post history'],
+			['screenshots', 'Screenshots'],
+		].map(link=>`<a href="${W.g_rgProfileData.url+link[0]}">${link[1]}</a>`).join(' | ')
+		$('.profile_header_bg').append('<p class=profile_header_centered_col>Check for unhidden data: '+links+'</p>')
+		return;
+	}
+
+	// next section for public profiles
+
 	// == Feature == like profile button
 	if(settings.cur.profileLikeBtn){
 		var comments = Object.values(g_rgCommentThreads)[0];
