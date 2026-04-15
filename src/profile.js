@@ -144,7 +144,8 @@ function profilePageInit(){
 
 	// Styles
 	document.body.insertAdjacentHTML("afterBegin",
-		'<style>#swt_badges{display:none;position:absolute;top:7px}.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;padding:3px}#swt_info{position:absolute;top:201px}</style>'
+		'<style>#swt_badges{display:none;position:absolute;top:7px}.badge{border-radius:3px;box-shadow:1px 1px 0px 0px #1D1D1D;font-size:.7em;padding:3px}'
+		+'#swt_info{padding-top:1em}</style>'
 	);
 
 
@@ -206,17 +207,20 @@ function profilePageInit(){
 
 	// inventory links
 	var el = document.querySelector('.profile_count_link a[href$="inventory/"]');
-	if(el)
-		el.insertAdjacentHTML('afterEnd',
-			': <span class="linkActionSubtle">'
-			+'<a title="Steam Gifts" href="'+el.href+'#753_1"><img src="//store'+CDN+'public/images/icon_gift.png"/></a>'
-			+'<a title="Steam Cards" href="'+el.href+'#753_6"><img width="26" height="16" src="//store'+CDN+'public/images/v6/ico/ico_cards.png"/></a>'
-			+'<a title="TF2" href="'+el.href+'#440"><img src="//cdn'+CDN+'apps/tf2/blog/images/favicon.ico"/></a>'
-			+'<a title="Dota 2" href="'+el.href+'#570"><img src="https://www.dota2.com/favicon.ico"/></a>'
-			+'<a title="CSGO" href="'+el.href+'#730"><img width="16" height="16" src="//cdn'+CDN+'steamcommunity/public/images/apps/730/69f7ebe2735c366c65c0b33dae00e12dc40edbe4.jpg"/></a>'
-			+'</span>'
+	if(el) {
+		let links = [
+			['CS2','730', 'cdn'+CDN+'steamcommunity/public/images/apps/730/8dbc71957312bbd3baea65848b545be9eae2a355.jpg'],
+			['DOTA2','570', 'cdn'+CDN+'steamcommunity/public/images/apps/570/0bbb630d63262dd66d2fdd0f7d37e8661a410075.jpg'],
+			['TF2','440', 'cdn'+CDN+'steamcommunity/public/images/apps/440/f568912870a4684f9ec76277a1a404dda6bab213.jpg'],
+			['Gifts','753_1', 'store'+CDN+'public/images/icon_gift.png'],
+			['Cards','753_6', 'store'+CDN+'public/images/v6/ico/ico_cards.png'],
+		];
+		el.querySelector('.profile_count_link_total').insertAdjacentHTML('beforeend',
+			links.map(link=>{
+				return `<a class="btn_profile_action btn_medium" title="${link[0]}" href="${el.href}#${link[1]}"><img height="26" src="//${link[2]}"/></a>`
+			}).join('')
 		);
-
+	}
 
 	// profiles link in "More"
 	var out = profilesLinks.map(link => link.hr ? '<hr/>'
@@ -259,7 +263,7 @@ function profilePageInit(){
 	let showcaseHeaders =
 	$('.profile_customization_header')
 	.click(e => {
-		$(e.target).next().slideToggle('fast')
+		$(e.currentTarget).next().slideToggle('fast')
 	})
 	.css('cursor', 'pointer');
 	if(settings.cur.profileСollapseShowcases){
@@ -283,7 +287,7 @@ function profilePageInit(){
 			return;
 		}
 		if(67==e.which && !e.ctrlKey){
-			document.querySelector('.profile_comment_area').scrollTo();
+			document.querySelector('.profile_comment_area').scrollIntoView();
 		}
 	});
 
