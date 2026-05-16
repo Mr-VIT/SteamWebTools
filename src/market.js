@@ -246,6 +246,8 @@ function itemPage(){
 	var itemlink = itemdata.owner_actions?.[0]?.link;
 	if(!itemlink) return;
 
+	let itemDescritionSelector = '#mainContents div.largeiteminfo_react_placeholder h1~div:last-of-type';
+
 	// is card/bpack
 	+function(){
 		var marketSearchUrl = '/market/search?appid=753&category_753_Game%5B%5D=tag_app_'+itemdata.market_fee_app+'&category_753_item_class%5B%5D=tag_item_class_';
@@ -261,27 +263,33 @@ function itemPage(){
 		} else return;
 
 		//add btns
-
-		var place = W.$J('<div class="item_actions" id="largeiteminfo_item_actions"></div>').insertAfter( W.$J('#largeiteminfo_game_info') );
 		var links = [btn,
 			{name: t('viewMyCardsGame'),
 			link: '/my/gamecards/'+itemdata.market_fee_app}
 		]
-		for (var i=links.length; i>0; --i, place.append('<a class="btn_small btn_grey_white_innerfade" href="'+links[i].link+'"><span>'+links[i].name+'</span></a>'));
+
+		let place = W.$J(itemDescritionSelector);
+		if(place.length){
+			place = W.$J('<div class="item_actions" id="largeiteminfo_item_actions"></div>').insertAfter(place);
+			for (var i=links.length; i>0; --i, place.append('<a class="btn_small btn_grey_white_innerfade" href="'+links[i].link+'"><span>'+links[i].name+'</span></a>'));
+		} else {
+			itemdata.market_actions = itemdata.market_actions?.concat(links) || links;
+		}
+
 
 		return true;
 	}()
 	// is emoticon
 	|| +function(){
 		if( !W.g_steamID ||
-			!itemdata.descriptions.last()?.value.includes('/emoticon/')) return;
+			!itemdata.descriptions.at(-1)?.value.includes('/emoticon/')) return;
 
 		W.$J.ajax({
 			url: '/actions/EmoticonList',
 			type: 'GET',
 			cache: true
 		}).done(list=>{
-			W.$J('#largeiteminfo_item_descriptors').append(t('inInv')+': '+(list.includes(itemdata.name) ? '✅' : '❌'))
+			W.$J(itemDescritionSelector).append(t('inInv')+': '+(list.includes(itemdata.name) ? '✅' : '❌'))
 		})
 
 		return true;
@@ -309,7 +317,7 @@ function itemPage(){
 					W.v_currencyformat( 1000*price/gv,
 						W.GetCurrencyCode( W.g_rgWalletInfo['wallet_currency'] ) )
 				}
-				W.$J('#largeiteminfo_item_descriptors').append(str+'</p>')
+				W.$J(itemDescritionSelector).append(str+'</p>')
 			})
 		}
 	}
