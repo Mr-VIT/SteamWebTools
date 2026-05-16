@@ -305,6 +305,18 @@ function profilePageInit(){
 		}
 	});
 
+	// == Feature == repair logos for unavailable games in showcases
+	let imgs = document.querySelectorAll('div.profile_customization a>img.game_capsule[src=""]');
+	imgs.forEach(async el=>{
+		let aEl = el.parentElement
+		let appid = aEl.href.match(/\/app\/(\d+)/)?.[1];
+		if(!appid) return;
+
+		// may be for new images need hash in url
+		el.src = 'https://shared'+CDN+'store_item_assets/steam/apps/'+appid+'/header.jpg';
+	})
+
+
 }
 
 if (W.g_rgProfileData) {
