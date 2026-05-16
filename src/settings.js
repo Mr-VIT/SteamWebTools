@@ -76,18 +76,9 @@ var settings = {
 					}
 				}
 			}
-			// first launch - show settings page button
 			this.save();
-			var style = {outline:"#48DA48 3px solid"},
-				item = W.$J("#global_header .menuitem.supernav:nth(1)");
-			item.css(style);
-			setTimeout(function(){
-				item.trigger('mouseover');
-			},1000);
-			setTimeout(function(){
-				W.$J("#global_header .submenu_community .submenuitem.swt").css(style);
-			},2000);
 
+			this._first=1;
 		}
 	},
 	save : function(){

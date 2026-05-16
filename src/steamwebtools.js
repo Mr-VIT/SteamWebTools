@@ -1,4 +1,4 @@
-!function(){
+await async function(){
 var W = window.unsafeWindow || window;
 
 let CDN = W.VALVE_PUBLIC_PATH?.match('//\\w+(\\..+?/)')?.[1];
@@ -8,7 +8,9 @@ if(!CDN)
 //!include settings.js
 //!include lang.js
 
-//!include global.js
+await async function(){
+	//!include global.js
+}();
 
 var rURL_STORE = 'https?://(store|checkout)\\.steampowered\\.com/';
 var rURL_COMMUNITY = 'https?://steamcommunity\\.com/';
