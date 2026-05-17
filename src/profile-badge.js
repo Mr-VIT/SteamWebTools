@@ -20,6 +20,14 @@ $bar
 .append(`<a class="btn_grey_grey btn_small_thin" href="https://steamcommunity.com/market/search?appid=753&category_753_item_class%5B%5D=tag_item_class_5&category_753_Game%5B%5D=tag_app_${app}"><span>Booster Pack</span></a>
 <a class="btn_grey_grey btn_small_thin" href="http://www.steamcardexchange.net/index.php?inventorygame-appid-${app}"><span>SteamCardExchange.net</span></a> `);
 
+// remove steamstatic host
+$J('div.badge_cards_to_collect .gamecards_inventorylink a')
+.on('click auxclick', function(){
+	const urlPart = '/market/multi';
+	if(this.href)
+		this.href = this.href.replace(new RegExp('^.+?'+urlPart), urlPart)
+})
+
 // == Feature == craft all lvls
 if($('.badge_craft_button').length){
 	W.craftAllAvailable=function(){
