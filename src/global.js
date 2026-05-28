@@ -42,6 +42,10 @@ if(settings._first){
 			:'header nav>ul>div:nth-of-type(2)'
 
 	let div = document.querySelector(menuSel);
+	if(!div){
+		console.error('no menu');
+		return;
+	}
 	let el = div.lastElementChild.cloneNode(true);
 	el.href = href;
 	el.innerText = text;
